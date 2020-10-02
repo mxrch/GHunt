@@ -3,3 +3,4 @@ httpx
 selenium-wire
 selenium
 imagehash
+pillow
