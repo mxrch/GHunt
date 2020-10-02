@@ -4,3 +4,4 @@ selenium-wire
 selenium
 imagehash
 pillow
+python-dateutil
