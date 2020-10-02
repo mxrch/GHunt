@@ -37,6 +37,8 @@ httpx
 selenium-wire
 selenium
 imagehash
+pillow
+python-dateutil
 ```
 
 ## 1. Chromedriver & Google Chrome
