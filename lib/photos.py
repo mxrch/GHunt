@@ -42,6 +42,7 @@ def get_source(gaiaID, client, cookies, cfg):
 	chrome_options = Options()
 	chrome_options.add_argument('--log-level=3')
 	chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
+	chrome_options.add_argument('--no-sandbox')
 	if cfg["headless"]:
 		chrome_options.add_argument("--headless")
 	options = {
