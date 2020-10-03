@@ -79,11 +79,13 @@ def get_source(gaiaID, client, cookies, cfg):
 	tmprinter.out("Got the albums overview !")
 	no_photos_trigger = "reached the end"
 	photos_trigger = " item"
-	result = wait.until(element_has_substring_or_substring((By.XPATH, "//body"), photos_trigger, no_photos_trigger))
-	if result == no_photos_trigger:
+	body = driver.find_element_by_xpath("//body").text
+	if no_photos_trigger in body:
 		stats = "notfound"
-	else:
+	elif photos_trigger in body:
 		stats = "found"
+	else:
+		return False
 	tmprinter.out("")
 	source = driver.page_source
 	driver.close()
