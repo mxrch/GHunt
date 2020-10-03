@@ -28,6 +28,7 @@ It can currently extract :
 Either this is a bug and this will be fixed, either it's a protection that we need to find how to bypass.\
 **So, currently, the photos & metadata module will always return "No albums" even if there is one.**
 - **02/10/2020** : I found a bypass, I'm working on the patch right now.
+- **03/10/2020** : Successfully bypassed. 🕺 (commit 01dc016)
 
 # Installation
 - Python 3.6+ would be ok. (I developed it with Python 3.8.1)
