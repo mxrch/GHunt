@@ -111,7 +111,7 @@ for user in data["matches"]:
 			else:
 				print("\nYoutube channel not found.")
 
-	gpics(gaiaID, client, cfg)
+	gpics(gaiaID, client, cookies, cfg)
 	reviews = gmaps.scrape(gaiaID, client, cookies, cfg)
 	if reviews:
 		confidence, locations = gmaps.get_confidence(reviews, cfg)
