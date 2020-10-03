@@ -70,7 +70,7 @@ options = {
 
 tmprinter.out("Starting browser...")
 
-driverpath = get_driverpath()
+driverpath = "./chromedriver.exe"
 driver = webdriver.Chrome(executable_path=driverpath, seleniumwire_options=options, options=chrome_options)
 
 tmprinter.out("Setting cookies...")
