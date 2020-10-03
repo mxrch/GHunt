@@ -24,10 +24,10 @@ It can currently extract :
 </p>
 
 ## ⚠️ Warning
-**02/10/2020** : Since few days ago, Google return a 404 when we try to access someone's Google Photos public albums, we can only access it if we have a link of one of his albums.\
+- **02/10/2020** : Since few days ago, Google return a 404 when we try to access someone's Google Photos public albums, we can only access it if we have a link of one of his albums.\
 Either this is a bug and this will be fixed, either it's a protection that we need to find how to bypass.\
-**So, currently, the photos & metadata module will always return "No albums" even if there is one.**
-**02/10/200** : I found a bypass, I'm working on the patch right now.
+**So, currently, the photos & metadata module will always return "No albums" even if there is one.**\
+- **02/10/2020** : I found a bypass, I'm working on the patch right now.
 
 # Installation
 - Python 3.6+ would be ok. (I developed it with Python 3.8.1)
