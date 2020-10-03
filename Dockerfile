@@ -16,7 +16,8 @@ RUN groupadd -r app && adduser --system --home /home/app --ingroup app app && \
     rm -rf /var/lib/apt/lists/*
 
 RUN curl -O https://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip && \
-    unzip chromedriver_linux64.zip
+    unzip chromedriver_linux64.zip && \
+    rm -f chromedriver_linux64.zip
 
 COPY requirements.txt ./
 
