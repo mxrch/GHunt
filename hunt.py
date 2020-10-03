@@ -13,19 +13,18 @@ import lib.gmaps as gmaps
 from config import cfg
 from os.path import isfile
 
-
 if len(sys.argv) <= 1:
 	exit("Please put an email address.")
 
 query = sys.argv[1]
 
-if not isfile('data.txt'):
+if not isfile(cfg['data_path']):
 	exit("Please generate cookies and tokens first.")
 
 cookies = ""
 auth = ""
 key = ""
-with open('data.txt', 'r') as f:
+with open(cfg['data_path'], 'r') as f:
 	out = json.loads(f.read())
 	auth = out["auth"]
 	hangouts_token = out["keys"]["hangouts"]

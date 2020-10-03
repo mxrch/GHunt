@@ -30,6 +30,23 @@ Either this is a bug and this will be fixed, either it's a protection that we ne
 - **02/10/2020** : I found a bypass, I'm working on the patch right now.
 
 # Installation
+
+## Docker
+
+You can build the Docker image with:
+
+```
+docker build -t ghunt .
+```
+
+Any of the scripts can be invoked through:
+
+```
+docker run -v $(pwd)/resources:/usr/src/app/resources -ti ghunt check_and_gen.py
+docker run -v $(pwd)/resources:/usr/src/app/resources -ti ghunt hunt.py <email_address>
+```
+
+## Manual installation
 - Python 3.6+ would be ok. (I developed it with Python 3.8.1)
 - These Python modules are required (we'll install them after):
 ```
