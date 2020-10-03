@@ -11,12 +11,14 @@ It can currently extract :
 - Activated Google services (Youtube, Photos, Maps, News360, Hangouts, etc.)
 - Possible Youtube channel
 - Possible other usernames
-- Public photos
-- Phones models
-- Phones firmwares
-- Installed softwares
+- Public photos (T)
+- Phones models (T)
+- Phones firmwares (T)
+- Installed softwares (T)
 - Google Maps reviews
 - Possible physical location
+
+The features marked with a **(T)** requiere the tool to be authenticated with the target's gmail cookies.
 
 # Screenshots
 <p align="center">
@@ -64,7 +66,7 @@ Then, you can run the tool like this :
 ```bash
 python hunt.py myemail@gmail.com
 ```
-⚠️ Every time you re-login to the Google Account used for the cookies, it will break their validity, so I highly suggest you to make an empty account just for that, or use an account where you never login.
+⚠️ If you login to the Google Account from a **different IP** than the one where the cookies were extracted: it will break their validity, so I highly suggest you to make an empty account just for that, or use an account where you never login.
 
 # Ok but where I find these 4 cookies ?
 1. Login to accounts.google.com
