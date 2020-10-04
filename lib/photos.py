@@ -121,7 +121,6 @@ def gpics(gaiaID, client, cookies, cfg):
 			if album_length >= 1:
 				req = client.get(album_link)
 				source = req.text.replace('\n', '')
-				open('tmp.html', 'w').write(source)
 				results_pics = re.compile(cfg["regexs"]["photos"]).findall(source)
 				for pic in results_pics:
 					pic_name = pic[1]

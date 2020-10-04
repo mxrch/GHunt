@@ -6,6 +6,9 @@ from lib.utils import *
 import json
 from os.path import isfile
 
+
+driverpath = get_driverpath()
+
 cookies = ""
 auth = ""
 keys = ""
@@ -71,7 +74,6 @@ options = {
 
 tmprinter.out("Starting browser...")
 
-driverpath = get_driverpath()
 driver = webdriver.Chrome(executable_path=driverpath, seleniumwire_options=options, options=chrome_options)
 
 tmprinter.out("Setting cookies...")
