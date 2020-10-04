@@ -48,7 +48,7 @@ class ExifEater():
         else:
             if location:
                 location = sanitize_location(location)
-                return f'{location["village"]}, {location["country"]}'
+                return f'{location["town"]}, {location["country"]}'
             else:
                 return ""
 
