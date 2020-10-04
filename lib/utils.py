@@ -1,7 +1,7 @@
 import imagehash
 from platform import system
 from os.path import isfile
-
+from .os_detect import Os
 
 def image_hash(img):
     hash = str(imagehash.average_hash(img))
@@ -31,10 +31,12 @@ def sanitize_location(location):
     return location
 
 def get_driverpath():
-    if system() == "Windows":
+    if Os().wsl or Os().windows:
         driverpath = "./chromedriver.exe"
+        print("here")
     else:
         driverpath = "./chromedriver"
+        print("fart")
     
     if isfile(driverpath):
         return driverpath

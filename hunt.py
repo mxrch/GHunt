@@ -13,7 +13,6 @@ import lib.gmaps as gmaps
 from config import cfg
 from os.path import isfile
 
-
 if len(sys.argv) <= 1:
 	exit("Please put an email address.")
 
