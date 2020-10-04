@@ -33,10 +33,8 @@ def sanitize_location(location):
 def get_driverpath():
     if Os().wsl or Os().windows:
         driverpath = "./chromedriver.exe"
-        print("here")
     else:
         driverpath = "./chromedriver"
-        print("fart")
     
     if isfile(driverpath):
         return driverpath
