@@ -63,15 +63,7 @@ def scrape(gaiaID, client, cookies, cfg):
     chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
     if cfg["headless"]:
         chrome_options.add_argument("--headless")
-        if Os().wsl or Os().windows:
-            chrome_options.add_argument("--disable-gpu")
-            chrome_options.add_argument("--disable-dev-shm-usage")
-            chrome_options.add_argument("--disable-setuid-sandbox")
-            chrome_options.add_argument("--no-first-run")
-            chrome_options.add_argument("--no-zygote")
-            chrome_options.add_argument("--single-process")
-            chrome_options.add_argument("--no-sandbox")
-            chrome_options.add_argument("--disable-features=VizDisplayCompositor")
+        get_wsl_chrome_options_args()
     options = {
         'connection_timeout': None  # Never timeout, otherwise it floods errors
     }

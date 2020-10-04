@@ -44,6 +44,7 @@ def get_source(gaiaID, client, cookies, cfg):
 	chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
 	if cfg["headless"]:
 		chrome_options.add_argument("--headless")
+		get_wsl_chrome_options_args()
 	options = {
 		'connection_timeout': None  # Never timeout, otherwise it floods errors
 	}
