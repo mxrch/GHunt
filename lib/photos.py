@@ -42,6 +42,7 @@ def get_source(gaiaID, client, cookies, cfg):
 	chrome_options = Options()
 	chrome_options.add_argument('--log-level=3')
 	chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
+	chrome_options.add_argument('--no-sandbox')
 	if cfg["headless"]:
 		chrome_options.add_argument("--headless")
 		get_wsl_chrome_options_args()
@@ -80,11 +81,13 @@ def get_source(gaiaID, client, cookies, cfg):
 	tmprinter.out("Got the albums overview !")
 	no_photos_trigger = "reached the end"
 	photos_trigger = " item"
-	result = wait.until(element_has_substring_or_substring((By.XPATH, "//body"), photos_trigger, no_photos_trigger))
-	if result == no_photos_trigger:
+	body = driver.find_element_by_xpath("//body").text
+	if no_photos_trigger in body:
 		stats = "notfound"
-	else:
+	elif photos_trigger in body:
 		stats = "found"
+	else:
+		return False
 	tmprinter.out("")
 	source = driver.page_source
 	driver.close()
@@ -119,7 +122,6 @@ def gpics(gaiaID, client, cookies, cfg):
 			if album_length >= 1:
 				req = client.get(album_link)
 				source = req.text.replace('\n', '')
-				open('tmp.html', 'w').write(source)
 				results_pics = re.compile(cfg["regexs"]["photos"]).findall(source)
 				for pic in results_pics:
 					pic_name = pic[1]

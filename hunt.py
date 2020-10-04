@@ -47,7 +47,7 @@ headers = {
 req = client.post(host + url, data=body.format(query), headers=headers, cookies=cookies)
 data = json.loads(req.text)
 if not "matches" in data:
-	exit("Invalid Gmail address.")
+	exit("[-] This email address does not belong to a Google Account.")
 	
 #print(data)
 geolocator = Nominatim(user_agent="nominatim")

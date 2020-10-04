@@ -3,6 +3,7 @@ from PIL.ExifTags import TAGS, GPSTAGS
 from pprint import pprint
 from datetime import datetime
 from geopy.geocoders import Nominatim
+from lib.utils import *
 
 
 class ExifEater():
@@ -46,6 +47,7 @@ class ExifEater():
             return ""
         else:
             if location:
+                location = sanitize_location(location)
                 return f'{location["village"]}, {location["country"]}'
             else:
                 return ""

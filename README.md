@@ -31,7 +31,7 @@ Either this is a bug and this will be fixed, either it's a protection that we ne
 - **03/10/2020** : Successfully bypassed. 🕺 (commit 01dc016)
 
 # Installation
-- Python 3.6+ would be ok. (I developed it with Python 3.8.1)
+- Python 3.6.1+ would be ok. (I developed it with Python 3.8.1)
 - These Python modules are required (we'll install them after):
 ```
 geopy
