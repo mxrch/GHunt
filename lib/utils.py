@@ -1,12 +1,15 @@
-import imagehash
-from platform import system
 from os.path import isfile
-from .os_detect import Os
+
+import imagehash
 from selenium.webdriver.chrome.options import Options
+
+from .os_detect import Os
+
 
 def image_hash(img):
     hash = str(imagehash.average_hash(img))
     return hash
+
 
 class TMPrinter():
     def __init__(self):
@@ -18,6 +21,7 @@ class TMPrinter():
         else:
             text += (" " * (self.max_len - len(text)))
         print(text, end='\r')
+
 
 def sanitize_location(location):
     not_country = False
@@ -42,16 +46,18 @@ def sanitize_location(location):
     location["town"] = town
     return location
 
+
 def get_driverpath():
     if Os().wsl or Os().windows:
         driverpath = "./chromedriver.exe"
     else:
         driverpath = "./chromedriver"
-    
+
     if isfile(driverpath):
         return driverpath
     else:
         exit("The chromedriver is missing.\nPlease put it in the GHunt directory.")
+
 
 def get_chrome_options_args(cfg):
     chrome_options = Options()
