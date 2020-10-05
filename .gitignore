@@ -2,5 +2,4 @@ __pycache__/
 lib/__pycache__/
 resources/
 chromedriver.exe
-data.txt
 login.py

@@ -42,8 +42,8 @@ docker build -t ghunt .
 Any of the scripts can be invoked through:
 
 ```
-docker run --privileged -v $(pwd)/resources:/usr/src/app/resources -ti ghunt check_and_gen.py
-docker run --privileged -v $(pwd)/resources:/usr/src/app/resources -ti ghunt hunt.py <email_address>
+docker run -v $(pwd)/resources:/usr/src/app/resources -ti ghunt check_and_gen.py
+docker run -v $(pwd)/resources:/usr/src/app/resources -ti ghunt hunt.py <email_address>
 ```
 
 ## Manual installation
