@@ -39,12 +39,7 @@ def get_source(gaiaID, client, cookies, cfg):
 				return False
 
 	tmprinter = TMPrinter()
-	chrome_options = Options()
-	chrome_options.add_argument('--log-level=3')
-	chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
-	chrome_options.add_argument('--no-sandbox')
-	if cfg["headless"]:
-		chrome_options.add_argument("--headless")
+	chrome_options = get_chrome_options_args(cfg)
 	options = {
 		'connection_timeout': None  # Never timeout, otherwise it floods errors
 	}
