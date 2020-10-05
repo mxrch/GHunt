@@ -1,20 +1,20 @@
 ![screenshot](https://files.catbox.moe/8a5nzs.png)
 
 # Description
-GHunt is an OSINT tool to extract a lot of informations of someone's Google Account email.
+GHunt is an OSINT tool to extract information from a Google Account using an email.
 
-It can currently extract :
+It can currently extract:
 - Owner's name
 - Last time the profile was edited
 - Google ID
-- If the account is an Hangouts Bot
-- Activated Google services (Youtube, Photos, Maps, News360, Hangouts, etc.)
-- Possible Youtube channel
+- If the account is a Hangouts Bot
+- Activated Google services (YouTube, Photos, Maps, News360, Hangouts, etc.)
+- Possible YouTube channel
 - Possible other usernames
 - Public photos
-- Phones models
-- Phones firmwares
-- Installed softwares
+- Phone models
+- Phone firmwares
+- Installed software
 - Google Maps reviews
 - Possible physical location
 
@@ -23,11 +23,11 @@ It can currently extract :
   <img src="https://files.catbox.moe/2zb1z9.png">
 </p>
 
-## ⚠️ Warning
+## 📰 Latest news
 - **02/10/2020** : Since few days ago, Google return a 404 when we try to access someone's Google Photos public albums, we can only access it if we have a link of one of his albums.\
-Either this is a bug and this will be fixed, either it's a protection that we need to find how to bypass.\
-**So, currently, the photos & metadata module will always return "No albums" even if there is one.**
-- **02/10/2020** : I found a bypass, I'm working on the patch right now.
+Either this is a bug and this will be fixed, either it's a protection that we need to find how to bypass.
+- **03/10/2020** : Successfully bypassed. 🕺 (commit 01dc016)\
+It require the "Profile photos" album to be public (it is by default)
 
 # Installation
 
@@ -47,8 +47,9 @@ docker run --privileged -v $(pwd)/resources:/usr/src/app/resources -ti ghunt hun
 ```
 
 ## Manual installation
-- Python 3.6+ would be ok. (I developed it with Python 3.8.1)
-- These Python modules are required (we'll install them after):
+- Make sure you have Python 3.6.1+ installed. (I developed it with Python 3.8.1)
+- These Python modules are required (we'll install them later):
+
 ```
 geopy
 httpx
@@ -60,37 +61,36 @@ python-dateutil
 ```
 
 ## 1. Chromedriver & Google Chrome
-This project uses Selenium, so you'll need to download the chromedriver here : https://chromedriver.chromium.org/downloads \
-And put it in the GHunt folder. Be sure it's called "chromedriver.exe" or "chromedriver".\
-Also, be sure to have Google Chrome installed.
+This project uses Selenium, so you'll need to download [chromedriver](https://chromedriver.chromium.org/downloads). \
+After you do that, put it in the GHunt folder. Make sure it's called "chromedriver.exe" or "chromedriver".\
+⚠️ Be sure to have Google Chrome installed, and that Google Chrome and chromedriver have the same version.
 
 ## 2. Requirements
-In the GHunt folder, do this:
+In the GHunt folder, run:
 ```bash
 python -m pip install -r requirements.txt
 ```
-Adapt the command with your operating system if needed.
+Adapt the command to your operating system if needed.
 
 # Usage
-For the first usage and sometimes after, you'll need to check the validity of your cookies.\
-To do this, launch `check_and_gen.py`.\
-If you don't have cookies stored (ex: first launch) it will ask you the 4 needed cookies, enter them and if they are valid, it will generate the Authentification token, and the Google Docs & Hangouts tokens.
+For the first run and sometimes after, you'll need to check the validity of your cookies.\
+To do this, run `check_and_gen.py`. \
+If you don't have cookies stored (ex: first launch), you will be asked for the 4 required cookies. If they are valid, it will generate the Authentication token and the Google Docs & Hangouts tokens.
 
-Then, you can run the tool like this :
+Then, you can run the tool like this:
 ```bash
 python hunt.py myemail@gmail.com
 ```
-⚠️ Every time you re-login to the Google Account used for the cookies, it will break their validity, so I highly suggest you to make an empty account just for that, or use an account where you never login.
+⚠️ I suggest you to make an empty account just for that, or use an account where you never log in, because depends on your browser / location if you re-login in the Google Account used for the cookies, it can deauthorize them.
 
-# Ok but where I find these 4 cookies ?
-1. Login to accounts.google.com
-2. Once connected, open the Dev Tools window and goes to the Storage tab (Shift + F9 on Firefox) (looks like it's called "Application" on Chrome)\
-If you don't know how to open it, just right-click somewhere and "Inspect Element"
+# Where I find these 4 cookies ?
+1. Log in to accounts.google.com
+2. After that, open the Dev Tools window and navigate to the Storage tab (Shift + F9 on Firefox) (It's called "Application" on Chrome)\
+If you don't know how to open it, just right-click anywhere and click "Inspect Element".
 3. Then you'll find every cookie you need, including the 4 ones.
 
 ![cookies](https://files.catbox.moe/9jy200.png)
 
 # Thanks
-This tool is based on the Sector's researches on the Google IDs : https://sector035.nl/articles/getting-a-grasp-on-google-ids \
-And completed by my own researches.\
-If I have the motivation to write a blog post about it, I'll add the link here !
+This tool is based on [Sector's research on Google IDs](https://sector035.nl/articles/getting-a-grasp-on-google-ids) and completed by my own as well.\
+If I have the motivation to write a blog post about it, I'll add the link here!

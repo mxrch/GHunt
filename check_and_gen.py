@@ -6,6 +6,9 @@ from lib.utils import *
 import json
 from os.path import isfile
 
+
+driverpath = get_driverpath()
+
 cookies = ""
 auth = ""
 keys = ""
@@ -60,17 +63,13 @@ else:
 
 # Hangouts
 tmprinter = TMPrinter()
-chrome_options = Options()
-chrome_options.add_argument('--log-level=3')
-chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
-chrome_options.add_argument("--headless")
+chrome_options = get_chrome_options_args(cfg)
 options = {
     'connection_timeout': None  # Never timeout, otherwise it floods errors
 }
 
 tmprinter.out("Starting browser...")
 
-driverpath = get_driverpath()
 driver = webdriver.Chrome(executable_path=driverpath, seleniumwire_options=options, options=chrome_options)
 
 tmprinter.out("Setting cookies...")

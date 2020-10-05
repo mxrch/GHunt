@@ -47,7 +47,7 @@ headers = {
 req = client.post(host + url, data=body.format(query), headers=headers, cookies=cookies)
 data = json.loads(req.text)
 if not "matches" in data:
-	exit("Invalid Gmail address.")
+	exit("[-] This email address does not belong to a Google Account.")
 	
 #print(data)
 geolocator = Nominatim(user_agent="nominatim")
@@ -110,10 +110,14 @@ for user in data["matches"]:
 			else:
 				print("\nYoutube channel not found.")
 
-	gpics(gaiaID, client, cfg)
+	gpics(gaiaID, client, cookies, cfg)
 	reviews = gmaps.scrape(gaiaID, client, cookies, cfg)
 	if reviews:
 		confidence, locations = gmaps.get_confidence(reviews, cfg)
 		print(f"\nProbable location (confidence => {confidence}) :")
+		loc_names = []
 		for loc in locations:
-			print(f"- {loc['avg']['town']}, {loc['avg']['country']}")
+			loc_names.append(f"- {loc['avg']['town']}, {loc['avg']['country']}")
+		loc_names = set(loc_names) # We delete duplicates
+		for loc in loc_names:
+			print(loc)

@@ -3,6 +3,7 @@ from PIL.ExifTags import TAGS, GPSTAGS
 from pprint import pprint
 from datetime import datetime
 from geopy.geocoders import Nominatim
+from lib.utils import *
 
 
 class ExifEater():
@@ -46,7 +47,10 @@ class ExifEater():
             return ""
         else:
             if location:
-                return f'{location["village"]}, {location["country"]}'
+                location = sanitize_location(location)
+                if not location:
+                    return ""
+                return f'{location["town"]}, {location["country"]}'
             else:
                 return ""
 
@@ -59,7 +63,7 @@ class ExifEater():
             try:
                 date = datetime.strptime(metadata["DateTime"], '%Y:%m:%d %H:%M:%S')
                 is_date_valid = "Valid"
-            except:
+            except Exception:
                 date = None
                 is_date_valid = "Invalid"
 
@@ -70,7 +74,7 @@ class ExifEater():
             if "Make" in metadata and "Model" in metadata:
                 if metadata["Model"] not in self.devices:
                     self.devices[metadata["Model"]] = {"Make": metadata["Make"], "History": {"Valid": [], "Invalid": []}, "Firmwares": {}}
-                self.devices[metadata["Model"]]["History"]["Valid"].append(date)
+                self.devices[metadata["Model"]]["History"][is_date_valid].append(date)
                 if "Software" in metadata:
                     if metadata["Software"] not in self.devices[metadata["Model"]]["Firmwares"]:
                         self.devices[metadata["Model"]]["Firmwares"][metadata["Software"]] = {"Valid": [], "Invalid": []}
@@ -166,4 +170,4 @@ class ExifEater():
                         print(f"- {software} ({n} pic{picx(n)}) [{dates}]")
 
         if not devices and not locations and not softwares:
-            print("- Nothing found")
+            print("=> Nothing found")
