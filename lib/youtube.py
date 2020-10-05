@@ -119,6 +119,7 @@ def get_confidence(data, query, hash):
         if len(chans) > 1:
             panel-=5
         return (panel/maxscore*100), chans
+    return 0, []
 
 def extract_usernames(channels):
     return [chan['profil_url'].split("/user/")[1] for chan in channels if "/user/" in chan['profil_url']]
