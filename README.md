@@ -23,15 +23,33 @@ It can currently extract:
   <img src="https://files.catbox.moe/2zb1z9.png">
 </p>
 
-## 📰 Last news
+## 📰 Latest news
 - **02/10/2020** : Since few days ago, Google return a 404 when we try to access someone's Google Photos public albums, we can only access it if we have a link of one of his albums.\
 Either this is a bug and this will be fixed, either it's a protection that we need to find how to bypass.
 - **03/10/2020** : Successfully bypassed. 🕺 (commit 01dc016)\
 It requires the "Profile photos" album to be public (it is by default)
 
 # Installation
+
+## Docker
+
+You can build the Docker image with:
+
+```
+docker build -t ghunt .
+```
+
+Any of the scripts can be invoked through:
+
+```
+docker run -v $(pwd)/resources:/usr/src/app/resources -ti ghunt check_and_gen.py
+docker run -v $(pwd)/resources:/usr/src/app/resources -ti ghunt hunt.py <email_address>
+```
+
+## Manual installation
 - Make sure you have Python 3.6.1+ installed. (I developed it with Python 3.8.1)
 - These Python modules are required (we'll install them later):
+
 ```
 geopy
 httpx
