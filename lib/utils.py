@@ -44,6 +44,8 @@ def get_driverpath():
 
 def get_wsl_chrome_options_args():
     chrome_options = Options()
+    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--no-sandbox")
     if Os().wsl or Os().windows:
         chrome_options.add_argument("--disable-gpu")
         chrome_options.add_argument("--disable-dev-shm-usage")
@@ -51,5 +53,4 @@ def get_wsl_chrome_options_args():
         chrome_options.add_argument("--no-first-run")
         chrome_options.add_argument("--no-zygote")
         chrome_options.add_argument("--single-process")
-        chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-features=VizDisplayCompositor")
