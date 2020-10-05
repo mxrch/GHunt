@@ -5,7 +5,7 @@ from pprint import pprint
 def search(query, cfg):
 	cookies = ""
 	token = ""
-	with open('data.txt', 'r') as f:
+	with open(cfg['data_path'], 'r') as f:
 		out = json.loads(f.read())
 		token = out["keys"]["gdoc"]
 		cookies = out["cookies"]

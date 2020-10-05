@@ -13,9 +13,9 @@ cookies = ""
 auth = ""
 keys = ""
 already_exists = False
-if isfile('data.txt'):
+if isfile(cfg['data_path']):
     try:
-        with open('data.txt', 'r') as f:
+        with open(cfg['data_path'], 'r') as f:
             out = json.loads(f.read())
             auth = out["auth"]
             hangouts_token = out["keys"]
@@ -92,5 +92,5 @@ hangouts_token = req.url.split("key=")[1]
 print("Hangouts Token => {}".format(hangouts_token))
 
 output = {"auth": auth, "keys": {"gdoc": gdoc_token, "hangouts": hangouts_token}, "cookies": cookies}
-with open('data.txt', 'w') as f:
+with open(cfg['data_path'], 'w') as f:
 	f.write(json.dumps(output))
