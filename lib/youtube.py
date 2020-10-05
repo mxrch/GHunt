@@ -120,7 +120,7 @@ def get_confidence(data, query, hash):
     channels = sorted([json.loads(chan) for chan in set([json.dumps(channel) for channel in channels])],
                       key=lambda k: k['score'], reverse=True)
     panels = sorted(set([c["score"] for c in channels]), reverse=True)
-    if panels and panels[0] <= 0:
+    if not channels or (panels and panels[0] <= 0):
         return 0, []
 
     maxscore = sum([p * score_steps for p in range(1, score_steps + 1)])
