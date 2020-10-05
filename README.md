@@ -27,7 +27,7 @@ It can currently extract:
 - **02/10/2020** : Since few days ago, Google return a 404 when we try to access someone's Google Photos public albums, we can only access it if we have a link of one of his albums.\
 Either this is a bug and this will be fixed, either it's a protection that we need to find how to bypass.
 - **03/10/2020** : Successfully bypassed. 🕺 (commit 01dc016)\
-It require the "Profile photos" album to be public (it is by default)
+It requires the "Profile photos" album to be public (it is by default)
 
 # Installation
 - Make sure you have Python 3.6.1+ installed. (I developed it with Python 3.8.1)
