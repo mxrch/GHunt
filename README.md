@@ -1,7 +1,7 @@
 ![screenshot](https://files.catbox.moe/8a5nzs.png)
 
 # Description
-GHunt is an OSINT tool to extract information from a Google Account using an email.
+GHunt is an OSINT tool to extract information from any Google Account using an email.
 
 It can currently extract:
 - Owner's name
