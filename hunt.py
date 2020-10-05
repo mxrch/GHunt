@@ -116,5 +116,9 @@ for user in data["matches"]:
 	if reviews:
 		confidence, locations = gmaps.get_confidence(reviews, cfg)
 		print(f"\nProbable location (confidence => {confidence}) :")
+		loc_names = []
 		for loc in locations:
-			print(f"- {loc['avg']['town']}, {loc['avg']['country']}")
+			loc_names.append(f"- {loc['avg']['town']}, {loc['avg']['country']}")
+		loc_names = set(loc_names) # We delete duplicates
+		for loc in loc_names:
+			print(loc)

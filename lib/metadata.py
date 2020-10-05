@@ -48,6 +48,8 @@ class ExifEater():
         else:
             if location:
                 location = sanitize_location(location)
+                if not location:
+                    return ""
                 return f'{location["town"]}, {location["country"]}'
             else:
                 return ""
@@ -168,4 +170,4 @@ class ExifEater():
                         print(f"- {software} ({n} pic{picx(n)}) [{dates}]")
 
         if not devices and not locations and not softwares:
-            print("- Nothing found")
+            print("=> Nothing found")

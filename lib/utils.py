@@ -19,14 +19,25 @@ class TMPrinter():
         print(text, end='\r')
 
 def sanitize_location(location):
+    not_country = False
+    not_town = False
+    town = "?"
+    country = "?"
     if "city" in location:
         town = location["city"]
     elif "village" in location:
         town = location["village"]
     elif "town" in location:
         town = location["town"]
-    else:
+    elif "municipality" in location:
         town = location["municipality"]
+    else:
+        not_town = True
+    if not "country" in location:
+        not_country = True
+        location["country"] = country
+    if not_country and not_town:
+        return False
     location["town"] = town
     return location
 
