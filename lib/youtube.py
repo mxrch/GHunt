@@ -9,13 +9,14 @@ from io import BytesIO
 
 
 def youtube_channel_search(client, query):
-    link = "https://www.youtube.com/results?search_query={}&sp=EgIQAg%253D%253D"
-    req = client.get(link.format(urllib.parse.quote(query)))
-    source = req.text
-    data = json.loads(source.split('window["ytInitialData"] = ')[1].split('window["ytInitialPlayerResponse"]')[0].split(';\n')[0])
-    channels = data["contents"]["twoColumnSearchResultsRenderer"]["primaryContents"]["sectionListRenderer"]["contents"][0]["itemSectionRenderer"]["contents"]
-    results = {"channels": [], "length": len(channels)}
     try:
+        link = "https://www.youtube.com/results?search_query={}&sp=EgIQAg%253D%253D"
+        req = client.get(link.format(urllib.parse.quote(query)))
+        source = req.text
+        data = json.loads(source.split('window["ytInitialData"] = ')[1].split('window["ytInitialPlayerResponse"]')[0].split(';\n')[0])
+        #print(data)
+        channels = data["contents"]["twoColumnSearchResultsRenderer"]["primaryContents"]["sectionListRenderer"]["contents"][0]["itemSectionRenderer"]["contents"]
+        results = {"channels": [], "length": len(channels)}
         for channel in channels:
             if len(results["channels"]) >= 10:
                 break

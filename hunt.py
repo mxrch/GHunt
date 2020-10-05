@@ -68,26 +68,31 @@ for user in data["matches"]:
 	gmaps_source = req.text
 	
 	name = gmaps_source.split("Contributions by")[1].split('"')[0].strip()
+	if name :
+		print(f"Name: {name}")
+	else:
+		print("[-] The name can't be found.")
 	
-	print("Name: {}\n\nLast profile edit : {}\n\nEmail : {}\nGoogle ID : {}\n".format(name, last_edit, email, gaiaID))
+	print("\nLast profile edit : {}\n\nEmail : {}\nGoogle ID : {}\n".format(last_edit, email, gaiaID))
 	
 	profil_pic = infos["photo"][0]["url"]
 	isBot = infos["extendedData"]["hangoutsExtendedData"]["isBot"]
 	if isBot:
 		print("Hangouts Bot : Yes !\n")
 	else:
-		print("Hangouts Bot : No\n")
+		print("Hangouts Bot : No")
 	
 	ytb_hunt = False
-	try:
-		services = [x["appType"].lower() if x["appType"].lower() != "babel" else "hangouts" for x in infos["inAppReachability"]]
-		if "youtube" in services:
+	if name :
+		try:
+			services = [x["appType"].lower() if x["appType"].lower() != "babel" else "hangouts" for x in infos["inAppReachability"]]
+			if "youtube" in services:
+				ytb_hunt = True
+			print("\nActivated Google services :")
+			print('\n'.join(["- "+x.capitalize() for x in services]))
+		except KeyError:
 			ytb_hunt = True
-		print("Activated Google services :")
-		print('\n'.join(["- "+x.capitalize() for x in services]))
-	except KeyError:
-		ytb_hunt = True
-		print("Unable to fetch connected Google services.")
+			print("\nUnable to fetch connected Google services.")
 
 	if ytb_hunt or cfg["ytb_hunt_always"]:
 		req = client.get(profil_pic)
