@@ -1,25 +1,20 @@
-from pprint import pprint
-import json
+import hashlib
 import re
 import time
-from seleniumwire import webdriver
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.common.exceptions import StaleElementReferenceException
-from selenium.webdriver.chrome.options import Options
-from dateutil.relativedelta import relativedelta
 from datetime import datetime
-import httpx
+
+from dateutil.relativedelta import relativedelta
 from geopy import distance
 from geopy.geocoders import Nominatim
-import hashlib
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
+from seleniumwire import webdriver
+
 from lib.utils import *
 
 
 def scrape(gaiaID, client, cookies, cfg):
-
     def get_datetime(datepublished):
         if datepublished.split()[0] == "a":
             nb = 1
@@ -57,7 +52,7 @@ def scrape(gaiaID, client, cookies, cfg):
         tmprinter.out("")
         print("=> No reviews")
         return False
-        
+
     chrome_options = get_chrome_options_args(cfg)
     options = {
         'connection_timeout': None  # Never timeout, otherwise it floods errors
@@ -71,12 +66,12 @@ def scrape(gaiaID, client, cookies, cfg):
 
     tmprinter.out("Setting cookies...")
     driver.get("https://www.google.com/robots.txt")
-    for k,v in cookies.items():
+    for k, v in cookies.items():
         driver.add_cookie({'name': k, 'value': v})
 
     tmprinter.out("Fetching reviews page...")
     driver.get(base_url)
-    
+
     wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'div.section-scrollbox')))
     scrollbox = driver.find_element_by_css_selector('div.section-scrollbox')
 
@@ -88,7 +83,7 @@ def scrape(gaiaID, client, cookies, cfg):
 
     print(f"=> {scroll_max} reviews found !             ")
 
-    timeout = scroll_max*1.25
+    timeout = scroll_max * 1.25
     timeout_start = time.time()
     reviews_elements = driver.find_elements_by_xpath('//div[@data-review-id][@aria-label]')
     tmprinter.out(f"Fetching reviews... ({len(reviews_elements)}/{scroll_max})")
@@ -103,21 +98,22 @@ def scrape(gaiaID, client, cookies, cfg):
     tmprinter.out("Fetching internal requests history...")
     requests = [r.url for r in driver.requests if "locationhistory" in r.url]
     tmprinter.out(f"Fetching internal requests... (0/{len(requests)})")
-    for nb,load in enumerate(requests):
+    for nb, load in enumerate(requests):
         req = client.get(load)
         data += req.text.replace('\n', '')
-        tmprinter.out(f"Fetching internal requests... ({nb+1}/{len(requests)})")
+        tmprinter.out(f"Fetching internal requests... ({nb + 1}/{len(requests)})")
 
     tmprinter.out(f"Fetching reviews location... (0/{len(reviews_elements)})")
     reviews = []
-    for nb,review in enumerate(reviews_elements):
+    for nb, review in enumerate(reviews_elements):
         id = review.get_attribute("data-review-id")
         location = re.compile(cfg["regexs"]["review_loc_by_id"].format(id)).findall(data)[0]
         date = get_datetime(review.find_element_by_css_selector('span.section-review-publish-date').text)
         reviews.append({"location": location, "date": date})
-        tmprinter.out(f"Fetching reviews location... ({nb+1}/{len(reviews_elements)})")
+        tmprinter.out(f"Fetching reviews location... ({nb + 1}/{len(reviews_elements)})")
 
     return reviews
+
 
 def avg_location(locs):
     latitude = []
@@ -126,9 +122,10 @@ def avg_location(locs):
         latitude.append(float(loc[0]))
         longitude.append(float(loc[1]))
 
-    latitude = sum(latitude)/len(latitude)
-    longitude = sum(longitude)/len(longitude)
+    latitude = sum(latitude) / len(latitude)
+    longitude = sum(longitude) / len(longitude)
     return latitude, longitude
+
 
 def translate_confidence(percents):
     if percents >= 100:
@@ -146,15 +143,15 @@ def translate_confidence(percents):
     else:
         return "Extremely low"
 
+
 def get_confidence(data, cfg):
-    
     geolocator = Nominatim(user_agent="nominatim")
     tmprinter = TMPrinter()
     radius = cfg["gmaps_radius"]
 
     locations = {}
     tmprinter.out(f"Calculation of the distance of each review...")
-    for nb,review in enumerate(data):
+    for nb, review in enumerate(data):
         hash = hashlib.md5(str(review).encode()).hexdigest()
         if hash not in locations:
             locations[hash] = {"dates": [], "locations": [], "range": None, "score": 0}
@@ -174,8 +171,8 @@ def get_confidence(data, cfg):
 
     tmprinter.out("")
 
-
-    locations = {k:v for k,v in sorted(locations.items(), key=lambda k: len(k[1]["locations"]), reverse=True)} # We sort it
+    locations = {k: v for k, v in
+                 sorted(locations.items(), key=lambda k: len(k[1]["locations"]), reverse=True)}  # We sort it
 
     tmprinter.out("Identification of redundant areas...")
     to_del = []
@@ -188,7 +185,7 @@ def get_confidence(data, cfg):
             if all([loc in locations[hash]["locations"] for loc in locations[hash2]["locations"]]):
                 to_del.append(hash2)
     for hash in to_del:
-        del(locations[hash])
+        del locations[hash]
 
     tmprinter.out("Calculating confidence...")
     maxrange = max([locations[hash]["range"] for hash in locations])
@@ -197,39 +194,39 @@ def get_confidence(data, cfg):
     mingroups = 3
 
     score_steps = 4
-    for hash,loc in locations.items():
+    for hash, loc in locations.items():
         if len(loc["locations"]) == maxlen:
-            locations[hash]["score"] += score_steps*4
+            locations[hash]["score"] += score_steps * 4
         if loc["range"] == maxrange:
-            locations[hash]["score"] += score_steps*3
+            locations[hash]["score"] += score_steps * 3
         if len(locations) >= mingroups:
             others = sum([len(locations[h]["locations"]) for h in locations if h != hash])
             if len(loc["locations"]) > others:
-                locations[hash]["score"] += score_steps*2
+                locations[hash]["score"] += score_steps * 2
         if len(loc["locations"]) >= minreq:
             locations[hash]["score"] += score_steps
 
-    #for hash,loc in locations.items():
+    # for hash,loc in locations.items():
     #    print(f"{hash} => {len(loc['locations'])} ({int(loc['score'])/40*100})")
-        
+
     panels = sorted(set([loc["score"] for loc in locations.values()]), reverse=True)
 
-    maxscore = sum([p*score_steps for p in range(1,score_steps+1)])
+    maxscore = sum([p * score_steps for p in range(1, score_steps + 1)])
     for panel in panels:
         locs = [loc for loc in locations.values() if loc["score"] == panel]
         if len(locs[0]["locations"]) == 1:
-            panel/=2
+            panel /= 2
         if len(data) < 4:
-            panel/=2
-        confidence = translate_confidence(panel/maxscore*100)
-        for nb,loc in enumerate(locs):
+            panel /= 2
+        confidence = translate_confidence(panel / maxscore * 100)
+        for nb, loc in enumerate(locs):
             avg = avg_location(loc["locations"])
             location = geolocator.reverse(f"{avg[0]}, {avg[1]}").raw["address"]
             location = sanitize_location(location)
             locs[nb]["avg"] = location
-            del(locs[nb]["locations"])
-            del(locs[nb]["score"])
-            del(locs[nb]["range"])
-            del(locs[nb]["dates"])
+            del locs[nb]["locations"]
+            del locs[nb]["score"]
+            del locs[nb]["range"]
+            del locs[nb]["dates"]
         tmprinter.out("")
         return confidence, locs

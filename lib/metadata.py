@@ -1,8 +1,9 @@
-from PIL import Image, ExifTags
-from PIL.ExifTags import TAGS, GPSTAGS
-from pprint import pprint
 from datetime import datetime
+
+from PIL import ExifTags
+from PIL.ExifTags import TAGS, GPSTAGS
 from geopy.geocoders import Nominatim
+
 from lib.utils import *
 
 
@@ -42,7 +43,9 @@ class ExifEater():
                                 seconds = -seconds
 
                             geoaxis[axis] = round(degrees + minutes + seconds, 5)
-                        location = self.geolocator.reverse("{}, {}".format(geoaxis["Latitude"], geoaxis["Longitude"])).raw["address"]
+                        location = \
+                        self.geolocator.reverse("{}, {}".format(geoaxis["Latitude"], geoaxis["Longitude"])).raw[
+                            "address"]
         except Exception:
             return ""
         else:
@@ -57,9 +60,9 @@ class ExifEater():
     def feed(self, img):
         if img.getexif():
             location = self.get_GPS(img)
-            exif = { ExifTags.TAGS[k]: v for k, v in img._getexif().items() if k in ExifTags.TAGS }
+            exif = {ExifTags.TAGS[k]: v for k, v in img._getexif().items() if k in ExifTags.TAGS}
             interesting_fields = ["Make", "Model", "DateTime", "Software"]
-            metadata = {k:v for k,v in exif.items() if k in interesting_fields}
+            metadata = {k: v for k, v in exif.items() if k in interesting_fields}
             try:
                 date = datetime.strptime(metadata["DateTime"], '%Y:%m:%d %H:%M:%S')
                 is_date_valid = "Valid"
@@ -73,11 +76,13 @@ class ExifEater():
                 self.locations[location][is_date_valid].append(date)
             if "Make" in metadata and "Model" in metadata:
                 if metadata["Model"] not in self.devices:
-                    self.devices[metadata["Model"]] = {"Make": metadata["Make"], "History": {"Valid": [], "Invalid": []}, "Firmwares": {}}
+                    self.devices[metadata["Model"]] = {"Make": metadata["Make"],
+                                                       "History": {"Valid": [], "Invalid": []}, "Firmwares": {}}
                 self.devices[metadata["Model"]]["History"][is_date_valid].append(date)
                 if "Software" in metadata:
                     if metadata["Software"] not in self.devices[metadata["Model"]]["Firmwares"]:
-                        self.devices[metadata["Model"]]["Firmwares"][metadata["Software"]] = {"Valid": [], "Invalid": []}
+                        self.devices[metadata["Model"]]["Firmwares"][metadata["Software"]] = {"Valid": [],
+                                                                                              "Invalid": []}
                     self.devices[metadata["Model"]]["Firmwares"][metadata["Software"]][is_date_valid].append(date)
             elif "Software" in metadata:
                 if metadata["Software"] not in self.softwares:
@@ -88,7 +93,7 @@ class ExifEater():
         return self.locations, self.devices
 
     def output(self):
-        bkn = '\n' # to use in f-strings
+        bkn = '\n'  # to use in f-strings
 
         def picx(n):
             return "s" if n > 1 else ""
@@ -102,7 +107,7 @@ class ExifEater():
             else:
                 return f'{dates["min"]} -> {dates["max"]}'
 
-        #pprint((self.devices, self.softwares, self.locations))
+        # pprint((self.devices, self.softwares, self.locations))
 
         devices = self.devices
         if devices:
@@ -112,8 +117,9 @@ class ExifEater():
                 if model.lower().startswith(make.lower()):
                     model = model[len(make):].strip()
                 n = len(data["History"]["Valid"] + data["History"]["Invalid"])
-                for validity,dateslist in data["History"].items():
-                    if dateslist and ((validity == "Valid") or (validity == "Invalid" and not data["History"]["Valid"])):
+                for validity, dateslist in data["History"].items():
+                    if dateslist and (
+                            (validity == "Valid") or (validity == "Invalid" and not data["History"]["Valid"])):
                         if validity == "Valid":
                             dates = print_dates(data["History"]["Valid"])
                         elif validity == "Valid" and data["History"]["Invalid"]:
@@ -121,13 +127,15 @@ class ExifEater():
                             dates += " (+ ?)"
                         elif validity == "Invalid" and not data["History"]["Valid"]:
                             dates = "?"
-                        print(f"{bkn if data['Firmwares'] else ''}- {make.capitalize()} {model} ({n} pic{picx(n)}) [{dates}]")
+                        print(
+                            f"{bkn if data['Firmwares'] else ''}- {make.capitalize()} {model} ({n} pic{picx(n)}) [{dates}]")
                         if data["Firmwares"]:
                             n = len(data['Firmwares'])
                             print(f"-> {n} Firmware{picx(n)} found !")
-                            for firmware,firmdata in data["Firmwares"].items():
-                                for validity2,dateslist2 in firmdata.items():
-                                    if dateslist2 and ((validity2 == "Valid") or (validity2 == "Invalid" and not firmdata["Valid"])):
+                            for firmware, firmdata in data["Firmwares"].items():
+                                for validity2, dateslist2 in firmdata.items():
+                                    if dateslist2 and ((validity2 == "Valid") or (
+                                            validity2 == "Invalid" and not firmdata["Valid"])):
                                         if validity2 == "Valid":
                                             dates2 = print_dates(firmdata["Valid"])
                                         elif validity2 == "Valid" and firmdata["Invalid"]:
