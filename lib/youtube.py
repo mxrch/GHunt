@@ -110,7 +110,7 @@ def get_confidence(data, query, hash):
                 channels.append(channel)
     channels = sorted([json.loads(chan) for chan in set([json.dumps(channel) for channel in channels])], key=lambda k: k['score'], reverse=True)
     panels = sorted(set([c["score"] for c in channels]), reverse=True)
-    if panels and panels[0] <= 0:
+    if not channels or (panels and panels[0] <= 0):
         return 0, []
 
     maxscore = sum([p*score_steps for p in range(1,score_steps+1)])
@@ -119,7 +119,6 @@ def get_confidence(data, query, hash):
         if len(chans) > 1:
             panel-=5
         return (panel/maxscore*100), chans
-    return 0, []
 
 def extract_usernames(channels):
     return [chan['profil_url'].split("/user/")[1] for chan in channels if "/user/" in chan['profil_url']]
