@@ -42,7 +42,7 @@ def get_driverpath():
     else:
         exit("The chromedriver is missing.\nPlease put it in the GHunt directory.")
 
-def get_wsl_chrome_options_args():
+def get_chrome_options_args():
     chrome_options = Options()
     chrome_options.add_argument("--headless")
     chrome_options.add_argument("--no-sandbox")

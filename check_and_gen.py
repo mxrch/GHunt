@@ -66,7 +66,7 @@ tmprinter = TMPrinter()
 chrome_options = Options()
 chrome_options.add_argument('--log-level=3')
 chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
-get_wsl_chrome_options_args()
+get_chrome_options_args()
 options = {
     'connection_timeout': None  # Never timeout, otherwise it floods errors
 }
