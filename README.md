@@ -36,7 +36,7 @@ It requires the "Profile photos" album to be public (it is by default)
 You can build the Docker image with:
 
 ```
-docker build -t ghunt .
+docker build --build-arg UID=$(id -u ${USER}) --build-arg GID=$(id -g ${USER}) -t ghunt .
 ```
 
 Any of the scripts can be invoked through:
