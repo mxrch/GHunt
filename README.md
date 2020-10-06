@@ -34,7 +34,7 @@ Then, un-check the only option there:
 ![setting.jpg](https://files.catbox.moe/b8879l.jpg)
 
 
-The target account will also be vulnerable if they have ever used **Picasa** linked to their google account in any way, shape or form. For more details on this, read my big-ass comment on #10.
+The target account will also be vulnerable if they have ever used **Picasa** linked to their google account in any way, shape or form. For more details on this, read my big-ass comment on issue #10.
 Sadly, there doesn't seem to be any option to turn this off, except for begging to the support staff for help.
 
 # Screenshots
