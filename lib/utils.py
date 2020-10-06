@@ -1,5 +1,3 @@
-from os.path import isfile
-
 import imagehash
 from selenium.webdriver.chrome.options import Options
 
