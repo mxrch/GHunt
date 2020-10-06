@@ -81,7 +81,7 @@ Then, you can run the tool like this:
 ```bash
 python hunt.py myemail@gmail.com
 ```
-⚠️ I suggest you to make an empty account just for that, or use an account where you never log in, because depends on your browser / location if you re-login in the Google Account used for the cookies, it can deauthorize them.
+⚠️ I suggest you make an empty account just for this or use an account where you never login because depending on your browser/location, re-logging in into the Google Account used for the cookies can deauthorize them.
 
 # Where I find these 4 cookies ?
 1. Log in to accounts.google.com
