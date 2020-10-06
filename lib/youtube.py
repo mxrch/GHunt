@@ -1,21 +1,25 @@
-import httpx
 import json
 import urllib.parse
-from PIL import Image
-from lib.utils import *
-from lib.search import search as gdoc_search
-from pprint import pprint
 from io import BytesIO
+
+from PIL import Image
+
+from lib.search import search as gdoc_search
+from lib.utils import *
 
 
 def youtube_channel_search(client, query):
-    link = "https://www.youtube.com/results?search_query={}&sp=EgIQAg%253D%253D"
-    req = client.get(link.format(urllib.parse.quote(query)))
-    source = req.text
-    data = json.loads(source.split('window["ytInitialData"] = ')[1].split('window["ytInitialPlayerResponse"]')[0].split(';\n')[0])
-    channels = data["contents"]["twoColumnSearchResultsRenderer"]["primaryContents"]["sectionListRenderer"]["contents"][0]["itemSectionRenderer"]["contents"]
-    results = {"channels": [], "length": len(channels)}
     try:
+        link = "https://www.youtube.com/results?search_query={}&sp=EgIQAg%253D%253D"
+        req = client.get(link.format(urllib.parse.quote(query)))
+        source = req.text
+        data = json.loads(
+            source.split('window["ytInitialData"] = ')[1].split('window["ytInitialPlayerResponse"]')[0].split(';\n')[0])
+        # print(data)
+        channels = \
+        data["contents"]["twoColumnSearchResultsRenderer"]["primaryContents"]["sectionListRenderer"]["contents"][0][
+            "itemSectionRenderer"]["contents"]
+        results = {"channels": [], "length": len(channels)}
         for channel in channels:
             if len(results["channels"]) >= 10:
                 break
@@ -24,8 +28,9 @@ def youtube_channel_search(client, query):
                 continue
             avatar_link = channel["channelRenderer"]["thumbnail"]["thumbnails"][0]["url"].split('=')[0]
             if avatar_link[:2] == "//":
-                avatar_link = "https:"+avatar_link
-            profil_url = "https://youtube.com" + channel["channelRenderer"]["navigationEndpoint"]["browseEndpoint"]["canonicalBaseUrl"]
+                avatar_link = "https:" + avatar_link
+            profil_url = "https://youtube.com" + channel["channelRenderer"]["navigationEndpoint"]["browseEndpoint"][
+                "canonicalBaseUrl"]
             req = client.get(avatar_link)
             img = Image.open(BytesIO(req.content))
             hash = image_hash(img)
@@ -34,12 +39,13 @@ def youtube_channel_search(client, query):
     except KeyError:
         return False
 
+
 def youtube_channel_search_gdocs(client, query, cfg):
     search_query = f"site:youtube.com/channel \\\"{query}\\\""
     search_results = gdoc_search(search_query, cfg)
     channels = []
     for result in search_results:
-        sanitized  = "https://youtube.com/"+('/'.join(result["link"].split('/')[3:5]))
+        sanitized = "https://youtube.com/" + ('/'.join(result["link"].split('/')[3:5]))
         if sanitized not in channels:
             channels.append(sanitized)
 
@@ -51,7 +57,8 @@ def youtube_channel_search_gdocs(client, query, cfg):
         req = client.get(profil_url)
         source = req.text
 
-        data = json.loads(source.split('window["ytInitialData"] = ')[1].split('window["ytInitialPlayerResponse"]')[0].split(';\n')[0])
+        data = json.loads(
+            source.split('window["ytInitialData"] = ')[1].split('window["ytInitialPlayerResponse"]')[0].split(';\n')[0])
         avatar_link = data["metadata"]["channelMetadataRenderer"]["avatar"]["thumbnails"][0]["url"].split('=')[0]
         req = client.get(avatar_link)
         img = Image.open(BytesIO(req.content))
@@ -59,6 +66,7 @@ def youtube_channel_search_gdocs(client, query, cfg):
         title = data["metadata"]["channelMetadataRenderer"]["title"]
         results["channels"].append({"profil_url": profil_url, "name": title, "hash": hash})
     return results
+
 
 def get_channels(client, query, cfg):
     from_youtube = youtube_channel_search(client, query)
@@ -74,6 +82,7 @@ def get_channels(client, query, cfg):
         return False
     return to_process
 
+
 def get_confidence(data, query, hash):
     score_steps = 4
 
@@ -82,13 +91,13 @@ def get_confidence(data, query, hash):
             score = 0
 
             if hash == channel["hash"]:
-                score += score_steps*4
+                score += score_steps * 4
             if query == channel["name"]:
-                score += score_steps*3
+                score += score_steps * 3
             if query in channel["name"]:
-                score += score_steps*2
+                score += score_steps * 2
             if ((source["origin"] == "youtube" and source["length"] <= 5) or
-                (source["origin"] == "google" and source["length"] <= 4)):
+                    (source["origin"] == "google" and source["length"] <= 4)):
                 score += score_steps
             data[source_nb]["channels"][channel_nb]["score"] = score
 
@@ -108,17 +117,19 @@ def get_confidence(data, query, hash):
                 continue
             else:
                 channels.append(channel)
-    channels = sorted([json.loads(chan) for chan in set([json.dumps(channel) for channel in channels])], key=lambda k: k['score'], reverse=True)
+    channels = sorted([json.loads(chan) for chan in set([json.dumps(channel) for channel in channels])],
+                      key=lambda k: k['score'], reverse=True)
     panels = sorted(set([c["score"] for c in channels]), reverse=True)
-    if panels and panels[0] <= 0:
+    if not channels or (panels and panels[0] <= 0):
         return 0, []
 
-    maxscore = sum([p*score_steps for p in range(1,score_steps+1)])
+    maxscore = sum([p * score_steps for p in range(1, score_steps + 1)])
     for panel in panels:
         chans = [c for c in channels if c["score"] == panel]
         if len(chans) > 1:
-            panel-=5
-        return (panel/maxscore*100), chans
+            panel -= 5
+        return (panel / maxscore * 100), chans
+
 
 def extract_usernames(channels):
     return [chan['profil_url'].split("/user/")[1] for chan in channels if "/user/" in chan['profil_url']]

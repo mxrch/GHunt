@@ -1,18 +1,21 @@
-import httpx
-from seleniumwire import webdriver
-from selenium.webdriver.chrome.options import Options
-from config import cfg
-from lib.utils import *
 import json
 from os.path import isfile
+
+import httpx
+from seleniumwire import webdriver
+
+from config import cfg
+from lib.utils import *
+
+driverpath = get_driverpath()
 
 cookies = ""
 auth = ""
 keys = ""
 already_exists = False
-if isfile('data.txt'):
+if isfile(cfg['data_path']):
     try:
-        with open('data.txt', 'r') as f:
+        with open(cfg['data_path'], 'r') as f:
             out = json.loads(f.read())
             auth = out["auth"]
             hangouts_token = out["keys"]
@@ -32,7 +35,8 @@ if not already_exists:
             cookies[name] = input(f"{name} => ").strip()
 
 headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; rv:68.0) Gecko/20100101 Firefox/68.0'}
-req = httpx.get("https://docs.google.com/document/u/0/?usp=direct_url", cookies=cookies, headers=headers, allow_redirects=False)
+req = httpx.get("https://docs.google.com/document/u/0/?usp=direct_url", cookies=cookies, headers=headers,
+                allow_redirects=False)
 exitflag = False
 if req.status_code != 200:
     exitflag = True
@@ -53,29 +57,25 @@ if already_exists:
 source = req.text
 trigger = '\"token\":\"'
 if trigger not in source:
-	exit("[-] I can't find the Google Docs token in the source code...\n")
+    exit("[-] I can't find the Google Docs token in the source code...\n")
 else:
-	gdoc_token = source.split(trigger)[1][:100].split('"')[0]
-	print("Google Docs Token => {}".format(gdoc_token))
+    gdoc_token = source.split(trigger)[1][:100].split('"')[0]
+    print("Google Docs Token => {}".format(gdoc_token))
 
 # Hangouts
 tmprinter = TMPrinter()
-chrome_options = Options()
-chrome_options.add_argument('--log-level=3')
-chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
-chrome_options.add_argument("--headless")
+chrome_options = get_chrome_options_args(cfg)
 options = {
     'connection_timeout': None  # Never timeout, otherwise it floods errors
 }
 
 tmprinter.out("Starting browser...")
 
-driverpath = get_driverpath()
 driver = webdriver.Chrome(executable_path=driverpath, seleniumwire_options=options, options=chrome_options)
 
 tmprinter.out("Setting cookies...")
 driver.get("https://hangouts.google.com/robots.txt")
-for k,v in cookies.items():
+for k, v in cookies.items():
     driver.add_cookie({'name': k, 'value': v})
 
 tmprinter.out("Fetching Hangouts homepage...")
@@ -83,7 +83,7 @@ driver.get("https://hangouts.google.com")
 tmprinter.out("Waiting for the /v2/people/me/blockedPeople request, it can takes a few minutes...")
 req = driver.wait_for_request('/v2/people/me/blockedPeople', timeout=120)
 tmprinter.out("Request found !")
-#driver.get("about:blank")
+# driver.get("about:blank")
 driver.close()
 
 auth = req.headers["Authorization"]
@@ -93,5 +93,5 @@ hangouts_token = req.url.split("key=")[1]
 print("Hangouts Token => {}".format(hangouts_token))
 
 output = {"auth": auth, "keys": {"gdoc": gdoc_token, "hangouts": hangouts_token}, "cookies": cookies}
-with open('data.txt', 'w') as f:
-	f.write(json.dumps(output))
+with open(cfg['data_path'], 'w') as f:
+    f.write(json.dumps(output))
