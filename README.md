@@ -18,7 +18,24 @@ It can currently extract :
 - Google Maps reviews
 - Possible physical location
 
-The features marked with a **(T)** requiere the tool to be authenticated with the target's gmail cookies.
+The features marked with a **(T)** requiere the target account to have the default setting of `"allow the people you share content with to download your photos and videos. People may still be able to download photos and videos that you've shared with google photos"`. 
+
+Even for a tech-savy person this setting is hard to find, bc of how buried it is, and how much google tried to hide the fact that some albums can be collected regardless of what the account dashboard says:
+
+![0-public_bullshit](https://files.catbox.moe/ufqc9g.jpg)
+
+Here's how to _check if_/_fix the fact that_ you're vulnerable (wich you most likely are):
+Go to https://get.google.com/albumarchive/ while logged in with your google account. You will be **automatically** redirected to your correct albumarchive url (https://get.google.com/albumarchive/<YOUR-GOOGLE-ID-HERE>). After that, click the three dots on the top left corner, and click on **setting** 
+
+![how2.jpg](https://files.catbox.moe/ru6kci.jpg)
+
+Then, un-check the only option there:
+
+![setting.jpg](https://files.catbox.moe/b8879l.jpg)
+
+
+The target account will also be vulnerable if they have ever used **Picasa** linked to their google account in any way, shape or form. For more details on this, read my big-ass comment on #10.
+Sadly, there doesn't seem to be any option to turn this off, except for begging to the support staff for help.
 
 # Screenshots
 <p align="center">
