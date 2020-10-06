@@ -5,6 +5,7 @@ from selenium.webdriver.chrome.options import Options
 
 from .os_detect import Os
 
+from glob import glob
 
 def image_hash(img):
     hash = str(imagehash.average_hash(img))
@@ -48,13 +49,10 @@ def sanitize_location(location):
 
 
 def get_driverpath():
-    if Os().wsl or Os().windows:
-        driverpath = "./chromedriver.exe"
-    else:
-        driverpath = "./chromedriver"
+    drivers = glob('**/chromedriver*')
 
-    if isfile(driverpath):
-        return driverpath
+    if len(drivers):
+        return drivers[0]
     else:
         exit("The chromedriver is missing.\nPlease put it in the GHunt directory.")
 
