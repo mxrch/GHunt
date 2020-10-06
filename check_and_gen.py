@@ -8,7 +8,7 @@ from config import cfg
 from lib.utils import *
 
 driverpath = get_driverpath()
-
+max_retries = 3
 cookies = ""
 auth = ""
 keys = ""
@@ -79,9 +79,15 @@ for k, v in cookies.items():
     driver.add_cookie({'name': k, 'value': v})
 
 tmprinter.out("Fetching Hangouts homepage...")
-driver.get("https://hangouts.google.com")
-tmprinter.out("Waiting for the /v2/people/me/blockedPeople request, it can takes a few minutes...")
-req = driver.wait_for_request('/v2/people/me/blockedPeople', timeout=120)
+for _ in range(max_retries):
+    try:
+        driver.get("https://hangouts.google.com")
+        tmprinter.out("Waiting for the /v2/people/me/blockedPeople request, it can takes a few minutes...")
+        req = driver.wait_for_request('/v2/people/me/blockedPeople', timeout=120)
+        break
+    except Exception:
+        tmprinter.out('Request timed-out! Trying again...')
+        pass
 tmprinter.out("Request found !")
 # driver.get("about:blank")
 driver.close()
