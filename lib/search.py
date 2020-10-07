@@ -1,29 +1,23 @@
 import json
-
 import httpx
 
 
-def search(query, cfg):
+def search(query, data_path, gdocs_public_doc, size=1000):
     cookies = ""
     token = ""
-    with open(cfg['data_path'], 'r') as f:
+
+    with open(data_path, 'r') as f:
         out = json.loads(f.read())
         token = out["keys"]["gdoc"]
         cookies = out["cookies"]
-
-    doc = cfg["gdocs_public_doc"]
-    size = 1000
-
+    print('test')
     data = {"request": '["documentsuggest.search.search_request","{}",[{}],null,1]'.format(query, size)}
-
-    req = httpx.post('https://docs.google.com/document/d/{}/explore/search?token={}'.format(doc, token),
+    req = httpx.post('https://docs.google.com/document/d/{}/explore/search?token={}'.format(gdocs_public_doc, token),
                      cookies=cookies, data=data)
     if req.status_code != 200:
-        print("Error : request gives {}".format(req.status_code))
-        exit()
+        exit("Error (GDocs): request gives {}".format(req.status_code))
 
     output = json.loads(req.text.replace(")]}'", ""))
-    # pprint(output)
 
     results = []
     for result in output[0][1]:

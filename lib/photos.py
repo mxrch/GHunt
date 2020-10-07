@@ -11,7 +11,7 @@ from lib.metadata import ExifEater
 from lib.utils import *
 
 
-def get_source(gaiaID, client, cookies, cfg):
+def get_source(gaiaID, client, cookies, is_headless):
     baseurl = f"https://get.google.com/albumarchive/{gaiaID}/albums/profile-photos?hl=en"
     req = client.get(baseurl)
     if req.status_code != 200:
@@ -39,7 +39,7 @@ def get_source(gaiaID, client, cookies, cfg):
                 return False
 
     tmprinter = TMPrinter()
-    chrome_options = get_chrome_options_args(cfg)
+    chrome_options = get_chrome_options_args(is_headless)
     options = {
         'connection_timeout': None  # Never timeout, otherwise it floods errors
     }
@@ -89,11 +89,11 @@ def get_source(gaiaID, client, cookies, cfg):
     return {"stats": stats, "source": source}
 
 
-def gpics(gaiaID, client, cookies, cfg):
+def gpics(gaiaID, client, cookies, regex, headless=True):
     baseurl = "https://get.google.com/albumarchive/"
 
     print(f"\nGoogle Photos : {baseurl + gaiaID}")
-    out = get_source(gaiaID, client, cookies, cfg)
+    out = get_source(gaiaID, client, cookies, headless)
     if not out:
         print("=> Couldn't fetch the public photos.")
         return False
@@ -102,7 +102,7 @@ def gpics(gaiaID, client, cookies, cfg):
         return False
 
     # open('debug.html', 'w').write(repr(out["source"]))
-    results = re.compile(cfg["regexs"]["albums"]).findall(out["source"])
+    results = re.compile(regex).findall(out["source"])
 
     list_albums_length = len(results)
 

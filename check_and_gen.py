@@ -4,15 +4,15 @@ from os.path import isfile
 import httpx
 from seleniumwire import webdriver
 
-from config import cfg
+import config
 from lib.utils import *
 
 
 def get_saved_cookies():
     ''' returns cookie cache if exists '''
-    if isfile(cfg['data_path']):
+    if isfile(config.data_path):
         try:
-            with open(cfg['data_path'], 'r') as f:
+            with open(config.data_path, 'r') as f:
                 out = json.loads(f.read())
                 auth = out["auth"]
                 hangouts_token = out["keys"]
@@ -48,7 +48,7 @@ def save_tokens(auth, gdoc_token, hangouts_token, cookies):
         "keys": {"gdoc": gdoc_token, "hangouts": hangouts_token},
         "cookies": cookies
     }
-    with open(cfg['data_path'], 'w') as f:
+    with open(config.data_path, 'w') as f:
         f.write(json.dumps(output))
 
 
@@ -56,7 +56,7 @@ def get_hangouts_tokens(cookies):
     ''' gets auth and hangout token '''
     driverpath = get_driverpath()
     tmprinter = TMPrinter()
-    chrome_options = get_chrome_options_args(cfg)
+    chrome_options = get_chrome_options_args(config.headless)
     options = {
         'connection_timeout': None  # Never timeout, otherwise it floods errors
     }
