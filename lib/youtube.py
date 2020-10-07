@@ -56,7 +56,6 @@ def youtube_channel_search_gdocs(client, query, data_path, gdocs_public_doc):
     channels = channels[:5]
 
     for profile_url in channels:
-        print('waw')
         req = client.get(profile_url)
         source = req.text
 
@@ -111,7 +110,7 @@ def get_confidence(data, query, hash):
             found_better = False
             for source2 in data:
                 for channel2 in source["channels"]:
-                    if channel["profil_url"] == channel2["profil_url"]:
+                    if channel["profile_url"] == channel2["profile_url"]:
                         if channel2["score"] > channel["score"]:
                             found_better = True
                             break
@@ -136,4 +135,4 @@ def get_confidence(data, query, hash):
 
 
 def extract_usernames(channels):
-    return [chan['profil_url'].split("/user/")[1] for chan in channels if "/user/" in chan['profil_url']]
+    return [chan['profile_url'].split("/user/")[1] for chan in channels if "/user/" in chan['profile_url']]

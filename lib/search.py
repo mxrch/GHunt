@@ -10,7 +10,6 @@ def search(query, data_path, gdocs_public_doc, size=1000):
         out = json.loads(f.read())
         token = out["keys"]["gdoc"]
         cookies = out["cookies"]
-    print('test')
     data = {"request": '["documentsuggest.search.search_request","{}",[{}],null,1]'.format(query, size)}
     req = httpx.post('https://docs.google.com/document/d/{}/explore/search?token={}'.format(gdocs_public_doc, token),
                      cookies=cookies, data=data)
