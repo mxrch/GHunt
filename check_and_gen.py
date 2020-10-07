@@ -7,9 +7,6 @@ from seleniumwire import webdriver
 from config import cfg
 from lib.utils import *
 
-import chromedriver_autoinstaller
-
-chromedriver_autoinstaller.install(cwd=True)
 
 driverpath = get_driverpath()
 

@@ -1,9 +1,10 @@
 import imagehash
 from selenium.webdriver.chrome.options import Options
+import chromedriver_autoinstaller
 
-from .os_detect import Os
+from lib.os_detect import Os
 
-from glob import glob
+from pathlib import Path
 
 def image_hash(img):
     hash = str(imagehash.average_hash(img))
@@ -47,12 +48,19 @@ def sanitize_location(location):
 
 
 def get_driverpath():
-    drivers = glob('**/chromedriver*')
-
-    if len(drivers):
+    tmprinter = TMPrinter()
+    drivers = [str(x.absolute()) for x in Path('.').rglob('chromedriver*')]
+    if drivers:
         return drivers[0]
     else:
-        exit("The chromedriver is missing.\nPlease put it in the GHunt directory.")
+        tmprinter.out("I can't find the chromedriver, so I'm downloading and installing it for you...")
+        path = chromedriver_autoinstaller.install(cwd=True)
+        tmprinter.out("")
+        drivers = [str(x.absolute()) for x in Path('.').rglob('chromedriver*')]
+        if drivers:
+            return path
+        else:
+            exit(f"I can't find the chromedriver.\nI installed it in \"{path}\" but it must be in the GHunt directory, you should move it here.")
 
 
 def get_chrome_options_args(cfg):
