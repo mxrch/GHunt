@@ -7,6 +7,7 @@ from seleniumwire import webdriver
 from config import cfg
 from lib.utils import *
 
+
 driverpath = get_driverpath()
 
 cookies = ""
