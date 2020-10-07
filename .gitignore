@@ -1,5 +1,8 @@
 __pycache__/
 lib/__pycache__/
+resources/
+chromedriver
 chromedriver.exe
 data.txt
 login.py
+.DS_Store
