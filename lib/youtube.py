@@ -15,7 +15,6 @@ def youtube_channel_search(client, query):
         source = req.text
         data = json.loads(
             source.split('window["ytInitialData"] = ')[1].split('window["ytInitialPlayerResponse"]')[0].split(';\n')[0])
-        # print(data)
         channels = \
         data["contents"]["twoColumnSearchResultsRenderer"]["primaryContents"]["sectionListRenderer"]["contents"][0][
             "itemSectionRenderer"]["contents"]
@@ -29,21 +28,22 @@ def youtube_channel_search(client, query):
             avatar_link = channel["channelRenderer"]["thumbnail"]["thumbnails"][0]["url"].split('=')[0]
             if avatar_link[:2] == "//":
                 avatar_link = "https:" + avatar_link
-            profil_url = "https://youtube.com" + channel["channelRenderer"]["navigationEndpoint"]["browseEndpoint"][
+            profile_url = "https://youtube.com" + channel["channelRenderer"]["navigationEndpoint"]["browseEndpoint"][
                 "canonicalBaseUrl"]
             req = client.get(avatar_link)
             img = Image.open(BytesIO(req.content))
             hash = image_hash(img)
-            results["channels"].append({"profil_url": profil_url, "name": title, "hash": hash})
+            results["channels"].append({"profile_url": profile_url, "name": title, "hash": hash})
         return results
     except KeyError:
         return False
 
 
-def youtube_channel_search_gdocs(client, query, cfg):
+def youtube_channel_search_gdocs(client, query, data_path, gdocs_public_doc):
     search_query = f"site:youtube.com/channel \\\"{query}\\\""
-    search_results = gdoc_search(search_query, cfg)
+    search_results = gdoc_search(search_query, data_path, gdocs_public_doc)
     channels = []
+
     for result in search_results:
         sanitized = "https://youtube.com/" + ('/'.join(result["link"].split('/')[3:5]))
         if sanitized not in channels:
@@ -51,10 +51,13 @@ def youtube_channel_search_gdocs(client, query, cfg):
 
     if not channels:
         return False
+
     results = {"channels": [], "length": len(channels)}
     channels = channels[:5]
-    for profil_url in channels:
-        req = client.get(profil_url)
+
+    for profile_url in channels:
+        print('waw')
+        req = client.get(profile_url)
         source = req.text
 
         data = json.loads(
@@ -64,13 +67,14 @@ def youtube_channel_search_gdocs(client, query, cfg):
         img = Image.open(BytesIO(req.content))
         hash = image_hash(img)
         title = data["metadata"]["channelMetadataRenderer"]["title"]
-        results["channels"].append({"profil_url": profil_url, "name": title, "hash": hash})
+        results["channels"].append({"profile_url": profile_url, "name": title, "hash": hash})
+        
     return results
 
 
-def get_channels(client, query, cfg):
+def get_channels(client, query, data_path, gdocs_public_doc):
     from_youtube = youtube_channel_search(client, query)
-    from_gdocs = youtube_channel_search_gdocs(client, query, cfg)
+    from_gdocs = youtube_channel_search_gdocs(client, query, data_path, gdocs_public_doc)
     to_process = []
     if from_youtube:
         from_youtube["origin"] = "youtube"
