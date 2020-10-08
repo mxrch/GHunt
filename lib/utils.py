@@ -5,6 +5,8 @@ import chromedriver_autoinstaller
 from lib.os_detect import Os
 
 from pathlib import Path
+import shutil
+
 
 def image_hash(img):
     hash = str(imagehash.average_hash(img))
@@ -50,6 +52,8 @@ def sanitize_location(location):
 def get_driverpath():
     tmprinter = TMPrinter()
     drivers = [str(x.absolute()) for x in Path('.').rglob('chromedriver*')]
+    if not drivers:
+        drivers = shutil.which("chromedriver")
     if drivers:
         return drivers[0]
     else:
@@ -60,7 +64,7 @@ def get_driverpath():
         if drivers:
             return path
         else:
-            exit(f"I can't find the chromedriver.\nI installed it in \"{path}\" but it must be in the GHunt directory, you should move it here.")
+            exit(f"I can't find the chromedriver.\nI installed it in \"{path}\" but it must be in the GHunt directory or PATH, you should move it here.")
 
 
 def get_chrome_options_args(cfg):
