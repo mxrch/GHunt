@@ -7,3 +7,5 @@ data.txt
 login.py
 .DS_Store
 .vscode
+*.egg-info*
+build/

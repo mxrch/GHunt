@@ -4,8 +4,8 @@ from io import BytesIO
 
 from PIL import Image
 
-from lib.search import search as gdoc_search
-from lib.utils import *
+from ghunt.search import search as gdoc_search
+from ghunt.utils import *
 
 
 def youtube_channel_search(client, query):

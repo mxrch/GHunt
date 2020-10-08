@@ -1,0 +1,25 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+import sys
+import os
+import ghunt
+from ghunt.core import GHunt
+from ghunt.config import cfg
+
+
+if len(sys.argv) <= 1:
+    exit("Please put an email address!")
+
+# TODO: Add check on valid email address
+query = sys.argv[1]
+
+hunter = GHunt(query, cfg)
+try:
+    hunter.process(
+        hunter.post_query()
+    )
+except Error as e:
+    exit(str(e))
+
+sys.exit(0)

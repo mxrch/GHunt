@@ -2,7 +2,7 @@ import imagehash
 from selenium.webdriver.chrome.options import Options
 import chromedriver_autoinstaller
 
-from lib.os_detect import Os
+from ghunt.os_detect import Os
 
 from pathlib import Path
 

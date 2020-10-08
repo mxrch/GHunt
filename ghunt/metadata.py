@@ -4,7 +4,7 @@ from PIL import ExifTags
 from PIL.ExifTags import TAGS, GPSTAGS
 from geopy.geocoders import Nominatim
 
-from lib.utils import *
+from ghunt.utils import *
 
 
 class ExifEater():

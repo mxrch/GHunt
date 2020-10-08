@@ -78,7 +78,7 @@ setup(
     # List additional URLs that are relevant for the project.
 
     scripts = [
-        'scripts/ghunt.py'
+        'scripts/gghunt'
     ],
 
     #entry_points = {

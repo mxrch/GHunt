@@ -11,7 +11,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from seleniumwire import webdriver
 
-from lib.utils import *
+from ghunt.utils import *
 
 
 def scrape(gaiaID, client, cookies, cfg):

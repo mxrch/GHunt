@@ -1,10 +1,14 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 import json
 from os.path import isfile
 
 import httpx
 from seleniumwire import webdriver
 
-from config import cfg
+import ghunt
+from ghunt.config import cfg
 from ghunt.utils import *
 
 driverpath = get_driverpath()

@@ -7,8 +7,8 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from seleniumwire import webdriver
 
-from lib.metadata import ExifEater
-from lib.utils import *
+from ghunt.metadata import ExifEater
+from ghunt.utils import *
 
 
 def get_source(gaiaID, client, cookies, cfg):
