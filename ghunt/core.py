@@ -15,7 +15,7 @@ from ghunt.utils import *
 
 
 class GHunt:
-    def __init__(query: str, conf: dict):
+    def __init__(self, query: str, conf: dict):
         self.query = query
         self._request_params = {
             "cookies": "",
@@ -28,7 +28,7 @@ class GHunt:
         )
         self._client = __init_client()
 
-    def get_request_params(conf: dict) -> dict:
+    def get_request_params(self, conf: dict) -> dict:
         if not isfile(conf['data_path']):
             raise ValueError("Please generate cookies and tokens first!")
 
@@ -45,26 +45,26 @@ class GHunt:
             }
 
     @property
-    def cookies():
+    def cookies(self):
         return self._request_params["cookies"]
 
     @property
-    def hg_token():
+    def hg_token(self):
         return self._request_params["hangouts_token"]
 
     @property
-    def auth():
+    def auth(self):
         return self._request_params["auth"]
 
-    def __init_client():
+    def __init_client(self):
         # FIXME: client should be used as a context manager.
         return httpx.Client(cookies=self.cookies)
     
     @property
-    def client() -> httpx.Client:
+    def client(self) -> httpx.Client:
         return self._client
 
-    def post_query() -> httpx.Response:
+    def post_query(self) -> httpx.Response:
         host = "https://people-pa.clients6.google.com"
         url = "/v2/people/lookup?key={}".format(self._request_params["hangouts_token"])
         body = """id={}&type=EMAIL&matchType=EXACT&extensionSet.extensionNames=HANGOUTS_ADDITIONAL_DATA&extensionSet.extensionNames=HANGOUTS_OFF_NETWORK_GAIA_LOOKUP&extensionSet.extensionNames=HANGOUTS_PHONE_DATA&coreIdParams.useRealtimeNotificationExpandedAcls=true&requestMask.includeField.paths=person.email&requestMask.includeField.paths=person.gender&requestMask.includeField.paths=person.in_app_reachability&requestMask.includeField.paths=person.metadata&requestMask.includeField.paths=person.name&requestMask.includeField.paths=person.phone&requestMask.includeField.paths=person.photo&requestMask.includeField.paths=person.read_only_profile_info&requestMask.includeContainer=AFFINITY&requestMask.includeContainer=PROFILE&requestMask.includeContainer=DOMAIN_PROFILE&requestMask.includeContainer=ACCOUNT&requestMask.includeContainer=EXTERNAL_ACCOUNT&requestMask.includeContainer=CIRCLE&requestMask.includeContainer=DOMAIN_CONTACT&requestMask.includeContainer=DEVICE_CONTACT&requestMask.includeContainer=GOOGLE_GROUP&requestMask.includeContainer=CONTACT"""
@@ -82,7 +82,7 @@ class GHunt:
             cookies=self._request_params["cookies"]
         )
 
-    def process(res: httpx.Response):
+    def process(self, res: httpx.Response):
         data = json.loads(res.text)
         if not "matches" in data:
             raise ValueError("[-] This email address does not belong to a Google Account.")
