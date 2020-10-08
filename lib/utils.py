@@ -4,9 +4,11 @@ from os.path import isfile
 
 import imagehash
 from selenium.webdriver.chrome.options import Options
+import chromedriver_autoinstaller
 
-from .os_detect import Os
+from lib.os_detect import Os
 
+from pathlib import Path
 
 def is_email_google_account(httpx_client, auth, cookies, email, hangouts_token):
     host = "https://people-pa.clients6.google.com"
@@ -75,15 +77,19 @@ def sanitize_location(location):
 
 
 def get_driverpath():
-    if Os().wsl or Os().windows:
-        driverpath = "./chromedriver.exe"
+    tmprinter = TMPrinter()
+    drivers = [str(x.absolute()) for x in Path('.').rglob('chromedriver*')]
+    if drivers:
+        return drivers[0]
     else:
-        driverpath = "./chromedriver"
-
-    if isfile(driverpath):
-        return driverpath
-    else:
-        exit("The chromedriver is missing.\nPlease put it in the GHunt directory.")
+        tmprinter.out("I can't find the chromedriver, so I'm downloading and installing it for you...")
+        path = chromedriver_autoinstaller.install(cwd=True)
+        tmprinter.out("")
+        drivers = [str(x.absolute()) for x in Path('.').rglob('chromedriver*')]
+        if drivers:
+            return path
+        else:
+            exit(f"I can't find the chromedriver.\nI installed it in \"{path}\" but it must be in the GHunt directory, you should move it here.")
 
 
 def get_chrome_options_args(is_headless):

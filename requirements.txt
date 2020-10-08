@@ -6,3 +6,4 @@ imagehash
 pillow
 python-dateutil
 colorama
+chromedriver-autoinstaller

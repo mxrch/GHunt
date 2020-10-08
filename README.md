@@ -36,7 +36,7 @@ It requires the "Profile photos" album to be public (it is by default)
 You can build the Docker image with:
 
 ```
-docker build -t ghunt .
+docker build --build-arg UID=$(id -u ${USER}) --build-arg GID=$(id -g ${USER}) -t ghunt .
 ```
 
 Any of the scripts can be invoked through:
@@ -58,12 +58,12 @@ selenium
 imagehash
 pillow
 python-dateutil
+chromedriver_autoinstaller
 ```
 
 ## 1. Chromedriver & Google Chrome
-This project uses Selenium, so you'll need to download [chromedriver](https://chromedriver.chromium.org/downloads). \
-After you do that, put it in the GHunt folder. Make sure it's called "chromedriver.exe" or "chromedriver".\
-⚠️ Be sure to have Google Chrome installed, and that Google Chrome and chromedriver have the same version.
+This project uses Selenium and automatically downloads the correct driver for your Chrome version. \
+⚠️ So just make sure to have Google Chrome installed.
 
 ## 2. Requirements
 In the GHunt folder, run:
