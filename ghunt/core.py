@@ -26,7 +26,7 @@ class GHunt:
         self._request_params.update(
             self.get_request_params(self._conf)
         )
-        self._client = __init_client()
+        self._client = self.__init_client()
 
     def get_request_params(self, conf: dict) -> dict:
         if not isfile(conf['data_path']):
@@ -132,11 +132,11 @@ class GHunt:
                     ytb_hunt = True
                     print("\nUnable to fetch connected Google services.")
 
-            if ytb_hunt or self.conf["ytb_hunt_always"]:
+            if ytb_hunt or self._conf["ytb_hunt_always"]:
                 req = self.client.get(profil_pic)
                 img = Image.open(BytesIO(req.content))
                 hash = image_hash(img)
-                data = ytb.get_channels(self.client, name, cfg)
+                data = ytb.get_channels(self.client, name, self._conf)
                 if not data:
                     print("\nYoutube channel not found.")
                 else:
@@ -153,10 +153,10 @@ class GHunt:
                     else:
                         print("\nYoutube channel not found.")
 
-            gpics(gaiaID, self.client, self.cookies, self.conf)
-            reviews = gmaps.scrape(gaiaID, self.client, self.cookies, self.conf)
+            gpics(gaiaID, self.client, self.cookies, self._conf)
+            reviews = gmaps.scrape(gaiaID, self.client, self.cookies, self._conf)
             if reviews:
-                confidence, locations = gmaps.get_confidence(reviews, cfg)
+                confidence, locations = gmaps.get_confidence(reviews, self._conf)
                 print(f"\nProbable location (confidence => {confidence}) :")
                 loc_names = []
                 for loc in locations:

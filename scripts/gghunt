@@ -13,6 +13,7 @@ if len(sys.argv) <= 1:
 
 # TODO: Add check on valid email address
 query = sys.argv[1]
+# TODO: Add custom resources path.
 
 hunter = GHunt(query, cfg)
 try:
