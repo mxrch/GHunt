@@ -5,8 +5,7 @@ import httpx
 from seleniumwire import webdriver
 
 from config import cfg
-from lib.utils import *
-
+from ghunt.utils import *
 
 driverpath = get_driverpath()
 

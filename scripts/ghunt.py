@@ -8,8 +8,8 @@ import httpx
 from PIL import Image
 from geopy.geocoders import Nominatim
 
-import lib.gmaps as gmaps
-import lib.youtube as ytb
+import ghunt.gmaps as gmaps
+import ghunt.youtube as ytb
 from config import cfg
 from lib.photos import gpics
 from lib.utils import *
