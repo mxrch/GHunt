@@ -51,9 +51,9 @@ def sanitize_location(location):
 
 def get_driverpath():
     tmprinter = TMPrinter()
-    drivers = [str(x.absolute()) for x in Path('.').rglob('chromedriver*')]
+    drivers = shutil.which("chromedriver")
     if not drivers:
-        drivers = shutil.which("chromedriver")
+        drivers = [str(x.absolute()) for x in Path('.').rglob('chromedriver*')]
     if drivers:
         return drivers[0]
     else:
