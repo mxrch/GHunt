@@ -11,12 +11,16 @@ It can currently extract:
 - Activated Google services (YouTube, Photos, Maps, News360, Hangouts, etc.)
 - Possible YouTube channel
 - Possible other usernames
-- Public photos
-- Phone models
-- Phone firmwares
-- Installed software
-- Google Maps reviews
-- Possible physical location
+- Public photos (T)
+- Phones models (T)
+- Phones firmwares (T)
+- Installed softwares (T)
+- Google Maps reviews (M)
+- Possible physical location (M)
+
+The features marked with a **(T)** requiere the target account to have the default setting of `"allow the people you share content with to download your photos and videos. People may still be able to download photos and videos that you've shared with google photos"`, OR, have used **Picasa** linked to their Google account.
+
+The features marked with an **(M)** require the Google Maps reviews of the target to be public (they are by default).
 
 # Screenshots
 <p align="center">
@@ -70,6 +74,7 @@ Then, you can run the tool like this:
 ```bash
 python hunt.py myemail@gmail.com
 ```
+
 ⚠️ I suggest you make an empty account just for this or use an account where you never login because depending on your browser/location, re-logging in into the Google Account used for the cookies can deauthorize them.
 
 # Where I find these 4 cookies ?
@@ -79,6 +84,26 @@ If you don't know how to open it, just right-click anywhere and click "Inspect E
 3. Then you'll find every cookie you need, including the 4 ones.
 
 ![cookies](https://files.catbox.moe/9jy200.png)
+
+# 🛡️ Protecting yourself
+Regarding the collection of metadata from your Google Photos account:
+
+Given that Google shows **"X require access"** on [your Google Account Dashboard](https://myaccount.google.com/intro/dashboard), you might imagine that you had to explicitly authorize another account in order for it to access your pictures; but this is not the case. **Any** account can access your AlbumArchive (by default):
+
+![account-dashboard](https://files.catbox.moe/ufqc9g.jpg)
+
+Here's how to _check if_/_fix the fact that_ you're vulnerable (wich you most likely are):
+Go to https://get.google.com/albumarchive/ while logged in with your Google account. You will be **automatically** redirected to your correct albumarchive URL (https://get.google.com/albumarchive/<YOUR-GOOGLE-ID-HERE>). After that, click the three dots on the top left corner, and click on **setting** 
+
+![three-dots-setting](https://files.catbox.moe/ru6kci.jpg)
+
+Then, un-check the only option there:
+
+![setting](https://files.catbox.moe/b8879l.jpg)
+
+
+On another note, the target account will **also** be vulnerable if they have ever used **Picasa** linked to their Google account in any way, shape or form. For more details on this, read PinkDev1's comment on [issue #10](https://github.com/mxrch/GHunt/issues/10).
+For now, the only (known) solution to this is to delete the Picasa albums from your AlbumArchive. 
 
 # Thanks
 This tool is based on [Sector's research on Google IDs](https://sector035.nl/articles/getting-a-grasp-on-google-ids) and completed by my own as well.\
