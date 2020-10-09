@@ -36,7 +36,7 @@ if __name__ == "__main__":
         hangouts_token = out["keys"]["hangouts"]
         cookies = out["cookies"]
 
-    client = httpx.Client(cookies=cookies)
+    client = httpx.Client(cookies=cookies, headers=config.headers)
 
     data = is_email_google_account(client, auth, cookies, email,
                                    hangouts_token)
@@ -59,8 +59,7 @@ if __name__ == "__main__":
 
         # last edit
         timestamp = int(infos["metadata"]["lastUpdateTimeMicros"][:-3])
-        last_edit = datetime.utcfromtimestamp(timestamp)
-        last_edit = last_edit.strftime("%Y/%m/%d %H:%M:%S (UTC)")
+        last_edit = datetime.utcfromtimestamp(timestamp).strftime("%Y/%m/%d %H:%M:%S (UTC)")
         print(f"\nLast profile edit : {last_edit}\n"
               f"\nEmail : {email}\nGoogle ID : {gaiaID}\n")
 
@@ -73,21 +72,21 @@ if __name__ == "__main__":
             print("Hangouts Bot : No")
 
         # decide to check YouTube
-        yt_hunt = False
+        ytb_hunt = False
         try:
             services = [x["appType"].lower() if x["appType"].lower() != "babel" else "hangouts" for x in
                         infos["inAppReachability"]]
             if "youtube" in services and name:
-                yt_hunt = True
+                ytb_hunt = True
             print("\nActivated Google services :")
             print('\n'.join(["- " + x.capitalize() for x in services]))
 
         except KeyError:
-            yt_hunt = True
+            ytb_hunt = True
             print("\nUnable to fetch connected Google services.")
 
         # check YouTube
-        if yt_hunt or config.yt_hunt_always:
+        if ytb_hunt or config.ytb_hunt_always:
             confidence = None
             req = client.get(profile_pic)
             img = Image.open(BytesIO(req.content))
@@ -112,11 +111,11 @@ if __name__ == "__main__":
                 print("\nYouTube channel not found.")
 
         # TODO: return gpics function output here
-        gpics(gaiaID, client, cookies, config.regexs["albums"],
+        gpics(gaiaID, client, cookies, config.headers, config.regexs["albums"], config.regexs["photos"],
               config.headless)
 
         # reviews
-        reviews = gmaps.scrape(gaiaID, client, cookies, config.regexs["review_loc_by_id"], config.headless)
+        reviews = gmaps.scrape(gaiaID, client, cookies, config.headers, config.regexs["review_loc_by_id"], config.headless)
 
         if reviews:
             confidence, locations = gmaps.get_confidence(reviews, config.gmaps_radius)

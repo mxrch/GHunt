@@ -1,5 +1,6 @@
 import json
 from os.path import isfile
+from ssl import SSLError
 
 import httpx
 from seleniumwire import webdriver
@@ -14,28 +15,24 @@ def get_saved_cookies():
         try:
             with open(config.data_path, 'r') as f:
                 out = json.loads(f.read())
-                auth = out["auth"]
-                hangouts_token = out["keys"]
                 cookies = out["cookies"]
                 print("[+] Detected stored cookies, checking it")
                 return cookies
         except Exception:
-            print("[-] Stored cookies are corrupted.")
+            print("[-] Stored cookies are corrupted")
             return False
-    print("[-] No pre-existing cookies found")
+    print("[-] No stored cookies found")
     return False
 
 
 def get_authorization_source(cookies):
-    ''' returns html source of hangouts page if user authorised '''
-    headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; rv:68.0) Gecko/20'
-               '100101 Firefox/68.0'}
+    ''' returns html source of hangouts page if user authorized '''
     req = httpx.get("https://docs.google.com/document/u/0/?usp=direct_url",
-                    cookies=cookies, headers=headers, allow_redirects=False)
+                    cookies=cookies, headers=config.headers, allow_redirects=False)
 
     if req.status_code == 200:
         req2 = httpx.get("https://hangouts.google.com", cookies=cookies,
-                         headers=headers, allow_redirects=False)
+                         headers=config.headers, allow_redirects=False)
         if "myaccount.google.com" in req2.text:
             return req.text
     return None
@@ -52,9 +49,8 @@ def save_tokens(auth, gdoc_token, hangouts_token, cookies):
         f.write(json.dumps(output))
 
 
-def get_hangouts_tokens(cookies):
+def get_hangouts_tokens(cookies, driverpath):
     ''' gets auth and hangout token '''
-    driverpath = get_driverpath()
     tmprinter = TMPrinter()
     chrome_options = get_chrome_options_args(config.headless)
     options = {
@@ -66,6 +62,7 @@ def get_hangouts_tokens(cookies):
         executable_path=driverpath, seleniumwire_options=options,
         options=chrome_options
     )
+    driver.header_overrides = config.headers
 
     tmprinter.out("Setting cookies...")
     driver.get("https://hangouts.google.com/robots.txt")
@@ -74,6 +71,7 @@ def get_hangouts_tokens(cookies):
 
     tmprinter.out("Fetching Hangouts homepage...")
     driver.get("https://hangouts.google.com")
+
     tmprinter.out("Waiting for the /v2/people/me/blockedPeople request, it "
                   "can takes a few minutes...")
     req = driver.wait_for_request('/v2/people/me/blockedPeople', timeout=120)
@@ -81,25 +79,21 @@ def get_hangouts_tokens(cookies):
     driver.close()
     tmprinter.out("")
 
-    auth = req.headers["Authorization"]
+    auth_token = req.headers["Authorization"]
     hangouts_token = req.url.split("key=")[1]
 
-    return [auth, hangouts_token]
+    return (auth_token, hangouts_token)
 
 
 if __name__ == '__main__':
 
+    driverpath = get_driverpath()
     cookies = get_saved_cookies()
 
-    if cookies:
-        print("[+] Pre-existing cookies found")
-        choice = input("Do you want to generate new Google Docs "
-                       "and Hangouts tokens ? (Y/n) ").lower()
-        if choice != "y":
-            exit()
-
-    else:
-        print("\nEnter these browser cookies found at accounts.google.com")
+    ask = True
+    if not cookies:
+        ask = False
+        print("\nEnter these browser cookies found at accounts.google.com :")
         cookies = {"__Secure-3PSID": "", "APISID": "", "SAPISID": "",
                    "HSID": "", "CONSENT": "YES+FR.fr+V10+BX"}
         for name in cookies.keys():
@@ -110,9 +104,15 @@ if __name__ == '__main__':
     html = get_authorization_source(cookies)
     if html:
         print("\n[+] The cookies seems valid! Generating the Google Docs and "
-              "Hangouts token...\n")
+            "Hangouts token...\n")
     else:
         exit("\n[-] Seems like the cookies are invalid, try regenerating them")
+
+    if ask:
+        choice = input("Do you want to generate new Google Docs "
+                        "and Hangouts tokens ? (Y/n) ").lower()
+        if choice != "y":
+            exit()
 
     # get Google Docs token
     trigger = '\"token\":\"'
@@ -123,8 +123,8 @@ if __name__ == '__main__':
         print("Google Docs Token => {}".format(gdoc_token))
 
     # get Google Hangouts token
-    tokens = get_hangouts_tokens(cookies)
-    print("Authorization Token => {}".format(tokens[0]))
-    print("Hangouts Token => {}".format(tokens[1]))
+    auth_token, hangouts_token = get_hangouts_tokens(cookies, driverpath)
+    print("Authorization Token => {}".format(auth_token))
+    print("Hangouts Token => {}".format(hangouts_token))
 
-    save_tokens(tokens[0], gdoc_token, tokens[1], cookies)
+    save_tokens(auth_token, gdoc_token, hangouts_token, cookies)

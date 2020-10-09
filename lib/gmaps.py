@@ -14,7 +14,7 @@ from seleniumwire import webdriver
 from lib.utils import *
 
 
-def scrape(gaiaID, client, cookies, regex_rev_by_id, is_headless):
+def scrape(gaiaID, client, cookies, headers, regex_rev_by_id, is_headless):
     def get_datetime(datepublished):
         if datepublished.split()[0] == "a":
             nb = 1
@@ -62,6 +62,7 @@ def scrape(gaiaID, client, cookies, regex_rev_by_id, is_headless):
 
     driverpath = get_driverpath()
     driver = webdriver.Chrome(executable_path=driverpath, seleniumwire_options=options, options=chrome_options)
+    driver.header_overrides = headers
     wait = WebDriverWait(driver, 15)
 
     tmprinter.out("Setting cookies...")
