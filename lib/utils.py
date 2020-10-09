@@ -9,6 +9,8 @@ import chromedriver_autoinstaller
 from lib.os_detect import Os
 
 from pathlib import Path
+import shutil
+
 
 def is_email_google_account(httpx_client, auth, cookies, email, hangouts_token):
     host = "https://people-pa.clients6.google.com"
@@ -79,17 +81,19 @@ def sanitize_location(location):
 def get_driverpath():
     tmprinter = TMPrinter()
     drivers = [str(x.absolute()) for x in Path('.').rglob('chromedriver*')]
+    if not drivers:
+        drivers = shutil.which("chromedriver")
     if drivers:
         return drivers[0]
     else:
         tmprinter.out("I can't find the chromedriver, so I'm downloading and installing it for you...")
         path = chromedriver_autoinstaller.install(cwd=True)
         tmprinter.out("")
-        drivers = [str(x.absolute()) for x in Path('.').rglob('chromedriver*')]
+        drivers = [str(x.absolute()) for x in Path('.').rglob('chromedriver*') if x.name.lower() == "chromedriver" or x.name.lower() == "chromedriver.exe"]
         if drivers:
             return path
         else:
-            exit(f"I can't find the chromedriver.\nI installed it in \"{path}\" but it must be in the GHunt directory, you should move it here.")
+            exit(f"I can't find the chromedriver.\nI installed it in \"{path}\" but it must be in the GHunt directory or PATH, you should move it here.")
 
 
 def get_chrome_options_args(is_headless):

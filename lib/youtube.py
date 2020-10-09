@@ -35,7 +35,7 @@ def youtube_channel_search(client, query):
             hash = image_hash(img)
             results["channels"].append({"profile_url": profile_url, "name": title, "hash": hash})
         return results
-    except KeyError:
+    except (KeyError, IndexError):
         return False
 
 

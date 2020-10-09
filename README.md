@@ -11,12 +11,17 @@ It can currently extract:
 - Activated Google services (YouTube, Photos, Maps, News360, Hangouts, etc.)
 - Possible YouTube channel
 - Possible other usernames
-- Public photos
-- Phone models
-- Phone firmwares
-- Installed software
-- Google Maps reviews
-- Possible physical location
+- Public photos (P)
+- Phones models (P)
+- Phones firmwares (P)
+- Installed softwares (P)
+- Google Maps reviews (M)
+- Possible physical location (M)
+
+The features marked with a **(P)** require the target account to have the default setting of `Allow the people you share content with to download your photos and videos` on Picasa, or have used Picasa linked to their Google account.\
+More info [here](https://github.com/mxrch/GHunt#%EF%B8%8F-protecting-yourself).
+
+Those marked with a **(M)** require the Google Maps reviews of the target to be public (they are by default).
 
 # Screenshots
 <p align="center">
@@ -48,24 +53,13 @@ docker run -v $(pwd)/resources:/usr/src/app/resources -ti ghunt hunt.py <email_a
 
 ## Manual installation
 - Make sure you have Python 3.6.1+ installed. (I developed it with Python 3.8.1)
-- These Python modules are required (we'll install them later):
+- Some Python modules are required which are contained in `requirements.txt` and will be installed below.
 
-```
-geopy
-httpx
-selenium-wire
-selenium
-imagehash
-pillow
-python-dateutil
-chromedriver_autoinstaller
-```
-
-## 1. Chromedriver & Google Chrome
+### 1. Chromedriver & Google Chrome
 This project uses Selenium and automatically downloads the correct driver for your Chrome version. \
 ⚠️ So just make sure to have Google Chrome installed.
 
-## 2. Requirements
+### 2. Requirements
 In the GHunt folder, run:
 ```bash
 python -m pip install -r requirements.txt
@@ -81,6 +75,7 @@ Then, you can run the tool like this:
 ```bash
 python hunt.py myemail@gmail.com
 ```
+
 ⚠️ I suggest you make an empty account just for this or use an account where you never login because depending on your browser/location, re-logging in into the Google Account used for the cookies can deauthorize them.
 
 # Where I find these 4 cookies ?
@@ -91,6 +86,27 @@ If you don't know how to open it, just right-click anywhere and click "Inspect E
 
 ![cookies](https://files.catbox.moe/9jy200.png)
 
+# 🛡️ Protecting yourself
+Regarding the collection of metadata from your Google Photos account:
+
+Given that Google shows **"X require access"** on [your Google Account Dashboard](https://myaccount.google.com/intro/dashboard), you might imagine that you had to explicitly authorize another account in order for it to access your pictures; but this is not the case.\
+Any account can access your AlbumArchive (by default):
+
+![account-dashboard](https://files.catbox.moe/ufqc9g.jpg)
+
+Here's how to check and fix the fact that you're vulnerable (wich you most likely are):\
+Go to https://get.google.com/albumarchive/ while logged in with your Google account. You will be **automatically** redirected to your correct albumarchive URL (https://get.google.com/albumarchive/<YOUR-GOOGLE-ID-HERE>). After that, click the three dots on the top left corner, and click on **setting** 
+
+![three-dots-setting](https://files.catbox.moe/ru6kci.jpg)
+
+Then, un-check the only option there:
+
+![setting](https://files.catbox.moe/b8879l.jpg)
+
+
+On another note, the target account will **also** be vulnerable if they have ever used **Picasa** linked to their Google account in any way, shape or form. For more details on this, read PinkDev1's comment on [issue #10](https://github.com/mxrch/GHunt/issues/10).\
+For now, the only (known) solution to this is to delete the Picasa albums from your AlbumArchive. 
+
 # Thanks
 This tool is based on [Sector's research on Google IDs](https://sector035.nl/articles/getting-a-grasp-on-google-ids) and completed by my own as well.\
-If I have the motivation to write a blog post about it, I'll add the link here!
+If I have the motivation to write a blog post about it, I'll add the link here !
