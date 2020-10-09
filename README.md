@@ -50,11 +50,11 @@ docker run -v $(pwd)/resources:/usr/src/app/resources -ti ghunt hunt.py <email_a
 - Make sure you have Python 3.6.1+ installed. (I developed it with Python 3.8.1)
 - Some Python modules are required which are contained in `requirements.txt` and will be installed below.
 
-## 1. Chromedriver & Google Chrome
+### 1. Chromedriver & Google Chrome
 This project uses Selenium and automatically downloads the correct driver for your Chrome version. \
 ⚠️ So just make sure to have Google Chrome installed.
 
-## 2. Requirements
+### 2. Requirements
 In the GHunt folder, run:
 ```bash
 python -m pip install -r requirements.txt
