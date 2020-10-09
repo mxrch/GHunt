@@ -15,10 +15,12 @@ It can currently extract:
 - Phones models (T)
 - Phones firmwares (T)
 - Installed softwares (T)
-- Google Maps reviews
-- Possible physical location
+- Google Maps reviews (M)
+- Possible physical location (M)
 
 The features marked with a **(T)** requiere the target account to have the default setting of `"allow the people you share content with to download your photos and videos. People may still be able to download photos and videos that you've shared with google photos"`, OR, have used **Picasa** linked to their Google account.
+
+The features marked with an **(M)** require the Google Maps reviews of the target to be public (they are by default).
 
 # Screenshots
 <p align="center">
@@ -97,22 +99,22 @@ If you don't know how to open it, just right-click anywhere and click "Inspect E
 # 🛡️ Protecting yourself
 Regarding the collection of metadata from your Google Photos account:
 
-Even for a tech-savy person this setting is hard to find, because of how buried it is, and how much Google tried to hide the fact that some albums can be collected regardless of what the account dashboard says:
+Given that Google shows **"X require access"** on [your Google Account Dashboard](https://myaccount.google.com/intro/dashboard), you might imagine that you had to explicitly authorize another account in order for it to access your pictures; but this is not the case. **Any** account can access your AlbumArchive (by default):
 
-![0-public_bullshit](https://files.catbox.moe/ufqc9g.jpg)
+![account-dashboard](https://files.catbox.moe/ufqc9g.jpg)
 
 Here's how to _check if_/_fix the fact that_ you're vulnerable (wich you most likely are):
 Go to https://get.google.com/albumarchive/ while logged in with your Google account. You will be **automatically** redirected to your correct albumarchive URL (https://get.google.com/albumarchive/<YOUR-GOOGLE-ID-HERE>). After that, click the three dots on the top left corner, and click on **setting** 
 
-![how2.jpg](https://files.catbox.moe/ru6kci.jpg)
+![three-dots-setting](https://files.catbox.moe/ru6kci.jpg)
 
 Then, un-check the only option there:
 
-![setting.jpg](https://files.catbox.moe/b8879l.jpg)
+![setting](https://files.catbox.moe/b8879l.jpg)
 
 
-The target account will also be vulnerable if they have ever used **Picasa** linked to their Google account in any way, shape or form. For more details on this, read my comment on issue #10.
-Sadly, there doesn't seem to be any option to turn this off, except for begging the support staff for help (un-tested).
+On another note, the target account will **also** be vulnerable if they have ever used **Picasa** linked to their Google account in any way, shape or form. For more details on this, read PinkDev1's comment on [issue #10](https://github.com/mxrch/GHunt/issues/10).
+For now, the only (known) solution to this is to delete the Picasa albums from your AlbumArchive. 
 
 # Thanks
 This tool is based on [Sector's research on Google IDs](https://sector035.nl/articles/getting-a-grasp-on-google-ids) and completed by my own as well.\
