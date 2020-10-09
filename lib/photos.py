@@ -56,7 +56,7 @@ def get_source(gaiaID, client, cookies, cfg):
         driver.add_cookie({'name': k, 'value': v})
 
     tmprinter.out('Fetching Google Photos "Profile photos" album...')
-    driver.get(f"https://get.google.com/albumarchive/{gaiaID}/albums/profile-photos?hl=en")
+    driver.get(baseurl)
 
     tmprinter.out('Fetching the Google Photos albums overview...')
     buttons = driver.find_elements(By.XPATH, "//button")
@@ -92,7 +92,7 @@ def get_source(gaiaID, client, cookies, cfg):
 def gpics(gaiaID, client, cookies, cfg):
     baseurl = "https://get.google.com/albumarchive/"
 
-    print(f"\nGoogle Photos : {baseurl + gaiaID}")
+    print(f"\nGoogle Photos : {baseurl + gaiaID + '/albums/profile-photos'}")
     out = get_source(gaiaID, client, cookies, cfg)
     if not out:
         print("=> Couldn't fetch the public photos.")
