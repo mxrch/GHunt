@@ -88,11 +88,11 @@ If you don't know how to open it, just right-click anywhere and click "Inspect E
 # 🛡️ Protecting yourself
 Regarding the collection of metadata from your Google Photos account:
 
-Given that Google shows **"X require access"** on [your Google Account Dashboard](https://myaccount.google.com/intro/dashboard), you might imagine that you had to explicitly authorize another account in order for it to access your pictures; but this is not the case. **Any** account can access your AlbumArchive (by default):
+Given that Google shows **"X require access"** on [your Google Account Dashboard](https://myaccount.google.com/intro/dashboard), you might imagine that you had to explicitly authorize another account in order for it to access your pictures; but this is not the case. Any account can access your AlbumArchive (by default):
 
 ![account-dashboard](https://files.catbox.moe/ufqc9g.jpg)
 
-Here's how to _check if_/_fix the fact that_ you're vulnerable (wich you most likely are):
+Here's how to check and fix the fact that you're vulnerable (wich you most likely are):\
 Go to https://get.google.com/albumarchive/ while logged in with your Google account. You will be **automatically** redirected to your correct albumarchive URL (https://get.google.com/albumarchive/<YOUR-GOOGLE-ID-HERE>). After that, click the three dots on the top left corner, and click on **setting** 
 
 ![three-dots-setting](https://files.catbox.moe/ru6kci.jpg)
