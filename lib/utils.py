@@ -60,7 +60,7 @@ def get_driverpath():
         tmprinter.out("I can't find the chromedriver, so I'm downloading and installing it for you...")
         path = chromedriver_autoinstaller.install(cwd=True)
         tmprinter.out("")
-        drivers = [str(x.absolute()) for x in Path('.').rglob('chromedriver*')]
+        drivers = [str(x.absolute()) for x in Path('.').rglob('chromedriver*') if x.name.lower() == "chromedriver" or x.name.lower() == "chromedriver.exe"]
         if drivers:
             return path
         else:
