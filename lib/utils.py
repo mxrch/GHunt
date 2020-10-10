@@ -103,7 +103,7 @@ def get_chrome_options_args(is_headless):
     chrome_options.add_argument("--no-sandbox")
     if is_headless:
         chrome_options.add_argument("--headless")
-    if Os().wsl or Os().windows:
+    if (Os().wsl or Os().windows) and is_headless:
         chrome_options.add_argument("--disable-gpu")
         chrome_options.add_argument("--disable-dev-shm-usage")
         chrome_options.add_argument("--disable-setuid-sandbox")

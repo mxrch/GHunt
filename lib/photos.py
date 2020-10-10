@@ -1,5 +1,6 @@
 import re
 from io import BytesIO
+import pdb
 
 from PIL import Image
 from selenium.webdriver.common.by import By
@@ -9,6 +10,22 @@ from seleniumwire import webdriver
 
 from lib.metadata import ExifEater
 from lib.utils import *
+
+
+class element_has_substring_or_substring(object):
+    def __init__(self, locator, substring1, substring2):
+        self.locator = locator
+        self.substring1 = substring1
+        self.substring2 = substring2
+        
+    def __call__(self, driver):
+        element = driver.find_element(*self.locator)   # Finding the referenced element
+        if self.substring1 in element.text:
+            return self.substring1
+        elif self.substring2 in element.text:
+            return self.substring2
+        else:
+            return False
 
 
 def get_source(gaiaID, client, cookies, headers, is_headless):
@@ -61,7 +78,18 @@ def get_source(gaiaID, client, cookies, headers, is_headless):
     elif photos_trigger in body:
         stats = "found"
     else:
-        return False
+        try:
+            result = wait.until(element_has_substring_or_substring((By.XPATH, "//body"), no_photos_trigger, photos_trigger))
+        except Exception:
+            tmprinter.out("[-] Timeout while fetching photos.")
+            return False
+        else:
+            if result == no_photos_trigger:
+                stats = "notfound"
+            elif result == photos_trigger:
+                stats = "found"
+            else:
+                return False
     tmprinter.out("")
     source = driver.page_source
     driver.close()

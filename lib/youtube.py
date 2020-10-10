@@ -56,12 +56,23 @@ def youtube_channel_search_gdocs(client, query, data_path, gdocs_public_doc):
     channels = channels[:5]
 
     for profile_url in channels:
-        req = client.get(profile_url)
-        source = req.text
+        data = None
+        avatar_link = None
 
-        data = json.loads(
-            source.split('window["ytInitialData"] = ')[1].split('window["ytInitialPlayerResponse"]')[0].split(';\n')[0])
-        avatar_link = data["metadata"]["channelMetadataRenderer"]["avatar"]["thumbnails"][0]["url"].split('=')[0]
+        retries = 2
+        for retry in list(range(retries))[::-1]:
+            req = client.get(profile_url)
+            source = req.text
+            try:
+                data = json.loads(
+                    source.split('window["ytInitialData"] = ')[1].split('window["ytInitialPlayerResponse"]')[0].split(';\n')[0])
+                avatar_link = data["metadata"]["channelMetadataRenderer"]["avatar"]["thumbnails"][0]["url"].split('=')[0]
+            except (KeyError, IndexError):
+                if retry == 0:
+                    return False
+                continue
+            else:
+                break
         req = client.get(avatar_link)
         img = Image.open(BytesIO(req.content))
         hash = image_hash(img)
