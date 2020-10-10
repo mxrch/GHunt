@@ -10,7 +10,7 @@ from geopy.geocoders import Nominatim
 
 from lib.banner import banner
 import lib.gmaps as gmaps
-import lib.youtube as yt
+import lib.youtube as ytb
 import config
 from lib.photos import gpics
 from lib.utils import *
@@ -91,18 +91,18 @@ if __name__ == "__main__":
             req = client.get(profile_pic)
             img = Image.open(BytesIO(req.content))
             hash = image_hash(img)
-            data = yt.get_channels(client, name, config.data_path,
+            data = ytb.get_channels(client, name, config.data_path,
                                    config.gdocs_public_doc)
             if not data:
                 print("\nYouTube channel not found.")
             else:
-                confidence, channels = yt.get_confidence(data, name, hash)
+                confidence, channels = ytb.get_confidence(data, name, hash)
 
             if confidence:
                 print(f"\nYouTube channel (confidence => {confidence}%) :")
                 for channel in channels:
                     print(f"- [{channel['name']}] {channel['profile_url']}")
-                possible_usernames = yt.extract_usernames(channels)
+                possible_usernames = ytb.extract_usernames(channels)
                 if possible_usernames:
                     print("\nPossible usernames found :")
                     for username in possible_usernames:
