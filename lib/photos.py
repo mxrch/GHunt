@@ -11,35 +11,14 @@ from lib.metadata import ExifEater
 from lib.utils import *
 
 
-def get_source(gaiaID, client, cookies, cfg):
+def get_source(gaiaID, client, cookies, headers, is_headless):
     baseurl = f"https://get.google.com/albumarchive/{gaiaID}/albums/profile-photos?hl=en"
     req = client.get(baseurl)
     if req.status_code != 200:
         return False
 
-    class element_has_substring_or_substring(object):
-        """An expectation for checking that an element has a particular css class.
-
-        locator - used to find the element
-        returns the WebElement once it has the particular css class
-        """
-
-        def __init__(self, locator, substring1, substring2):
-            self.locator = locator
-            self.substring1 = substring1
-            self.substring2 = substring2
-
-        def __call__(self, driver):
-            element = driver.find_element(*self.locator)  # Finding the referenced element
-            if self.substring1 in element.text:
-                return self.substring1
-            elif self.substring2 in element.text:
-                return self.substring2
-            else:
-                return False
-
     tmprinter = TMPrinter()
-    chrome_options = get_chrome_options_args(cfg)
+    chrome_options = get_chrome_options_args(is_headless)
     options = {
         'connection_timeout': None  # Never timeout, otherwise it floods errors
     }
@@ -48,6 +27,7 @@ def get_source(gaiaID, client, cookies, cfg):
 
     driverpath = get_driverpath()
     driver = webdriver.Chrome(executable_path=driverpath, seleniumwire_options=options, options=chrome_options)
+    driver.header_overrides = headers
     wait = WebDriverWait(driver, 30)
 
     tmprinter.out("Setting cookies...")
@@ -89,11 +69,12 @@ def get_source(gaiaID, client, cookies, cfg):
     return {"stats": stats, "source": source}
 
 
-def gpics(gaiaID, client, cookies, cfg):
+def gpics(gaiaID, client, cookies, headers, regex_albums, regex_photos, headless=True):
     baseurl = "https://get.google.com/albumarchive/"
 
     print(f"\nGoogle Photos : {baseurl + gaiaID + '/albums/profile-photos'}")
-    out = get_source(gaiaID, client, cookies, cfg)
+    out = get_source(gaiaID, client, cookies, headers, headless)
+
     if not out:
         print("=> Couldn't fetch the public photos.")
         return False
@@ -102,7 +83,7 @@ def gpics(gaiaID, client, cookies, cfg):
         return False
 
     # open('debug.html', 'w').write(repr(out["source"]))
-    results = re.compile(cfg["regexs"]["albums"]).findall(out["source"])
+    results = re.compile(regex_albums).findall(out["source"])
 
     list_albums_length = len(results)
 
@@ -117,7 +98,7 @@ def gpics(gaiaID, client, cookies, cfg):
             if album_length >= 1:
                 req = client.get(album_link)
                 source = req.text.replace('\n', '')
-                results_pics = re.compile(cfg["regexs"]["photos"]).findall(source)
+                results_pics = re.compile(regex_photos).findall(source)
                 for pic in results_pics:
                     pic_name = pic[1]
                     pic_link = pic[0]
