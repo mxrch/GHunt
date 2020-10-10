@@ -82,7 +82,9 @@ def get_driverpath():
     tmprinter = TMPrinter()
     drivers = [str(x.absolute()) for x in Path('.').rglob('chromedriver*')]
     if not drivers:
-        drivers = shutil.which("chromedriver")
+        driver = shutil.which("chromedriver")
+        if driver is not None:
+            drivers = [driver]
     if drivers:
         return drivers[0]
     else:
