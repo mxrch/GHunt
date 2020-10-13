@@ -58,6 +58,13 @@ class ExifEater():
                 return ""
 
     def feed(self, img):
+        try:
+            img._getexif()
+        except:
+            try:
+                img._getexif = img.getexif
+            except:
+                img._getexif = lambda d={}:d
         if img._getexif():
             location = self.get_GPS(img)
             exif = {ExifTags.TAGS[k]: v for k, v in img._getexif().items() if k in ExifTags.TAGS}
