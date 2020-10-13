@@ -58,7 +58,7 @@ class ExifEater():
                 return ""
 
     def feed(self, img):
-        if img.getexif():
+        if img._getexif():
             location = self.get_GPS(img)
             exif = {ExifTags.TAGS[k]: v for k, v in img._getexif().items() if k in ExifTags.TAGS}
             interesting_fields = ["Make", "Model", "DateTime", "Software"]
