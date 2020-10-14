@@ -18,7 +18,7 @@ It can currently extract:
 - Google Maps reviews (M)
 - Possible physical location (M)
 
-The features marked with a **(P)** require the target account to have the default setting of `Allow the people you share content with to download your photos and videos` on Picasa, or have used Picasa linked to their Google account.\
+The features marked with a **(P)** require the target account to have the default setting of `Allow the people you share content with to download your photos and videos` on the Google AlbumArchive, OR if the target has ever used Picasa linked to their Google account.\
 More info [here](https://github.com/mxrch/GHunt#%EF%B8%8F-protecting-yourself).
 
 Those marked with a **(M)** require the Google Maps reviews of the target to be public (they are by default).
@@ -95,7 +95,7 @@ Any account can access your AlbumArchive (by default):
 ![account-dashboard](https://files.catbox.moe/ufqc9g.jpg)
 
 Here's how to check and fix the fact that you're vulnerable (wich you most likely are):\
-Go to https://get.google.com/albumarchive/ while logged in with your Google account. You will be **automatically** redirected to your correct albumarchive URL (https://get.google.com/albumarchive/<YOUR-GOOGLE-ID-HERE>). After that, click the three dots on the top left corner, and click on **setting** 
+Go to https://get.google.com/albumarchive/ while logged in with your Google account. You will be **automatically** redirected to your correct albumarchive URL (`https://get.google.com/albumarchive/YOUR-GOOGLE-ID-HERE`). After that, click the three dots on the top left corner, and click on **setting** 
 
 ![three-dots-setting](https://files.catbox.moe/ru6kci.jpg)
 
