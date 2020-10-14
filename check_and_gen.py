@@ -8,7 +8,6 @@ from seleniumwire import webdriver
 import config
 from lib.utils import *
 
-print("test")
 
 def get_saved_cookies():
     ''' returns cookie cache if exists '''
