@@ -1,29 +1,26 @@
 FROM python:3.8.6-slim-buster
 
-ENV CHROMEDRIVER_VERSION 85.0.4183.87
-ENV CHROME_VERSION 85.0.4183.121-1
+ARG UID=1000
+ARG GID=1000
 
 WORKDIR /usr/src/app
 
-RUN groupadd -r app && adduser --system --home /home/app --ingroup app app && \
+RUN groupadd -g ${GID} -r app && adduser --system --home /home/app --ingroup app --uid ${UID} app && \
     chown -R app:app /usr/src/app && \
     apt-get update && \
     apt-get install -y curl unzip gnupg && \
     curl -sS -o - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - && \
     echo "deb [arch=amd64]  http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list && \
     apt-get update && \
-    apt-get install -y google-chrome-stable=${CHROME_VERSION} && \
+    apt-get install -y google-chrome-stable && \
     rm -rf /var/lib/apt/lists/*
 
-RUN curl -O https://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip && \
-    unzip chromedriver_linux64.zip && \
-    rm -f chromedriver_linux64.zip
+COPY --chown=app:app requirements.txt docker/download_chromedriver.py ./
 
-COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt && \
+    python3 download_chromedriver.py
 
-RUN pip install --no-cache-dir -r requirements.txt
-
-COPY . .
+COPY --chown=app:app . .
 
 USER app
 
