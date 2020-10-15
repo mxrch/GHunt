@@ -7,4 +7,4 @@ pillow
 python-dateutil
 colorama
 chromedriver-autoinstaller
-bs4
+scrapy

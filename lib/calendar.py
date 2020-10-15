@@ -1,6 +1,7 @@
 import json
 import httpx
-from bs4 import BeautifulSoup
+#from bs4 import BeautifulSoup
+from scrapy.selector import Selector
 
 from lib.utils import TMPrinter 
 from lib.utils import get_chrome_options_args
@@ -23,18 +24,26 @@ def fetch_calendar(email, cookies, headers, headless_wanted):
 
         if calendar_source == None:
             return None
-
-        bs_source_code = BeautifulSoup(calendar_source, features="html.parser")
-
         # adding event titles into dictionary
-        for date_section in bs_source_code.find_all("div", attrs={"class" : "day"}): # iterating through all days
+        # --------------------------------------- FOR BS4 ----------------------------------------------------------
+        # for date_section in bs_source_code.find_all("div", attrs={"class" : "day"}): # iterating through all days
+        #
+        #    for event in date_section.find_all("div", attrs={"class":"event"}):
+        #        ev_title         = event.find("div", attrs={"class": "event-summary"}).div.find("span", attrs={"class":"event-title"}).text
+        #        ev_date_and_time = event.find("div", attrs={"class": "event-summary"}).span["title"]
+        #
+        #        event_info_dictionary[ev_title] = ev_date_and_time
+        # ----------------------------------------------------------------------------------------------------------
 
-            for event in date_section.find_all("div", attrs={"class":"event"}):
-                ev_title         = event.find("div", attrs={"class": "event-summary"}).div.find("span", attrs={"class":"event-title"}).text
-                ev_date_and_time = event.find("div", attrs={"class": "event-summary"}).span["title"]
-
+        # ----------------------------------------- SCRAPY ---------------------------------------------------------
+        for i in Selector(text=calendar_source).css(".day"):
+            for event in i.css(".event"):
+                ev_date_and_time = event.css("[class=\"event-time\"]::attr(title)").get()
+                ev_title         = event.css(".event-title::text").get()
+                #print(ev_title + " " + ev_date_and_time)
                 event_info_dictionary[ev_title] = ev_date_and_time
-
+        # ----------------------------------------------------------------------------------------------------------
+        
     except TimeoutException:
         # if we are not able to fetch date-label, it means there are some problems in calendar
         return None
@@ -77,10 +86,10 @@ def connect_to_calendar(headers, headless, cookies, email):
 
     driver.get(url_endpoint)
     
+    tmprinter.out("")
+
     myElem = WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.CLASS_NAME, 'date-label')))
     source_code = driver.page_source
     driver.close()
-
-    tmprinter.out("")
-
+    
     return source_code
