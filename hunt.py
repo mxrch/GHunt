@@ -14,6 +14,7 @@ import lib.youtube as ytb
 import config
 from lib.photos import gpics
 from lib.utils import *
+from lib.calendar import fetch_calendar
 
 if __name__ == "__main__":
 
@@ -130,3 +131,19 @@ if __name__ == "__main__":
             loc_names = set(loc_names)  # delete duplicates
             for loc in loc_names:
                 print(loc)
+        
+
+        # fetch_calendar returns dictionary containing details about events
+        # if user has no events then None
+        calendar_response = fetch_calendar(email, cookies, config.headers, config.headless)
+        if calendar_response != None:
+            print("[!] Showing events from today..")
+            # Events successfully fetched
+            ev_index = 1
+
+            for ev_title, ev_date_and_time in calendar_response.items():
+                # printing event_title and the time where it is scheduled
+                print("=> {}) {:32} On {:10}".format(ev_index, ev_title, ev_date_and_time))
+                ev_index +=1
+        else:
+            print("=> Nothing from the calendar")
