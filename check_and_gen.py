@@ -87,32 +87,46 @@ def get_hangouts_tokens(cookies, driverpath):
 
 if __name__ == '__main__':
 
-    driverpath = get_driverpath()
-    cookies = get_saved_cookies()
+    driverpath        = get_driverpath()
+    cookies_from_file = get_saved_cookies()
+
+    cookies = {"__Secure-3PSID": "", "APISID": "", "SAPISID": "", "HSID": "", "CONSENT": "YES+FR.fr+V10+BX"}
 
     ask = True
-    if not cookies:
+    new_cookies_entered = False
+
+    if not cookies_from_file:
         ask = False
         print("\nEnter these browser cookies found at accounts.google.com :")
-        cookies = {"__Secure-3PSID": "", "APISID": "", "SAPISID": "",
-                   "HSID": "", "CONSENT": "YES+FR.fr+V10+BX"}
         for name in cookies.keys():
             if not cookies[name]:
                 cookies[name] = input(f"{name} => ").strip()
+    else:
+        # in case user wants to enter new cookise (for example: for new account)
+        new_gen_inp = input("\nDo you want to enter new browser cookies from accounts.google.com ? (Y/n) ").lower()
+        if new_gen_inp == "y":
+            new_cookies_entered = True
+            for name in cookies.keys():
+                if not cookies[name]:
+                    cookies[name] = input(f"{name} => ").strip()
+
 
     # validate cookies
+    if not new_cookies_entered:
+        cookies = cookies_from_file
     html = get_authorization_source(cookies)
     if html:
         print("\n[+] The cookies seems valid! Generating the Google Docs and "
             "Hangouts token...\n")
     else:
         exit("\n[-] Seems like the cookies are invalid, try regenerating them")
-
-    if ask:
-        choice = input("Do you want to generate new Google Docs "
-                        "and Hangouts tokens ? (Y/n) ").lower()
-        if choice != "y":
-            exit()
+    
+    if not new_cookies_entered:
+        if ask:
+            choice = input("Do you want to generate new Google Docs "
+                            "and Hangouts tokens ? (Y/n) ").lower()
+            if choice != "y":
+                exit()
 
     # get Google Docs token
     trigger = '\"token\":\"'
