@@ -7,3 +7,4 @@ pillow
 python-dateutil
 colorama
 chromedriver-autoinstaller
+banner
