@@ -146,4 +146,4 @@ if __name__ == "__main__":
                 print("=> {}) {:32} On {:10}".format(ev_index, ev_title, ev_date_and_time))
                 ev_index +=1
         else:
-            print("=> Nothing from the calendar")
+            print("=> No events")
