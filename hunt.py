@@ -57,7 +57,7 @@ if __name__ == "__main__":
             print(f"Name: {name}")
         else:
             print("Couldn't find name")
-
+        
         # last edit
         timestamp = int(infos["metadata"]["lastUpdateTimeMicros"][:-3])
         last_edit = datetime.utcfromtimestamp(timestamp).strftime("%Y/%m/%d %H:%M:%S (UTC)")
@@ -132,10 +132,10 @@ if __name__ == "__main__":
             for loc in loc_names:
                 print(loc)
         
-
+        
         # fetch_calendar returns dictionary containing details about events
         # if user has no events then None
-        calendar_response = fetch_calendar(email, cookies, config.headers, config.headless)
+        calendar_response = fetch_calendar(email)
         if calendar_response != None:
             print("[!] Showing events from today..")
             # Events successfully fetched
@@ -143,7 +143,10 @@ if __name__ == "__main__":
 
             for ev_title, ev_date_and_time in calendar_response.items():
                 # printing event_title and the time where it is scheduled
-                print("=> {}) {:32} On {:10}".format(ev_index, ev_title, ev_date_and_time))
-                ev_index +=1
+                print("=> {}) {:32} STARTS - {} - ENDS - {}".format(ev_index, 
+                                                                    ev_title, 
+                                                                    ev_date_and_time.split("####")[0], 
+                                                                    ev_date_and_time.split("####")[1]))
+                ev_index += 1
         else:
             print("=> No events")

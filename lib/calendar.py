@@ -1,95 +1,97 @@
-import json
 import httpx
-#from bs4 import BeautifulSoup
-from scrapy.selector import Selector
+import time
 
-from lib.utils import TMPrinter 
-from lib.utils import get_chrome_options_args
-from lib.utils import get_driverpath
+from datetime     import date
+from urllib.parse import urlencode
+from json         import loads as JSON_LOADS
 
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait
-from seleniumwire import webdriver
-from selenium.common.exceptions import TimeoutException
+# grabs todays date with special formatting for json request url ( assemble_calendar_url() )
+def get_min_date():
+    today = date.today()
 
-# this method returns a dictionary with information of events, if there are no events then it returns None
-def fetch_calendar(email, cookies, headers, headless_wanted):
-    
-    event_info_dictionary = {}
+    offset = time.timezone if (time.localtime().tm_isdst == 0) else time.altzone
+    offset /= 60
+    offset /= 60
+    offset *= -1
+
+    d1 = today.strftime("%Y-%m-%d")
+    d1 += "T00:00:00"
+   
+    offset = format_timezone(offset)
+
+    d1 += offset
+    return d1
+
+# assembling the json request url endpoint
+def assemble_calendar_url(calendarId, singleEvents, maxAttendees, maxResults, sanitizeHtml, timeMin, API_key, email):
+    base_url = "https://clients6.google.com/calendar/v3/calendars/{0}/events?".format(email)
+    params = {
+        "calendarId": calendarId,
+        "singleEvents": singleEvents,
+        "maxAttendees": maxAttendees,
+        "maxResults": maxResults,
+        "timeMin": timeMin,
+        "key": API_key
+    }
+    base_url += urlencode(params, doseq=True)
+    return base_url
+
+# splitting date format (ex. 2020-10-18T20:15:00+04:00)
+def split_date_formats(date_str):
+    start_date    = date_str.split("T")[0]
+    start_hour    = date_str.split(":")[0][11:]
+    start_minutes = date_str.split(":")[1]
+    GMT           = format_timezone(date_str.split(":")[2][3:])
+    return "{} {}:{} GMT {}".format(start_date, start_hour, start_minutes, GMT)
+
+# formats time zone to our needs
+def format_timezone(tz):
+    tz = int(tz)
+    if tz >= 0:
+        tz = "+{:02d}:00".format(tz)
+    else:
+        # it doesn't need - character, because offset will have itself
+        tz = "{:03d}:00".format(tz)
+    return tz
+
+# main method of calendar.py
+def fetch_calendar(email):
+    url_endpoint = "https://calendar.google.com/calendar/u/0/embed?src={}&hl=en".format(email)
+    print("\nGoogle Calendar : " + url_endpoint)
+    req = httpx.get(url_endpoint)
+
+    source = req.text
 
     try:
-        # -- Getting connection to calendar's page ------------
-        calendar_source = connect_to_calendar(headers, headless_wanted, cookies, email)
-
-        if calendar_source == None:
-            return None
-        # adding event titles into dictionary
-        # --------------------------------------- FOR BS4 ----------------------------------------------------------
-        # for date_section in bs_source_code.find_all("div", attrs={"class" : "day"}): # iterating through all days
-        #
-        #    for event in date_section.find_all("div", attrs={"class":"event"}):
-        #        ev_title         = event.find("div", attrs={"class": "event-summary"}).div.find("span", attrs={"class":"event-title"}).text
-        #        ev_date_and_time = event.find("div", attrs={"class": "event-summary"}).span["title"]
-        #
-        #        event_info_dictionary[ev_title] = ev_date_and_time
-        # ----------------------------------------------------------------------------------------------------------
-
-        # ----------------------------------------- SCRAPY ---------------------------------------------------------
-        for i in Selector(text=calendar_source).css(".day"):
-            for event in i.css(".event"):
-                ev_date_and_time = event.css("[class=\"event-time\"]::attr(title)").get()
-                ev_title         = event.css(".event-title::text").get()
-                #print(ev_title + " " + ev_date_and_time)
-                event_info_dictionary[ev_title] = ev_date_and_time
-        # ----------------------------------------------------------------------------------------------------------
-        
-    except TimeoutException:
-        # if we are not able to fetch date-label, it means there are some problems in calendar
+        # parsing parameters from source code
+        calendarId   = source.split('title\":\"')[1].split('\"')[0]
+        singleEvents = "true"
+        maxAttendees = 1
+        maxResults   = 250
+        sanitizeHtml = "true"
+        timeMin      = get_min_date()
+        API_key      = source.split('developerKey\":\"')[1].split('\"')[0]
+    except IndexError:
         return None
-    
-    return event_info_dictionary
 
-def connect_to_calendar(headers, headless, cookies, email):
-    
-    # I am sorry for starting browser, but I was not able to manage this without chromedriver
-    # but it's better than nothing, hun? Isn't it?
-    
-    delay = 3
-    url_endpoint = "https://calendar.google.com/calendar/u/0/embed?src=" + email + "&mode=AGENDA"
-    print("\nGoogle Calendar : " + url_endpoint)
 
-    tmprinter = TMPrinter()
-    # ------- Setting chrome settings ----------
-    chrome_options = get_chrome_options_args(headless)
-    options = {
-        'connection_timeout': None  # Never timeout, otherwise it floods errors
-    }
-    # ------------------------------------------
+    json_calendar_endpoint = assemble_calendar_url(calendarId, singleEvents, maxAttendees, maxResults, sanitizeHtml, timeMin, API_key, email)
+    myJSON = httpx.get(json_calendar_endpoint)
 
-    tmprinter.out("Starting browser...")
+    myJSON_Object = JSON_LOADS(myJSON.text)
 
-    driverpath = get_driverpath()
-    driver = webdriver.Chrome(executable_path=driverpath, seleniumwire_options=options, options=chrome_options)
-    driver.header_overrides = headers
-    wait = WebDriverWait(driver, 30)
+    events_dict = {}
 
-    tmprinter.out("Setting cookies...")
+    try:
+        for json_iter in myJSON_Object["items"]:
+            event_title = json_iter["summary"]
+            start_time  = split_date_formats( json_iter["start"]["dateTime"] )
+            end_time    = split_date_formats( json_iter["end"]["dateTime"]   )
 
-    # set cookies
-    driver.get("https://get.google.com/robots.txt")
-    for k, v in cookies.items():
-        driver.add_cookie({'name': k, 'value': v})
-  
+            events_dict[event_title] = start_time + "####" + end_time
+            
+            # print(json_calendar_endpoint)
+    except KeyError:
+        return None
 
-    tmprinter.out("Fetching Calendar...")
-
-    driver.get(url_endpoint)
-    
-    tmprinter.out("")
-
-    myElem = WebDriverWait(driver, delay).until(EC.presence_of_element_located((By.CLASS_NAME, 'date-label')))
-    source_code = driver.page_source
-    driver.close()
-    
-    return source_code
+    return events_dict
