@@ -3,6 +3,8 @@ import sys
 from datetime import datetime
 from io import BytesIO
 from os.path import isfile
+from os.path import abspath
+from os.path import split   as OSsplit
 
 import httpx
 from PIL import Image
@@ -19,11 +21,18 @@ from lib.calendar import fetch_calendar
 if __name__ == "__main__":
 
     banner()
+    
+    # "dirname" stores the path where GHunt directory is
+    dirname, filename = OSsplit(abspath(__file__))
+    dirname += '/'
+    # We build the path to resources/data.txt file, so we will be able to run ghunt from any directory
+    resources_txt_path = dirname + config.data_path
+
 
     if len(sys.argv) <= 1:
         exit("Please put an email address.")
 
-    if not isfile(config.data_path):
+    if not isfile(resources_txt_path):
         exit("Please generate cookies and tokens first.")
 
     email = sys.argv[1]
@@ -31,7 +40,7 @@ if __name__ == "__main__":
     hangouts_token = ""
     cookies = ""
 
-    with open(config.data_path, 'r') as f:
+    with open(resources_txt_path, 'r') as f:
         out = json.loads(f.read())
         auth = out["auth"]
         hangouts_token = out["keys"]["hangouts"]
@@ -92,7 +101,7 @@ if __name__ == "__main__":
             req = client.get(profile_pic)
             img = Image.open(BytesIO(req.content))
             hash = image_hash(img)
-            data = ytb.get_channels(client, name, config.data_path,
+            data = ytb.get_channels(client, name, resources_txt_path,
                                    config.gdocs_public_doc)
             if not data:
                 print("\nYouTube channel not found.")
