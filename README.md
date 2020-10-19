@@ -33,6 +33,7 @@ Those marked with a **(M)** require the Google Maps reviews of the target to be 
 Either this is a bug and this will be fixed, either it's a protection that we need to find how to bypass.
 - **03/10/2020** : Successfully bypassed. 🕺 (commit 01dc016)\
 It requires the "Profile photos" album to be public (it is by default)
+- **20/10/2020** : Google WebArchive now returns a 404 even when coming from the "Profile photos" album, so **the photos scraping is temporary (or permanently) disabled.** (commit e762543)\
 
 # Installation
 
