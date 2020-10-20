@@ -1,23 +1,27 @@
 import json
 import sys
+import os
 from datetime import datetime
 from io import BytesIO
 from os.path import isfile
+from pathlib import Path
 
 import httpx
 from PIL import Image
 from geopy.geocoders import Nominatim
 
+import config
 from lib.banner import banner
 import lib.gmaps as gmaps
 import lib.youtube as ytb
-import config
 from lib.photos import gpics
 from lib.utils import *
 
 if __name__ == "__main__":
 
     banner()
+
+    tmprinter = TMPrinter()
 
     if len(sys.argv) <= 1:
         exit("Please put an email address.")
@@ -55,7 +59,25 @@ if __name__ == "__main__":
         if name:
             print(f"Name: {name}")
         else:
-            print("Couldn't find name")
+            print("[-] Couldn't find name")
+
+        # profile picture
+        profile_pic_link = infos["photo"][0]["url"]
+        req = client.get(profile_pic_link)
+
+        profile_pic_img = Image.open(BytesIO(req.content))
+        profile_pic_hash = image_hash(profile_pic_img)
+        is_default_profile_pic = detect_default_profile_pic(profile_pic_hash)
+
+        if is_default_profile_pic:
+            print("\n[-] Default profile picture")
+        else:
+            print("\n[+] Custom profile picture !")
+            print(f"=> {profile_pic_link}")
+            if config.write_profile_pic:
+                print("Profile picture saved !")
+                open(Path(config.profile_pics_dir) / f'{email}.jpg', 'wb').write(req.content)
+            tmprinter.out("")
 
         # last edit
         timestamp = int(infos["metadata"]["lastUpdateTimeMicros"][:-3])
@@ -64,7 +86,6 @@ if __name__ == "__main__":
               f"\nEmail : {email}\nGoogle ID : {gaiaID}\n")
 
         # is bot?
-        profile_pic = infos["photo"][0]["url"]
         isBot = infos["extendedData"]["hangoutsExtendedData"]["isBot"]
         if isBot:
             print("Hangouts Bot : Yes !\n")
@@ -88,15 +109,12 @@ if __name__ == "__main__":
         # check YouTube
         if ytb_hunt or config.ytb_hunt_always:
             confidence = None
-            req = client.get(profile_pic)
-            img = Image.open(BytesIO(req.content))
-            hash = image_hash(img)
             data = ytb.get_channels(client, name, config.data_path,
                                    config.gdocs_public_doc)
             if not data:
                 print("\nYouTube channel not found.")
             else:
-                confidence, channels = ytb.get_confidence(data, name, hash)
+                confidence, channels = ytb.get_confidence(data, name, profile_pic_hash)
 
             if confidence:
                 print(f"\nYouTube channel (confidence => {confidence}%) :")
@@ -111,8 +129,8 @@ if __name__ == "__main__":
                 print("\nYouTube channel not found.")
 
         # TODO: return gpics function output here
-        gpics(gaiaID, client, cookies, config.headers, config.regexs["albums"], config.regexs["photos"],
-              config.headless)
+        #gpics(gaiaID, client, cookies, config.headers, config.regexs["albums"], config.regexs["photos"],
+        #      config.headless)
 
         # reviews
         reviews = gmaps.scrape(gaiaID, client, cookies, config.headers, config.regexs["review_loc_by_id"], config.headless)
