@@ -78,7 +78,7 @@ def youtube_channel_search_gdocs(client, query, data_path, gdocs_public_doc):
         hash = image_hash(img)
         title = data["metadata"]["channelMetadataRenderer"]["title"]
         results["channels"].append({"profile_url": profile_url, "name": title, "hash": hash})
-        
+
     return results
 
 
