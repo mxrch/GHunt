@@ -19,7 +19,7 @@ It can currently extract:
 - Possible physical location (M)
 - Events from Google Calendar (C)
 
-The features marked with a **(P)** require the target account to have the default setting of `Allow the people you share content with to download your photos and videos` on Picasa, or have used Picasa linked to their Google account.\
+The features marked with a **(P)** require the target account to have the default setting of `Allow the people you share content with to download your photos and videos` on the Google AlbumArchive, or if the target has ever used Picasa linked to their Google account.\
 More info [here](https://github.com/mxrch/GHunt#%EF%B8%8F-protecting-yourself).
 
 Those marked with a **(M)** require the Google Maps reviews of the target to be public (they are by default).
@@ -36,6 +36,7 @@ Those marked with a **(C)** requires user to have Google Calendar set on public 
 Either this is a bug and this will be fixed, either it's a protection that we need to find how to bypass.
 - **03/10/2020** : Successfully bypassed. 🕺 (commit 01dc016)\
 It requires the "Profile photos" album to be public (it is by default)
+- **20/10/2020** : Google WebArchive now returns a 404 even when coming from the "Profile photos" album, so **the photos scraping is temporary (or permanently) disabled.** (commit e762543)
 
 # Installation
 
@@ -98,7 +99,7 @@ Any account can access your AlbumArchive (by default):
 ![account-dashboard](https://files.catbox.moe/ufqc9g.jpg)
 
 Here's how to check and fix the fact that you're vulnerable (wich you most likely are):\
-Go to https://get.google.com/albumarchive/ while logged in with your Google account. You will be **automatically** redirected to your correct albumarchive URL (https://get.google.com/albumarchive/<YOUR-GOOGLE-ID-HERE>). After that, click the three dots on the top left corner, and click on **setting** 
+Go to https://get.google.com/albumarchive/ while logged in with your Google account. You will be **automatically** redirected to your correct albumarchive URL (`https://get.google.com/albumarchive/YOUR-GOOGLE-ID-HERE`). After that, click the three dots on the top left corner, and click on **setting** 
 
 ![three-dots-setting](https://files.catbox.moe/ru6kci.jpg)
 

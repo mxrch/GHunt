@@ -121,8 +121,8 @@ if __name__ == "__main__":
                 print("\nYouTube channel not found.")
 
         # TODO: return gpics function output here
-        gpics(gaiaID, client, cookies, config.headers, config.regexs["albums"], config.regexs["photos"],
-              config.headless)
+        #gpics(gaiaID, client, cookies, config.headers, config.regexs["albums"], config.regexs["photos"],
+        #      config.headless)
 
         # reviews
         reviews = gmaps.scrape(gaiaID, client, cookies, config.headers, config.regexs["review_loc_by_id"], config.headless)
