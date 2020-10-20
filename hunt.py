@@ -145,7 +145,7 @@ if __name__ == "__main__":
         # fetch_calendar returns dictionary containing details about events
         # if user has no events then None
         calendar_response = fetch_calendar(email)
-        if calendar_response != None:
+        if calendar_response != None and len(calendar_response) > 0:
             print("[!] Showing events from today..")
             # Events successfully fetched
             ev_index = 1
