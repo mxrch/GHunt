@@ -1,9 +1,9 @@
 import httpx
-import time
 
+import time
+import json
 from datetime     import date
 from urllib.parse import urlencode
-from json         import loads as JSON_LOADS
 
 # grabs todays date with special formatting for json request url ( assemble_calendar_url() )
 def get_min_date():
@@ -56,9 +56,9 @@ def format_timezone(tz):
 
 # main method of calendar.py
 def fetch_calendar(email):
-    url_endpoint = "https://calendar.google.com/calendar/u/0/embed?src={}&hl=en".format(email)
+    url_endpoint = f"https://calendar.google.com/calendar/u/0/embed?src={email}"
     print("\nGoogle Calendar : " + url_endpoint)
-    req = httpx.get(url_endpoint)
+    req = httpx.get(url_endpoint + "&hl=en")
 
     source = req.text
 
@@ -76,14 +76,14 @@ def fetch_calendar(email):
 
 
     json_calendar_endpoint = assemble_calendar_url(calendarId, singleEvents, maxAttendees, maxResults, sanitizeHtml, timeMin, API_key, email)
-    myJSON = httpx.get(json_calendar_endpoint)
+    req = httpx.get(json_calendar_endpoint)
 
-    myJSON_Object = JSON_LOADS(myJSON.text)
+    data = json.loads(req.text)
 
     events_dict = {}
 
     try:
-        for json_iter in myJSON_Object["items"]:
+        for json_iter in data["items"]:
             event_title = json_iter["summary"]
             start_time  = split_date_formats( json_iter["start"]["dateTime"] )
             end_time    = split_date_formats( json_iter["end"]["dateTime"]   )

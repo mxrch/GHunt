@@ -1,19 +1,21 @@
 import json
 import sys
+import os
 from datetime import datetime
 from io import BytesIO
 from os.path import isfile
 from os.path import abspath
-from os.path import split   as OSsplit
+from os.path import split   as os_split
+from pathlib import Path
 
 import httpx
 from PIL import Image
 from geopy.geocoders import Nominatim
 
+import config
 from lib.banner import banner
 import lib.gmaps as gmaps
 import lib.youtube as ytb
-import config
 from lib.photos import gpics
 from lib.utils import *
 from lib.calendar import fetch_calendar
@@ -23,16 +25,18 @@ if __name__ == "__main__":
     banner()
     
     # "dirname" stores the path where GHunt directory is
-    dirname, filename = OSsplit(abspath(__file__))
+    dirname, filename = os_split(abspath(__file__))
     dirname += '/'
     # We build the path to resources/data.txt file, so we will be able to run ghunt from any directory
-    resources_txt_path = dirname + config.data_path
+    data_path = dirname + config.data_path
 
+
+    tmprinter = TMPrinter()
 
     if len(sys.argv) <= 1:
         exit("Please put an email address.")
 
-    if not isfile(resources_txt_path):
+    if not isfile(data_path):
         exit("Please generate cookies and tokens first.")
 
     email = sys.argv[1]
@@ -40,7 +44,7 @@ if __name__ == "__main__":
     hangouts_token = ""
     cookies = ""
 
-    with open(resources_txt_path, 'r') as f:
+    with open(data_path, 'r') as f:
         out = json.loads(f.read())
         auth = out["auth"]
         hangouts_token = out["keys"]["hangouts"]
@@ -63,10 +67,35 @@ if __name__ == "__main__":
         # get name
         name = get_account_name(client, gaiaID)
         if name:
-            print(f"Name: {name}")
+            print(f"Name : {name}")
         else:
-            print("Couldn't find name")
-        
+            if "name" not in infos:
+                print("Couldn't find name")
+            else:
+                for i in range(len(infos["name"])):
+                    print(f"Name : {infos['name'][i]['displayName']}")
+                if len(infos["name"]) > 0:
+                    name = infos["name"][0]["displayName"]
+            print("[-] Couldn't find name")
+
+        # profile picture
+        profile_pic_link = infos["photo"][0]["url"]
+        req = client.get(profile_pic_link)
+
+        profile_pic_img = Image.open(BytesIO(req.content))
+        profile_pic_hash = image_hash(profile_pic_img)
+        is_default_profile_pic = detect_default_profile_pic(profile_pic_hash)
+
+        if is_default_profile_pic:
+            print("\n[-] Default profile picture")
+        else:
+            print("\n[+] Custom profile picture !")
+            print(f"=> {profile_pic_link}")
+            if config.write_profile_pic:
+                print("Profile picture saved !")
+                open(Path(config.profile_pics_dir) / f'{email}.jpg', 'wb').write(req.content)
+            tmprinter.out("")
+
         # last edit
         timestamp = int(infos["metadata"]["lastUpdateTimeMicros"][:-3])
         last_edit = datetime.utcfromtimestamp(timestamp).strftime("%Y/%m/%d %H:%M:%S (UTC)")
@@ -75,11 +104,14 @@ if __name__ == "__main__":
 
         # is bot?
         profile_pic = infos["photo"][0]["url"]
-        isBot = infos["extendedData"]["hangoutsExtendedData"]["isBot"]
-        if isBot:
-            print("Hangouts Bot : Yes !\n")
+        if "extendedData" in infos:
+            isBot = infos["extendedData"]["hangoutsExtendedData"]["isBot"]
+            if isBot:
+                print("Hangouts Bot : Yes !")
+            else:
+                print("Hangouts Bot : No")
         else:
-            print("Hangouts Bot : No")
+            print("Hangouts Bot : Unknown")
 
         # decide to check YouTube
         ytb_hunt = False
@@ -98,15 +130,12 @@ if __name__ == "__main__":
         # check YouTube
         if ytb_hunt or config.ytb_hunt_always:
             confidence = None
-            req = client.get(profile_pic)
-            img = Image.open(BytesIO(req.content))
-            hash = image_hash(img)
-            data = ytb.get_channels(client, name, resources_txt_path,
+            data = ytb.get_channels(client, name, data_path,
                                    config.gdocs_public_doc)
             if not data:
                 print("\nYouTube channel not found.")
             else:
-                confidence, channels = ytb.get_confidence(data, name, hash)
+                confidence, channels = ytb.get_confidence(data, name, profile_pic_hash)
 
             if confidence:
                 print(f"\nYouTube channel (confidence => {confidence}%) :")
@@ -145,7 +174,7 @@ if __name__ == "__main__":
         # fetch_calendar returns dictionary containing details about events
         # if user has no events then None
         calendar_response = fetch_calendar(email)
-        if calendar_response != None and len(calendar_response) > 0:
+        if calendar_response:
             print("[!] Showing events from today..")
             # Events successfully fetched
             ev_index = 1

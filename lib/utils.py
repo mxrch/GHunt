@@ -1,7 +1,3 @@
-import json
-
-from os.path import isfile
-
 import imagehash
 from selenium.webdriver.chrome.options import Options
 import chromedriver_autoinstaller
@@ -10,7 +6,22 @@ from lib.os_detect import Os
 
 from pathlib import Path
 import shutil
+import subprocess, os
+from os.path import isfile
+import json
+import re
 
+
+class TMPrinter():
+    def __init__(self):
+        self.max_len = 0
+
+    def out(self, text):
+        if len(text) > self.max_len:
+            self.max_len = len(text)
+        else:
+            text += (" " * (self.max_len - len(text)))
+        print(text, end='\r')
 
 def is_email_google_account(httpx_client, auth, cookies, email, hangouts_token):
     host = "https://people-pa.clients6.google.com"
@@ -34,25 +45,19 @@ def is_email_google_account(httpx_client, auth, cookies, email, hangouts_token):
 def get_account_name(httpx_client, gaiaID):
     req = httpx_client.get(f"https://www.google.com/maps/contrib/{gaiaID}")
     gmaps_source = req.text
-    name = gmaps_source.split("Contributions by")[1].split('"')[0].strip()
-    return name
+    match = re.search(r'<meta content="Contributions by (.*?)" itemprop="name">', gmaps_source)
+    if not match:
+        return None
+    return match[1]
 
 def image_hash(img):
     hash = str(imagehash.average_hash(img))
     return hash
 
-
-class TMPrinter():
-    def __init__(self):
-        self.max_len = 0
-
-    def out(self, text):
-        if len(text) > self.max_len:
-            self.max_len = len(text)
-        else:
-            text += (" " * (self.max_len - len(text)))
-        print(text, end='\r')
-
+def detect_default_profile_pic(hash):
+    if hash == 'ffffc3c3e7c38181':
+        return True
+    return False
 
 def sanitize_location(location):
     not_country = False
