@@ -1,8 +1,3 @@
-import json
-import re
-
-from os.path import isfile
-
 import imagehash
 from selenium.webdriver.chrome.options import Options
 import chromedriver_autoinstaller
@@ -11,6 +6,10 @@ from lib.os_detect import Os
 
 from pathlib import Path
 import shutil
+import subprocess, os
+from os.path import isfile
+import json
+import re
 
 
 def is_email_google_account(httpx_client, auth, cookies, email, hangouts_token):
@@ -42,6 +41,11 @@ def get_account_name(httpx_client, gaiaID):
 def image_hash(img):
     hash = str(imagehash.average_hash(img))
     return hash
+
+def detect_default_profile_pic(hash):
+    if hash == 'ffffc3c3e7c38181':
+        return True
+    return False
 
 
 class TMPrinter():

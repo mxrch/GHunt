@@ -67,7 +67,7 @@ def youtube_channel_search_gdocs(client, query, data_path, gdocs_public_doc):
                 data = json.loads(
                     source.split('window["ytInitialData"] = ')[1].split('window["ytInitialPlayerResponse"]')[0].split(';\n')[0])
                 avatar_link = data["metadata"]["channelMetadataRenderer"]["avatar"]["thumbnails"][0]["url"].split('=')[0]
-            except (KeyError, IndexError):
+            except (KeyError, IndexError) as e:
                 if retry == 0:
                     return False
                 continue
