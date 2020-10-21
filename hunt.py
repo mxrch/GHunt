@@ -57,8 +57,15 @@ if __name__ == "__main__":
         # get name
         name = get_account_name(client, gaiaID)
         if name:
-            print(f"Name: {name}")
+            print(f"Name : {name}")
         else:
+            if "name" not in infos:
+                print("Couldn't find name")
+            else:
+                for i in range(len(infos["name"])):
+                    print(f"Name : {infos['name'][i]['displayName']}")
+                if len(infos["name"]) > 0:
+                    name = infos["name"][0]["displayName"]
             print("[-] Couldn't find name")
 
         # profile picture
@@ -86,11 +93,15 @@ if __name__ == "__main__":
               f"\nEmail : {email}\nGoogle ID : {gaiaID}\n")
 
         # is bot?
-        isBot = infos["extendedData"]["hangoutsExtendedData"]["isBot"]
-        if isBot:
-            print("Hangouts Bot : Yes !\n")
+        profile_pic = infos["photo"][0]["url"]
+        if "extendedData" in infos:
+            isBot = infos["extendedData"]["hangoutsExtendedData"]["isBot"]
+            if isBot:
+                print("Hangouts Bot : Yes !")
+            else:
+                print("Hangouts Bot : No")
         else:
-            print("Hangouts Bot : No")
+            print("Hangouts Bot : Unknown")
 
         # decide to check YouTube
         ytb_hunt = False
