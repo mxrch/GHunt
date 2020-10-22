@@ -5,7 +5,7 @@ ARG GID=1000
 
 WORKDIR /usr/src/app
 
-RUN groupadd -g ${GID} -r app && adduser --system --home /home/app --ingroup app --uid ${UID} app && \
+RUN groupadd -o -g ${GID} -r app && adduser --system --home /home/app --ingroup app --uid ${UID} app && \
     chown -R app:app /usr/src/app && \
     apt-get update && \
     apt-get install -y curl unzip gnupg && \
