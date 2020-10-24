@@ -84,6 +84,5 @@ def out(events):
         else:
             duration = "?"
         date = event["start"].strftime("%Y/%m/%d %H:%M:%S")
-
         table.rows.append([title, date, duration])
     print(table)
