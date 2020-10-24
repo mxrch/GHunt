@@ -7,6 +7,7 @@ from os.path import isfile
 from os.path import abspath
 from os.path import split   as os_split
 from pathlib import Path
+from pprint import pprint
 
 import httpx
 from PIL import Image
@@ -18,7 +19,7 @@ import lib.gmaps as gmaps
 import lib.youtube as ytb
 from lib.photos import gpics
 from lib.utils import *
-from lib.calendar import fetch_calendar
+import lib.calendar as gcalendar
 
 if __name__ == "__main__":
 
@@ -120,12 +121,12 @@ if __name__ == "__main__":
                         infos["inAppReachability"]]
             if "youtube" in services and name:
                 ytb_hunt = True
-            print("\nActivated Google services :")
+            print("\n[+] Activated Google services :")
             print('\n'.join(["- " + x.capitalize() for x in services]))
 
         except KeyError:
             ytb_hunt = True
-            print("\nUnable to fetch connected Google services.")
+            print("\n[-] Unable to fetch connected Google services.")
 
         # check YouTube
         if ytb_hunt or config.ytb_hunt_always:
@@ -133,21 +134,21 @@ if __name__ == "__main__":
             data = ytb.get_channels(client, name, data_path,
                                    config.gdocs_public_doc)
             if not data:
-                print("\nYouTube channel not found.")
+                print("\n[-] YouTube channel not found.")
             else:
                 confidence, channels = ytb.get_confidence(data, name, profile_pic_hash)
 
             if confidence:
-                print(f"\nYouTube channel (confidence => {confidence}%) :")
+                print(f"\n[+] YouTube channel (confidence => {confidence}%) :")
                 for channel in channels:
                     print(f"- [{channel['name']}] {channel['profile_url']}")
                 possible_usernames = ytb.extract_usernames(channels)
                 if possible_usernames:
-                    print("\nPossible usernames found :")
+                    print("\n[+] Possible usernames found :")
                     for username in possible_usernames:
                         print(f"- {username}")
             else:
-                print("\nYouTube channel not found.")
+                print("\n[-] YouTube channel not found.")
 
         # TODO: return gpics function output here
         #gpics(gaiaID, client, cookies, config.headers, config.regexs["albums"], config.regexs["photos"],
@@ -158,7 +159,7 @@ if __name__ == "__main__":
 
         if reviews:
             confidence, locations = gmaps.get_confidence(reviews, config.gmaps_radius)
-            print(f"\nProbable location (confidence => {confidence}) :")
+            print(f"\n[+] Probable location (confidence => {confidence}) :")
 
             loc_names = []
             for loc in locations:
@@ -171,20 +172,15 @@ if __name__ == "__main__":
                 print(loc)
         
         
-        # fetch_calendar returns dictionary containing details about events
-        # if user has no events then None
-        calendar_response = fetch_calendar(email)
+       # Google Calendar
+        calendar_response = gcalendar.fetch(email)
         if calendar_response:
-            print("[!] Showing events from today..")
-            # Events successfully fetched
-            ev_index = 1
-
-            for ev_title, ev_date_and_time in calendar_response.items():
-                # printing event_title and the time where it is scheduled
-                print("=> {}) {:32} STARTS - {} - ENDS - {}".format(ev_index, 
-                                                                    ev_title, 
-                                                                    ev_date_and_time.split("####")[0], 
-                                                                    ev_date_and_time.split("####")[1]))
-                ev_index += 1
+            print("[+] Public Google Calendar found !")
+            events = calendar_response["events"]
+            if events:
+                gcalendar.out(events)
+            else:
+                print("=> No recent events found.")
         else:
-            print("=> No events")
+            print("[-] No public Google Calendar.")
+        

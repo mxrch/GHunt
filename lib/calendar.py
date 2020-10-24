@@ -1,30 +1,17 @@
 import httpx
+from dateutil.relativedelta import relativedelta
+from beautifultable import BeautifulTable
+from termcolor import colored
 
 import time
 import json
-from datetime     import date
+from datetime     import datetime, timezone
 from urllib.parse import urlencode
 
-# grabs todays date with special formatting for json request url ( assemble_calendar_url() )
-def get_min_date():
-    today = date.today()
-
-    offset = time.timezone if (time.localtime().tm_isdst == 0) else time.altzone
-    offset /= 60
-    offset /= 60
-    offset *= -1
-
-    d1 = today.strftime("%Y-%m-%d")
-    d1 += "T00:00:00"
-   
-    offset = format_timezone(offset)
-
-    d1 += offset
-    return d1
 
 # assembling the json request url endpoint
-def assemble_calendar_url(calendarId, singleEvents, maxAttendees, maxResults, sanitizeHtml, timeMin, API_key, email):
-    base_url = "https://clients6.google.com/calendar/v3/calendars/{0}/events?".format(email)
+def assemble_api_req(calendarId, singleEvents, maxAttendees, maxResults, sanitizeHtml, timeMin, API_key, email):
+    base_url = f"https://clients6.google.com/calendar/v3/calendars/{email}/events?"
     params = {
         "calendarId": calendarId,
         "singleEvents": singleEvents,
@@ -36,32 +23,18 @@ def assemble_calendar_url(calendarId, singleEvents, maxAttendees, maxResults, sa
     base_url += urlencode(params, doseq=True)
     return base_url
 
-# splitting date format (ex. 2020-10-18T20:15:00+04:00)
-def split_date_formats(date_str):
-    start_date    = date_str.split("T")[0]
-    start_hour    = date_str.split(":")[0][11:]
-    start_minutes = date_str.split(":")[1]
-    GMT           = format_timezone(date_str.split(":")[2][3:])
-    return "{} {}:{} GMT {}".format(start_date, start_hour, start_minutes, GMT)
-
-# formats time zone to our needs
-def format_timezone(tz):
-    tz = int(tz)
-    if tz >= 0:
-        tz = "+{:02d}:00".format(tz)
-    else:
-        # it doesn't need - character, because offset will have itself
-        tz = "{:03d}:00".format(tz)
-    return tz
+# from iso to datetime object in utc
+def get_datetime_utc(date_str):
+    date = datetime.fromisoformat(date_str)
+    margin = date.utcoffset()
+    return date.replace(tzinfo=timezone.utc) - margin
 
 # main method of calendar.py
-def fetch_calendar(email):
+def fetch(email):
     url_endpoint = f"https://calendar.google.com/calendar/u/0/embed?src={email}"
     print("\nGoogle Calendar : " + url_endpoint)
     req = httpx.get(url_endpoint + "&hl=en")
-
     source = req.text
-
     try:
         # parsing parameters from source code
         calendarId   = source.split('title\":\"')[1].split('\"')[0]
@@ -69,29 +42,48 @@ def fetch_calendar(email):
         maxAttendees = 1
         maxResults   = 250
         sanitizeHtml = "true"
-        timeMin      = get_min_date()
+        timeMin      = datetime.strptime(source.split('preloadStart\":\"')[1].split('\"')[0], '%Y%m%d').replace(tzinfo=timezone.utc).isoformat()
         API_key      = source.split('developerKey\":\"')[1].split('\"')[0]
     except IndexError:
-        return None
+        return False
 
-
-    json_calendar_endpoint = assemble_calendar_url(calendarId, singleEvents, maxAttendees, maxResults, sanitizeHtml, timeMin, API_key, email)
+    json_calendar_endpoint = assemble_api_req(calendarId, singleEvents, maxAttendees, maxResults, sanitizeHtml, timeMin, API_key, email)
     req = httpx.get(json_calendar_endpoint)
-
     data = json.loads(req.text)
-
-    events_dict = {}
-
+    events = []
     try:
-        for json_iter in data["items"]:
-            event_title = json_iter["summary"]
-            start_time  = split_date_formats( json_iter["start"]["dateTime"] )
-            end_time    = split_date_formats( json_iter["end"]["dateTime"]   )
+        for item in data["items"]:
+            title = item["summary"]
+            start  = get_datetime_utc(item["start"]["dateTime"])
+            end    = get_datetime_utc(item["end"]["dateTime"])
 
-            events_dict[event_title] = start_time + "####" + end_time
-            
-            # print(json_calendar_endpoint)
+            events.append({"title": title, "start": start, "end": end})
     except KeyError:
-        return None
+        return False
 
-    return events_dict
+    return {"status": "available", "events": events}
+
+def out(events):
+    limit = 5
+    now = datetime.utcnow().replace(tzinfo=timezone.utc)
+    after = [date for date in events if date["start"] >= now][:limit]
+    before = [date for date in events if date["start"] <= now][:limit]
+    print(f"\n=> The {'next' if after else 'last'} {len(after) if after else len(before)} events :")
+    target = after if after else before
+
+    table = BeautifulTable()
+    table.set_style(BeautifulTable.STYLE_GRID)
+    table.columns.header = [colored(x, attrs=['bold']) for x in ["Name", "Datetime (UTC)", "Duration"]]
+    for event in target:
+        title = event["title"]
+        duration = relativedelta(event["end"], event["start"])
+        if duration.days or duration.hours or duration.minutes:
+            duration = f"{(str(duration.days) + ' day' + ('s' if duration.days > 1 else '')) if duration.days else ''} \
+                {(str(duration.hours) + ' hour' + ('s' if duration.hours > 1 else '')) if duration.hours else ''} \
+                {(str(duration.minutes) + ' minute' + ('s' if duration.minutes > 1 else '')) if duration.minutes else ''}".strip()
+        else:
+            duration = "?"
+        date = event["start"].strftime("%Y/%m/%d %H:%M:%S")
+
+        table.rows.append([title, date, duration])
+    print(table)
