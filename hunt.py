@@ -4,8 +4,6 @@ import os
 from datetime import datetime
 from io import BytesIO
 from os.path import isfile
-from os.path import abspath
-from os.path import split   as os_split
 from pathlib import Path
 from pprint import pprint
 
@@ -25,19 +23,15 @@ if __name__ == "__main__":
 
     banner()
     
-    # "dirname" stores the path where GHunt directory is
-    dirname, filename = os_split(abspath(__file__))
-    dirname += '/'
-    # We build the path to resources/data.txt file, so we will be able to run ghunt from any directory
-    data_path = dirname + config.data_path
-
+    # We change the current working directory to allow using GHunt from anywhere
+    os.chdir(Path(__file__).parents[0])
 
     tmprinter = TMPrinter()
 
     if len(sys.argv) <= 1:
         exit("Please put an email address.")
 
-    if not isfile(data_path):
+    if not isfile(config.data_path):
         exit("Please generate cookies and tokens first.")
 
     email = sys.argv[1]
@@ -45,7 +39,7 @@ if __name__ == "__main__":
     hangouts_token = ""
     cookies = ""
 
-    with open(data_path, 'r') as f:
+    with open(config.data_path, 'r') as f:
         out = json.loads(f.read())
         auth = out["auth"]
         hangouts_token = out["keys"]["hangouts"]
@@ -131,7 +125,7 @@ if __name__ == "__main__":
         # check YouTube
         if ytb_hunt or config.ytb_hunt_always:
             confidence = None
-            data = ytb.get_channels(client, name, data_path,
+            data = ytb.get_channels(client, name, config.data_path,
                                    config.gdocs_public_doc)
             if not data:
                 print("\n[-] YouTube channel not found.")
