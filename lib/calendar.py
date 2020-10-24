@@ -78,9 +78,9 @@ def out(events):
         title = event["title"]
         duration = relativedelta(event["end"], event["start"])
         if duration.days or duration.hours or duration.minutes:
-            duration = f"{(str(duration.days) + ' day' + ('s' if duration.days > 1 else '')) if duration.days else ''} \
-                {(str(duration.hours) + ' hour' + ('s' if duration.hours > 1 else '')) if duration.hours else ''} \
-                {(str(duration.minutes) + ' minute' + ('s' if duration.minutes > 1 else '')) if duration.minutes else ''}".strip()
+            duration = (f"{(str(duration.days) + ' day' + ('s' if duration.days > 1 else '')) if duration.days else ''} "
+                f"{(str(duration.hours) + ' hour' + ('s' if duration.hours > 1 else '')) if duration.hours else ''} "
+                f"{(str(duration.minutes) + ' minute' + ('s' if duration.minutes > 1 else '')) if duration.minutes else ''}").strip()
         else:
             duration = "?"
         date = event["start"].strftime("%Y/%m/%d %H:%M:%S")
