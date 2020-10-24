@@ -7,6 +7,5 @@ pillow
 python-dateutil
 colorama
 chromedriver-autoinstaller
-json
 beautifultable
 termcolor
