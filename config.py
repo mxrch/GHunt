@@ -9,12 +9,19 @@ headers = {
     'Connection': 'Keep-Alive'
 }
 
-headless         = True # if True, it doesn't show the browser while scraping GMaps reviews
+headless         = False # if True, it doesn't show the browser while scraping GMaps reviews
 ytb_hunt_always  = False # if True, search the Youtube channel everytime
 gmaps_radius     = 30 # in km. The radius distance to create groups of gmaps reviews.
 gdocs_public_doc = "1jaEEHZL32t1RUN5WuZEnFpqiEPf_APYKrRBG9LhLdvE"  # The public Google Doc to use it as an endpoint, to use Google's Search.
 data_path        = "resources/data.txt"
 
-# profile pics options
+# Profile pictures options
 write_profile_pic = True
 profile_pics_dir = "profile_pics"
+
+# Cookies
+# if True, it will uses the Google Account cookies to request the services,
+# and gonna be able to read your personal informations
+gmaps_cookies = False
+calendar_cookies = False
+default_consent_cookie = "YES+FR.fr+V10+BX"

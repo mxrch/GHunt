@@ -14,7 +14,7 @@ from seleniumwire import webdriver
 from lib.utils import *
 
 
-def scrape(gaiaID, client, cookies, headers, regex_rev_by_id, is_headless):
+def scrape(gaiaID, client, cookies, config, headers, regex_rev_by_id, is_headless):
     def get_datetime(datepublished):
         if datepublished.split()[0] == "a":
             nb = 1
@@ -67,6 +67,9 @@ def scrape(gaiaID, client, cookies, headers, regex_rev_by_id, is_headless):
 
     tmprinter.out("Setting cookies...")
     driver.get("https://www.google.com/robots.txt")
+    
+    if not config.gmaps_cookies:
+        cookies = {"CONSENT": config.default_consent_cookie}
     for k, v in cookies.items():
         driver.add_cookie({'name': k, 'value': v})
 

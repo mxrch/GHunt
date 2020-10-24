@@ -151,7 +151,7 @@ if __name__ == "__main__":
         #      config.headless)
 
         # reviews
-        reviews = gmaps.scrape(gaiaID, client, cookies, config.headers, config.regexs["review_loc_by_id"], config.headless)
+        reviews = gmaps.scrape(gaiaID, client, cookies, config, config.headers, config.regexs["review_loc_by_id"], config.headless)
 
         if reviews:
             confidence, locations = gmaps.get_confidence(reviews, config.gmaps_radius)
@@ -169,7 +169,7 @@ if __name__ == "__main__":
         
         
        # Google Calendar
-        calendar_response = gcalendar.fetch(email)
+        calendar_response = gcalendar.fetch(email, client, config)
         if calendar_response:
             print("[+] Public Google Calendar found !")
             events = calendar_response["events"]

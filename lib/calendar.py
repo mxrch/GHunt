@@ -30,10 +30,13 @@ def get_datetime_utc(date_str):
     return date.replace(tzinfo=timezone.utc) - margin
 
 # main method of calendar.py
-def fetch(email):
+def fetch(email, client, config):
+    if not config.calendar_cookies:
+        cookies = {"CONSENT": config.default_consent_cookie}
+        client.cookies = cookies
     url_endpoint = f"https://calendar.google.com/calendar/u/0/embed?src={email}"
     print("\nGoogle Calendar : " + url_endpoint)
-    req = httpx.get(url_endpoint + "&hl=en")
+    req = client.get(url_endpoint + "&hl=en")
     source = req.text
     try:
         # parsing parameters from source code
@@ -48,7 +51,7 @@ def fetch(email):
         return False
 
     json_calendar_endpoint = assemble_api_req(calendarId, singleEvents, maxAttendees, maxResults, sanitizeHtml, timeMin, API_key, email)
-    req = httpx.get(json_calendar_endpoint)
+    req = client.get(json_calendar_endpoint)
     data = json.loads(req.text)
     events = []
     try:
