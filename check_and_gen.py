@@ -67,7 +67,7 @@ def get_hangouts_tokens(cookies, driverpath):
     tmprinter.out("Starting browser...")
     driver = webdriver.Chrome(
         executable_path=driverpath, seleniumwire_options=options,
-        options=chrome_options
+        chrome_options=chrome_options
     )
     driver.header_overrides = config.headers
 

@@ -61,7 +61,7 @@ def scrape(gaiaID, client, cookies, headers, regex_rev_by_id, is_headless):
     tmprinter.out("Starting browser...")
 
     driverpath = get_driverpath()
-    driver = webdriver.Chrome(executable_path=driverpath, seleniumwire_options=options, options=chrome_options)
+    driver = webdriver.Chrome(executable_path=driverpath, seleniumwire_options=options, chrome_options=chrome_options)
     driver.header_overrides = headers
     wait = WebDriverWait(driver, 15)
 
