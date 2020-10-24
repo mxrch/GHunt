@@ -107,6 +107,7 @@ if __name__ == '__main__':
     new_cookies_entered = False
 
     if not cookies_from_file:
+        new_cookies_entered = True
         print("\nEnter these browser cookies found at accounts.google.com :")
         for name in cookies.keys():
             if not cookies[name]:
