@@ -68,7 +68,7 @@ def out(events):
     now = datetime.utcnow().replace(tzinfo=timezone.utc)
     after = [date for date in events if date["start"] >= now][:limit]
     before = [date for date in events if date["start"] <= now][:limit]
-    print(f"\n=> The {'next' if after else 'last'} {len(after) if after else len(before)} events :")
+    print(f"\n=> The {'next' if after else 'last'} {len(after) if after else len(before)} event{'s' if (len(after) > 1) or (not after and len(before) > 1) else ''} :")
     target = after if after else before
 
     table = BeautifulTable()
