@@ -12,6 +12,17 @@ import json
 import re
 
 
+class TMPrinter():
+    def __init__(self):
+        self.max_len = 0
+
+    def out(self, text):
+        if len(text) > self.max_len:
+            self.max_len = len(text)
+        else:
+            text += (" " * (self.max_len - len(text)))
+        print(text, end='\r')
+
 def is_email_google_account(httpx_client, auth, cookies, email, hangouts_token):
     host = "https://people-pa.clients6.google.com"
     url = "/v2/people/lookup?key={}".format(hangouts_token)
@@ -32,9 +43,10 @@ def is_email_google_account(httpx_client, auth, cookies, email, hangouts_token):
     return data
 
 def get_account_name(httpx_client, gaiaID):
-    gmaps_source = httpx_client.get(f"https://www.google.com/maps/contrib/{gaiaID}").text
+    req = httpx_client.get(f"https://www.google.com/maps/contrib/{gaiaID}")
+    gmaps_source = req.text
     match = re.search(r'<meta content="Contributions by (.*?)" itemprop="name">', gmaps_source)
-    if match is None:
+    if not match:
         return None
     return match[1]
 
@@ -46,19 +58,6 @@ def detect_default_profile_pic(hash):
     if hash == 'ffffc3c3e7c38181':
         return True
     return False
-
-
-class TMPrinter():
-    def __init__(self):
-        self.max_len = 0
-
-    def out(self, text):
-        if len(text) > self.max_len:
-            self.max_len = len(text)
-        else:
-            text += (" " * (self.max_len - len(text)))
-        print(text, end='\r')
-
 
 def sanitize_location(location):
     not_country = False

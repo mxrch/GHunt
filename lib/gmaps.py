@@ -50,7 +50,7 @@ def scrape(gaiaID, client, cookies, headers, regex_rev_by_id, is_headless):
 
     if "/maps/reviews/data" not in data:
         tmprinter.out("")
-        print("=> No reviews")
+        print("[-] No reviews")
         return False
 
     chrome_options = get_chrome_options_args(is_headless)
@@ -82,7 +82,7 @@ def scrape(gaiaID, client, cookies, headers, regex_rev_by_id, is_headless):
     else:
         return False
 
-    print(f"=> {scroll_max} reviews found !             ")
+    print(f"[+] {scroll_max} reviews found !             ")
 
     timeout = scroll_max * 1.25
     timeout_start = time.time()

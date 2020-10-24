@@ -5,6 +5,7 @@ from datetime import datetime
 from io import BytesIO
 from os.path import isfile
 from pathlib import Path
+from pprint import pprint
 
 import httpx
 from PIL import Image
@@ -16,10 +17,14 @@ import lib.gmaps as gmaps
 import lib.youtube as ytb
 from lib.photos import gpics
 from lib.utils import *
+import lib.calendar as gcalendar
 
 if __name__ == "__main__":
 
     banner()
+    
+    # We change the current working directory to allow using GHunt from anywhere
+    os.chdir(Path(__file__).parents[0])
 
     tmprinter = TMPrinter()
 
@@ -110,12 +115,12 @@ if __name__ == "__main__":
                         infos["inAppReachability"]]
             if "youtube" in services and name:
                 ytb_hunt = True
-            print("\nActivated Google services :")
+            print("\n[+] Activated Google services :")
             print('\n'.join(["- " + x.capitalize() for x in services]))
 
         except KeyError:
             ytb_hunt = True
-            print("\nUnable to fetch connected Google services.")
+            print("\n[-] Unable to fetch connected Google services.")
 
         # check YouTube
         if ytb_hunt or config.ytb_hunt_always:
@@ -123,21 +128,21 @@ if __name__ == "__main__":
             data = ytb.get_channels(client, name, config.data_path,
                                    config.gdocs_public_doc)
             if not data:
-                print("\nYouTube channel not found.")
+                print("\n[-] YouTube channel not found.")
             else:
                 confidence, channels = ytb.get_confidence(data, name, profile_pic_hash)
 
             if confidence:
-                print(f"\nYouTube channel (confidence => {confidence}%) :")
+                print(f"\n[+] YouTube channel (confidence => {confidence}%) :")
                 for channel in channels:
                     print(f"- [{channel['name']}] {channel['profile_url']}")
                 possible_usernames = ytb.extract_usernames(channels)
                 if possible_usernames:
-                    print("\nPossible usernames found :")
+                    print("\n[+] Possible usernames found :")
                     for username in possible_usernames:
                         print(f"- {username}")
             else:
-                print("\nYouTube channel not found.")
+                print("\n[-] YouTube channel not found.")
 
         # TODO: return gpics function output here
         #gpics(gaiaID, client, cookies, config.headers, config.regexs["albums"], config.regexs["photos"],
@@ -148,7 +153,7 @@ if __name__ == "__main__":
 
         if reviews:
             confidence, locations = gmaps.get_confidence(reviews, config.gmaps_radius)
-            print(f"\nProbable location (confidence => {confidence}) :")
+            print(f"\n[+] Probable location (confidence => {confidence}) :")
 
             loc_names = []
             for loc in locations:
@@ -159,3 +164,17 @@ if __name__ == "__main__":
             loc_names = set(loc_names)  # delete duplicates
             for loc in loc_names:
                 print(loc)
+        
+        
+       # Google Calendar
+        calendar_response = gcalendar.fetch(email)
+        if calendar_response:
+            print("[+] Public Google Calendar found !")
+            events = calendar_response["events"]
+            if events:
+                gcalendar.out(events)
+            else:
+                print("=> No recent events found.")
+        else:
+            print("[-] No public Google Calendar.")
+        
