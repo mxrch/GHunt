@@ -124,19 +124,25 @@ def gpics(gaiaID, client, cookies, headers, regex_albums, regex_photos, headless
             album_length = int(album[2])
 
             if album_length >= 1:
-                req = client.get(album_link)
-                source = req.text.replace('\n', '')
-                results_pics = re.compile(regex_photos).findall(source)
-                for pic in results_pics:
-                    pic_name = pic[1]
-                    pic_link = pic[0]
-                    pics.append(pic_link)
+                try:
+                    req = client.get(album_link)
+                    source = req.text.replace('\n', '')
+                    results_pics = re.compile(regex_photos).findall(source)
+                    for pic in results_pics:
+                        pic_name = pic[1]
+                        pic_link = pic[0]
+                        pics.append(pic_link)
+                except:
+                    pass
 
         print(f"=> {list_albums_length} albums{', ' + str(len(pics)) + ' photos' if list_albums_length else ''}")
         for pic in pics:
-            req = client.get(pic)
-            img = Image.open(BytesIO(req.content))
-            exifeater.feed(img)
+            try:
+                req = client.get(pic)
+                img = Image.open(BytesIO(req.content))
+                exifeater.feed(img)
+            except:
+                pass
 
         print("\nSearching metadata...")
         exifeater.output()
