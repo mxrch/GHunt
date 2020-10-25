@@ -1,8 +1,10 @@
 name: Build and Push Image
 
 on:
+  workflow_dispatch:
   push:
-    - branches:master
+    branches:
+        - master
 
 jobs:
   build:
