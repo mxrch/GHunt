@@ -133,18 +133,18 @@ if __name__ == "__main__":
                 print("\n[-] YouTube channel not found.")
             else:
                 confidence, channels = ytb.get_confidence(data, name, profile_pic_hash)
-
-            if confidence:
-                print(f"\n[+] YouTube channel (confidence => {confidence}%) :")
-                for channel in channels:
-                    print(f"- [{channel['name']}] {channel['profile_url']}")
-                possible_usernames = ytb.extract_usernames(channels)
-                if possible_usernames:
-                    print("\n[+] Possible usernames found :")
-                    for username in possible_usernames:
-                        print(f"- {username}")
-            else:
-                print("\n[-] YouTube channel not found.")
+                
+                if confidence:
+                    print(f"\n[+] YouTube channel (confidence => {confidence}%) :")
+                    for channel in channels:
+                        print(f"- [{channel['name']}] {channel['profile_url']}")
+                    possible_usernames = ytb.extract_usernames(channels)
+                    if possible_usernames:
+                        print("\n[+] Possible usernames found :")
+                        for username in possible_usernames:
+                            print(f"- {username}")
+                else:
+                    print("\n[-] YouTube channel not found.")
 
         # TODO: return gpics function output here
         #gpics(gaiaID, client, cookies, config.headers, config.regexs["albums"], config.regexs["photos"],
