@@ -22,6 +22,6 @@ jobs:
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_TOKEN }}
-        repository: mxrch/ghunt
         tags: mxrch/ghunt:latest
-        dockerfile: Dockerfile
+        push: true
+        file: ./Dockerfile
