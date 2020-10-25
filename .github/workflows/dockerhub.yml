@@ -1,0 +1,25 @@
+name: Build and Push Image
+
+on:
+  push:
+    - branches:master
+
+jobs:
+  build:
+    name: Build NGINX Image
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    # Build Docker image
+    # -------------------------------------------------------
+    - name: Build and push Docker images
+      uses: docker/build-push-action@v1
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+        repository: mxrch/GHunt
+        tags: latest
+        dockerfile: Dockerfile
