@@ -1,5 +1,8 @@
 ![screenshot](https://files.catbox.moe/8a5nzs.png)
 
+![Python minimum version](https://img.shields.io/badge/Python-3.7%2B-brightgreen)
+
+![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/mxrch/ghunt) ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/mxrch/ghunt/CodeQL?label=CodeQL)
 # Description
 GHunt is an OSINT tool to extract information from any Google Account using an email.
 
@@ -41,22 +44,22 @@ It requires the "Profile photos" album to be public (it is by default)
 # Installation
 
 ## Docker
-
-You can build the Docker image with:
-
-```
-docker build --build-arg UID=$(id -u ${USER}) --build-arg GID=$(id -g ${USER}) -t ghunt .
-```
-
-Any of the scripts can be invoked through:
+The Docker image is automatically built and push on Dockerhub after each push on this repo.\
+You can pull the Docker image with:
 
 ```
-docker run -v $(pwd)/resources:/usr/src/app/resources -ti ghunt check_and_gen.py
-docker run -v $(pwd)/resources:/usr/src/app/resources -ti ghunt hunt.py <email_address>
+docker pull mxrch/ghunt
+```
+
+Then, any of the scripts can be invoked through:
+
+```
+docker run -v ghunt-resources:/usr/src/app/resources -ti mxrch/ghunt check_and_gen.py
+docker run -v ghunt-resources:/usr/src/app/resources -ti mxrch/ghunt hunt.py <email_address>
 ```
 
 ## Manual installation
-- Make sure you have Python 3.6.1+ installed. (I developed it with Python 3.8.1)
+- Make sure you have Python 3.7+ installed. (I developed it with Python 3.8.1)
 - Some Python modules are required which are contained in `requirements.txt` and will be installed below.
 
 ### 1. Chromedriver & Google Chrome
