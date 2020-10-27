@@ -14,6 +14,8 @@ onlyLabels: []
 exemptLabels:
   - pinned
   - security
+  - bug
+  - keep
 
 # Set to true to ignore issues in a project (defaults to false)
 exemptProjects: false
@@ -26,11 +28,6 @@ exemptAssignees: false
 
 # Label to use when marking as stale
 staleLabel: stale
-
-# Comment to post when marking as stale. Set to `false` to disable
-markComment: >
-  This issue has been automatically marked as stale because it has not had
-  recent activity on the last 18 days. It will be closed in 6 days if no further activity occurs.
 
 # Comment to post when removing the stale label.
 # unmarkComment: >
@@ -55,6 +52,6 @@ pulls:
      for your contributions.
 
 issues:
-   exemptLabels:
-     - confirmed
-     - will-fix
+   markComment: >
+     This issue has been automatically marked as stale because it has not had
+     recent activity on the last 18 days. It will be closed in 6 days if no further activity occurs.
