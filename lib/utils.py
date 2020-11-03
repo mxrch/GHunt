@@ -23,6 +23,9 @@ class TMPrinter():
             text += (" " * (self.max_len - len(text)))
         print(text, end='\r')
 
+def within_docker():
+    return Path('/.dockerenv').is_file()
+
 def is_email_google_account(httpx_client, auth, cookies, email, hangouts_token):
     host = "https://people-pa.clients6.google.com"
     url = "/v2/people/lookup?key={}".format(hangouts_token)

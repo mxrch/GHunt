@@ -28,8 +28,6 @@ if __name__ == "__main__":
     # We change the current working directory to allow using GHunt from anywhere
     os.chdir(Path(__file__).parents[0])
 
-    tmprinter = TMPrinter()
-
     if len(sys.argv) <= 1:
         exit("Please put an email address.")
 
@@ -51,6 +49,11 @@ if __name__ == "__main__":
 
     data = is_email_google_account(client, auth, cookies, email,
                                    hangouts_token)
+
+    is_within_docker = within_docker()
+    if is_within_docker:
+        print("[+] Docker detected, profile pictures will not be saved.")
+
     geolocator = Nominatim(user_agent="nominatim")
     print(f"[+] {len(data['matches'])} account found !")
 
@@ -83,15 +86,14 @@ if __name__ == "__main__":
         profile_pic_hash = image_hash(profile_pic_img)
         is_default_profile_pic = detect_default_profile_pic(profile_pic_hash)
 
-        if is_default_profile_pic:
-            print("\n[-] Default profile picture")
-        else:
+        if not is_default_profile_pic and not is_within_docker:
             print("\n[+] Custom profile picture !")
             print(f"=> {profile_pic_link}")
-            if config.write_profile_pic:
-                print("Profile picture saved !")
+            if config.write_profile_pic and not is_within_docker:
                 open(Path(config.profile_pics_dir) / f'{email}.jpg', 'wb').write(req.content)
-            tmprinter.out("")
+                print("Profile picture saved !")
+        else:
+            print("\n[-] Default profile picture")
 
         # last edit
         timestamp = int(infos["metadata"]["lastUpdateTimeMicros"][:-3])
