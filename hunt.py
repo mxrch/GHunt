@@ -22,27 +22,27 @@ from lib.utils import *
 import lib.calendar as gcalendar
 
 if __name__ == "__main__":
-
     banner()
-
     # We change the current working directory to allow using GHunt from anywhere
     os.chdir(Path(__file__).parents[0])
-
     if len(sys.argv) <= 1:
         exit("Please put an email address.")
-
     if not isfile(config.data_path):
         exit("Please generate cookies and tokens first.")
-
+    output_file_name = ''
+    if '-o' in sys.argv:
+        output_file_name = sys.argv[sys.argv.index('-o')+1]
     if '-f' in sys.argv:
         emails = open(sys.argv[sys.argv.index('-f')+1],'r').read().split('\n')
     else:
         emails = [sys.argv[1]]
+    outputs = {}
     for email in emails:
         print()
         auth = ""
         hangouts_token = ""
         cookies = ""
+        output = {'email': email}
 
         with open(config.data_path, 'r') as f:
             out = json.loads(f.read())
@@ -73,6 +73,7 @@ if __name__ == "__main__":
             name = get_account_name(client, gaiaID)
             if name:
                 print(f"Name : {name}")
+                output['name'] = name
             else:
                 if "name" not in infos:
                     print("Couldn't find name")
@@ -81,10 +82,12 @@ if __name__ == "__main__":
                         print(f"Name : {infos['name'][i]['displayName']}")
                     if len(infos["name"]) > 0:
                         name = infos["name"][0]["displayName"]
+                        output['name'] = name
                 print("[-] Couldn't find name")
 
             # profile picture
             profile_pic_link = infos["photo"][0]["url"]
+            output['pp_url'] = profile_pic_link
             req = client.get(profile_pic_link)
 
             profile_pic_img = Image.open(BytesIO(req.content))
@@ -103,6 +106,8 @@ if __name__ == "__main__":
             # last edit
             timestamp = int(infos["metadata"]["lastUpdateTimeMicros"][:-3])
             last_edit = datetime.utcfromtimestamp(timestamp).strftime("%Y/%m/%d %H:%M:%S (UTC)")
+            output['last_edit'] = last_edit
+            output['google_id'] = gaiaID
             print(f"\nLast profile edit : {last_edit}\n"
                   f"\nEmail : {email}\nGoogle ID : {gaiaID}\n")
 
@@ -112,10 +117,13 @@ if __name__ == "__main__":
                 isBot = infos["extendedData"]["hangoutsExtendedData"]["isBot"]
                 if isBot:
                     print("Hangouts Bot : Yes !")
+                    output['hangouts_bot'] = True
                 else:
                     print("Hangouts Bot : No")
+                    output['hangouts_bot'] = False
             else:
                 print("Hangouts Bot : Unknown")
+                output['hangouts_bot'] = None
 
             # decide to check YouTube
             ytb_hunt = False
@@ -126,10 +134,12 @@ if __name__ == "__main__":
                     ytb_hunt = True
                 print("\n[+] Activated Google services :")
                 print('\n'.join(["- " + x.capitalize() for x in services]))
+                output['services'] = services
 
             except KeyError:
                 ytb_hunt = True
                 print("\n[-] Unable to fetch connected Google services.")
+                output['services'] = []
 
             # check YouTube
             if ytb_hunt or config.ytb_hunt_always:
@@ -143,11 +153,13 @@ if __name__ == "__main__":
 
                     if confidence:
                         print(f"\n[+] YouTube channel (confidence => {confidence}%) :")
+                        output['yt_channels'] = channels
                         for channel in channels:
                             print(f"- [{channel['name']}] {channel['profile_url']}")
                         possible_usernames = ytb.extract_usernames(channels)
                         if possible_usernames:
                             print("\n[+] Possible usernames found :")
+                            output['usernames'] = possible_usernames
                             for username in possible_usernames:
                                 print(f"- {username}")
                     else:
@@ -171,6 +183,7 @@ if __name__ == "__main__":
                     )
 
                 loc_names = set(loc_names)  # delete duplicates
+                output['locations'] = loc_names
                 for loc in loc_names:
                     print(loc)
 
@@ -186,3 +199,8 @@ if __name__ == "__main__":
                     print("=> No recent events found.")
             else:
                 print("[-] No public Google Calendar.")
+        outputs[email] = output
+    if '-o' in sys.argv:
+        if '.json' not in output_file_name:
+            output_file_name += '.json'
+        json.dump(outputs, open(output_file_name,'w'), indent=4)
