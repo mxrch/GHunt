@@ -101,7 +101,7 @@ Any account can access your AlbumArchive (by default):
 
 ![account-dashboard](https://files.catbox.moe/ufqc9g.jpg)
 
-Here's how to check and fix the fact that you're vulnerable (wich you most likely are):\
+Here's how to check and fix the fact that you're vulnerable (which you most likely are):\
 Go to https://get.google.com/albumarchive/ while logged in with your Google account. You will be **automatically** redirected to your correct albumarchive URL (`https://get.google.com/albumarchive/YOUR-GOOGLE-ID-HERE`). After that, click the three dots on the top left corner, and click on **setting** 
 
 ![three-dots-setting](https://files.catbox.moe/ru6kci.jpg)

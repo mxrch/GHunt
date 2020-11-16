@@ -1,2 +1,2 @@
 #!/bin/bash
-docker run -v $(pwd)/resources:/usr/src/app/resources -ti ghunt hunt.py $1
+docker run -v ghunt-resources:/usr/src/app/resources -ti mxrch/ghunt hunt.py $1

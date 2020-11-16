@@ -1,2 +1,2 @@
 #!/bin/bash
-docker run -v $(pwd)/resources:/usr/src/app/resources -ti ghunt check_and_gen.py
+docker run -v ghunt-resources:/usr/src/app/resources -ti mxrch/ghunt check_and_gen.py
