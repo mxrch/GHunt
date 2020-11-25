@@ -10,6 +10,7 @@ import subprocess, os
 from os.path import isfile
 import json
 import re
+from pprint import pprint
 
 
 class TMPrinter():

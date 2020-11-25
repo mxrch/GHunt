@@ -70,13 +70,12 @@ if __name__ == "__main__":
             print(f"Name : {name}")
         else:
             if "name" not in infos:
-                print("Couldn't find name")
+                print("[-] Couldn't find name")
             else:
                 for i in range(len(infos["name"])):
-                    print(f"Name : {infos['name'][i]['displayName']}")
-                if len(infos["name"]) > 0:
-                    name = infos["name"][0]["displayName"]
-            print("[-] Couldn't find name")
+                    if 'displayName' in infos['name'][i].keys():
+                        name = infos["name"][i]["displayName"]
+                        print(f"Name : {name}")
 
         # profile picture
         profile_pic_link = infos["photo"][0]["url"]
@@ -117,7 +116,7 @@ if __name__ == "__main__":
         try:
             services = [x["appType"].lower() if x["appType"].lower() != "babel" else "hangouts" for x in
                         infos["inAppReachability"]]
-            if "youtube" in services and name:
+            if name and (config.ytb_hunt_always or "youtube" in services):
                 ytb_hunt = True
             print("\n[+] Activated Google services :")
             print('\n'.join(["- " + x.capitalize() for x in services]))
@@ -127,7 +126,7 @@ if __name__ == "__main__":
             print("\n[-] Unable to fetch connected Google services.")
 
         # check YouTube
-        if ytb_hunt or config.ytb_hunt_always:
+        if name and ytb_hunt:
             confidence = None
             data = ytb.get_channels(client, name, config.data_path,
                                    config.gdocs_public_doc)
