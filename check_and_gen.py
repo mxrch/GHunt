@@ -102,7 +102,7 @@ if __name__ == '__main__':
     driverpath        = get_driverpath()
     cookies_from_file = get_saved_cookies()
 
-    cookies = {"__Secure-3PSID": "", "APISID": "", "SAPISID": "", "HSID": "", "CONSENT": config.default_consent_cookie}
+    cookies = {"SID": "", "SSID": "", "APISID": "", "SAPISID": "", "HSID": "", "CONSENT": config.default_consent_cookie}
 
     new_cookies_entered = False
 
