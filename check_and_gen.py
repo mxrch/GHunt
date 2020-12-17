@@ -8,6 +8,7 @@ from ssl import SSLError
 import httpx
 from seleniumwire import webdriver
 from selenium.common.exceptions import TimeoutException as SE_TimeoutExepction
+from webdriver_manager.chrome import ChromeDriverManager
 
 import config
 from lib.utils import *
@@ -65,8 +66,8 @@ def get_hangouts_tokens(cookies, driverpath):
     }
 
     tmprinter.out("Starting browser...")
-    driver = webdriver.Chrome(
-        executable_path=driverpath, seleniumwire_options=options,
+    driver = webdriver.Chrome(ChromeDriverManager().install(),
+        seleniumwire_options=options,
         chrome_options=chrome_options
     )
     driver.header_overrides = config.headers
