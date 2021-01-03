@@ -10,6 +10,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from seleniumwire import webdriver
+from webdriver_manager.chrome import ChromeDriverManager
 
 from lib.utils import *
 
@@ -61,7 +62,7 @@ def scrape(gaiaID, client, cookies, config, headers, regex_rev_by_id, is_headles
     tmprinter.out("Starting browser...")
 
     driverpath = get_driverpath()
-    driver = webdriver.Chrome(executable_path=driverpath, seleniumwire_options=options, chrome_options=chrome_options)
+    driver = webdriver.Chrome(ChromeDriverManager().install(), seleniumwire_options=options, chrome_options=chrome_options)
     driver.header_overrides = headers
     wait = WebDriverWait(driver, 15)
 
