@@ -14,13 +14,13 @@ It can currently extract:
 - Activated Google services (YouTube, Photos, Maps, News360, Hangouts, etc.)
 - Possible YouTube channel
 - Possible other usernames
+- Google Maps reviews (M)
 - Possible physical location (M)
 - Events from Google Calendar (C)
 - ~~Public photos (P)~~
 - ~~Phones models (P)~~
 - ~~Phones firmwares (P)~~
 - ~~Installed softwares (P)~~
-- ~~Google Maps reviews (M)~~
 
 The features marked with a **(P)** require the target account to have the default setting of `Allow the people you share content with to download your photos and videos` on the Google AlbumArchive, or if the target has ever used Picasa linked to their Google account.\
 More info [here](https://github.com/mxrch/GHunt#%EF%B8%8F-protecting-yourself).
