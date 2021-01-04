@@ -65,7 +65,7 @@ def youtube_channel_search_gdocs(client, query, data_path, gdocs_public_doc):
             source = req.text
             try:
                 data = json.loads(
-                    source.split('window["ytInitialData"] = ')[1].split('window["ytInitialPlayerResponse"]')[0].split(';\n')[0])
+                    source.split('var ytInitialData = ')[1].split(';</script>')[0])
                 avatar_link = data["metadata"]["channelMetadataRenderer"]["avatar"]["thumbnails"][0]["url"].split('=')[0]
             except (KeyError, IndexError) as e:
                 if retry == 0:
@@ -78,7 +78,6 @@ def youtube_channel_search_gdocs(client, query, data_path, gdocs_public_doc):
         hash = image_hash(img)
         title = data["metadata"]["channelMetadataRenderer"]["title"]
         results["channels"].append({"profile_url": profile_url, "name": title, "hash": hash})
-
     return results
 
 
