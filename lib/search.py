@@ -20,9 +20,10 @@ def search(query, data_path, gdocs_public_doc, size=1000):
 
     output = json.loads(req.text.replace(")]}'", ""))
     #pprint(output)
-    if type(output[0][1]) == "str" and output[0][1].lower() == "xsrf":
+    if isinstance(output[0][1], str) and output[0][1].lower() == "xsrf":
         exit(f"\n[-] Error : XSRF detected.\nIt means your cookies have expired, please generate new ones.")
 
+    print(type(output[0][1]))
     results = []
     for result in output[0][1]:
         link = result[0][0]
