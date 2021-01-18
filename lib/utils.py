@@ -90,7 +90,7 @@ def sanitize_location(location):
 
 def get_driverpath():
     tmprinter = TMPrinter()
-    drivers = [str(x.absolute()) for x in Path('.').rglob('chromedriver*')]
+    drivers = [str(x.absolute()) for x in Path('.').rglob('chromedriver*') if not "chromedriver_autoinstaller" in str(x)]
     if drivers:
         return drivers[0]
     else:
