@@ -35,7 +35,7 @@ Those marked with a **(C)** requires user to have Google Calendar set on public 
 </p>
 
 ## 📰 Latest news
-- **02/10/2020** : Since few days ago, Google return a 404 when we try to access someone's Google Photos public albums, we can only access it if we have a link of one of his albums.\
+- **02/10/2020** : Since a few days ago, Google returns a 404 when we try to access someone's Google Photos public albums, we can only access it if we have a link to one of their albums.\
 Either this is a bug and this will be fixed, either it's a protection that we need to find how to bypass.
 - **03/10/2020** : Successfully bypassed. 🕺 (commit 01dc016)\
 It requires the "Profile photos" album to be public (it is by default)
@@ -45,7 +45,7 @@ It requires the "Profile photos" album to be public (it is by default)
 # Installation
 
 ## Docker
-The Docker image is automatically built and push on Dockerhub after each push on this repo.\
+The Docker image is automatically built and pushed to Dockerhub after each push on this repo.\
 You can pull the Docker image with:
 
 ```
@@ -75,7 +75,7 @@ python -m pip install -r requirements.txt
 Adapt the command to your operating system if needed.
 
 # Usage
-For the first run and sometimes after, you'll need to check the validity of your cookies.\
+For the first run and sometime after, you'll need to check the validity of your cookies.\
 To do this, run `check_and_gen.py`. \
 If you don't have cookies stored (ex: first launch), you will be asked for the 5 required cookies. If they are valid, it will generate the Authentication token and the Google Docs & Hangouts tokens.
 
@@ -107,7 +107,7 @@ Go to https://get.google.com/albumarchive/ while logged in with your Google acco
 
 ![three-dots-setting](https://files.catbox.moe/ru6kci.jpg)
 
-Then, un-check the only option there:
+Then, uncheck the only option there:
 
 ![setting](https://files.catbox.moe/b8879l.jpg)
 
