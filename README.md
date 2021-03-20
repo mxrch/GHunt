@@ -41,6 +41,7 @@ Either this is a bug and this will be fixed, either it's a protection that we ne
 It requires the "Profile photos" album to be public (it is by default)
 - **20/10/2020** : Google WebArchive now returns a 404 even when coming from the "Profile photos" album, so **the photos scraping is temporary (or permanently) disabled.** (commit e762543)
 - **25/11/2020** : Google now removes the name from the Google Maps profile if the user has 0 reviews (or contributions, even private). I did not find a bypass for the moment, so **all the help in the research of a bypass is appreciated.**
+- **20/03/2021** : Successfully bypassed. 🕺 (commit b3b01bc)
 
 # Installation
 
@@ -56,7 +57,7 @@ Then, any of the scripts can be invoked through:
 
 ```
 docker run -v ghunt-resources:/usr/src/app/resources -ti mxrch/ghunt check_and_gen.py
-docker run -v ghunt-resources:/usr/src/app/resources -ti mxrch/ghunt hunt.py <email_address>
+docker run -v ghunt-resources:/usr/src/app/resources -ti mxrch/ghunt ghunt.py email <email_address>
 ```
 
 ## Manual installation
@@ -70,7 +71,7 @@ This project uses Selenium and automatically downloads the correct driver for yo
 ### 2. Requirements
 In the GHunt folder, run:
 ```bash
-python -m pip install -r requirements.txt
+python3 -m pip install -r requirements.txt
 ```
 Adapt the command to your operating system if needed.
 
@@ -81,7 +82,7 @@ If you don't have cookies stored (ex: first launch), you will be asked for the 5
 
 Then, you can run the tool like this:
 ```bash
-python hunt.py myemail@gmail.com
+python3 ghunt.py email myemail@gmail.com
 ```
 
 ⚠️ I suggest you make an empty account just for this or use an account where you never login because depending on your browser/location, re-logging in into the Google Account used for the cookies can deauthorize them.
@@ -118,3 +119,4 @@ For now, the only (known) solution to this is to delete the Picasa albums from y
 # Thanks
 This tool is based on [Sector's research on Google IDs](https://sector035.nl/articles/getting-a-grasp-on-google-ids) and completed by my own as well.\
 If I have the motivation to write a blog post about it, I'll add the link here !
+- Palenath (for the name bypass)
