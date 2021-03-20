@@ -21,33 +21,34 @@ from lib.photos import gpics
 from lib.utils import *
 import lib.calendar as gcalendar
 
-if __name__ == "__main__":
 
+def email_hunt(email):
     banner()
-    
-    # We change the current working directory to allow using GHunt from anywhere
-    os.chdir(Path(__file__).parents[0])
 
-    if len(sys.argv) <= 1:
-        exit("Please put an email address.")
+    if not email:
+        exit("Please give a valid email.\nExample : larry@google.com")
 
     if not isfile(config.data_path):
-        exit("Please generate cookies and tokens first.")
+        exit("Please generate cookies and tokens first, with the check_and_gen.py script.")
 
-    email = sys.argv[1]
-    auth = ""
+    hangouts_auth = ""
     hangouts_token = ""
-    cookies = ""
+    internal_auth = ""
+    internal_token = ""
+
+    cookies = {}
 
     with open(config.data_path, 'r') as f:
         out = json.loads(f.read())
-        auth = out["auth"]
+        hangouts_auth = out["hangouts_auth"]
         hangouts_token = out["keys"]["hangouts"]
+        internal_auth = out["internal_auth"]
+        internal_token = out["keys"]["internal"]
         cookies = out["cookies"]
 
     client = httpx.Client(cookies=cookies, headers=config.headers)
 
-    data = is_email_google_account(client, auth, cookies, email,
+    data = is_email_google_account(client, hangouts_auth, cookies, email,
                                    hangouts_token)
 
     is_within_docker = within_docker()
@@ -65,7 +66,7 @@ if __name__ == "__main__":
         infos = data["people"][gaiaID]
 
         # get name
-        name = get_account_name(client, gaiaID)
+        name = get_account_name(client, gaiaID, internal_auth, internal_token, cookies, config)
         if name:
             print(f"Name : {name}")
         else:
@@ -95,10 +96,14 @@ if __name__ == "__main__":
             print("\n[-] Default profile picture")
 
         # last edit
-        timestamp = int(infos["metadata"]["lastUpdateTimeMicros"][:-3])
-        last_edit = datetime.utcfromtimestamp(timestamp).strftime("%Y/%m/%d %H:%M:%S (UTC)")
-        print(f"\nLast profile edit : {last_edit}\n"
-              f"\nEmail : {email}\nGoogle ID : {gaiaID}\n")
+        try:
+            timestamp = int(infos["metadata"]["lastUpdateTimeMicros"][:-3])
+            last_edit = datetime.utcfromtimestamp(timestamp).strftime("%Y/%m/%d %H:%M:%S (UTC)")
+            print(f"\nLast profile edit : {last_edit}")
+        except KeyError:
+            last_edit = None
+            print(f"\nLast profile edit : Not found")
+        print(f"\nEmail : {email}\nGoogle ID : {gaiaID}\n")
 
         # is bot?
         profile_pic = infos["photo"][0]["url"]

@@ -23,6 +23,8 @@ class TMPrinter():
         else:
             text += (" " * (self.max_len - len(text)))
         print(text, end='\r')
+    def clear(self):
+    	print(" " * self.max_len, end="\r")
 
 def within_docker():
     return Path('/.dockerenv').is_file()
@@ -41,13 +43,33 @@ def is_email_google_account(httpx_client, auth, cookies, email, hangouts_token):
 
     req = httpx_client.post(host + url, data=body.format(email), headers=headers, cookies=cookies)
     data = json.loads(req.text)
-    #pprint(data)
+    #pprint(data); exit()
     if not "matches" in data:
         exit("[-] This email address does not belong to a Google Account.")
 
     return data
 
-def get_account_name(httpx_client, gaiaID):
+def get_account_name(httpx_client, gaiaID, internal_auth, internal_token, cookies, config):
+    # New method
+    req_headers = {
+        "Origin": "https://drive.google.com",
+        "authorization": internal_auth,
+        "Host": "people-pa.clients6.google.com"
+    }
+    headers = {**config.headers, **req_headers}
+
+    url = f"https://people-pa.clients6.google.com/v2/people?person_id={gaiaID}&request_mask.include_container=PROFILE&request_mask.include_container=DOMAIN_PROFILE&request_mask.include_field.paths=person.metadata.best_display_name&core_id_params.enable_private_names=true&key={internal_token}"
+    req = httpx_client.get(url, headers=headers)
+    data = json.loads(req.text)
+
+    try:
+        name = data["personResponse"][0]["person"]["metadata"]["bestDisplayName"]["displayName"]
+    except KeyError:
+        pass # We fallback on the classic method
+    else:
+        return name
+
+    # Classic method, but requires the target to have at least 1 GMaps contribution
     req = httpx_client.get(f"https://www.google.com/maps/contrib/{gaiaID}")
     gmaps_source = req.text
     match = re.search(r'<meta content="Contributions by (.*?)" itemprop="name">', gmaps_source)
