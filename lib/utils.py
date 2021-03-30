@@ -6,11 +6,9 @@ from lib.os_detect import Os
 
 from pathlib import Path
 import shutil
-import subprocess, os
-from os.path import isfile
 import json
 import re
-from pprint import pprint
+import sys
 
 
 class TMPrinter():
@@ -45,7 +43,7 @@ def is_email_google_account(httpx_client, auth, cookies, email, hangouts_token):
     data = json.loads(req.text)
     #pprint(data); exit()
     if not "matches" in data:
-        exit("[-] This email address does not belong to a Google Account.")
+        sys.exit("[-] This email address does not belong to a Google Account.")
 
     return data
 
@@ -112,7 +110,7 @@ def sanitize_location(location):
 
 def get_driverpath():
     tmprinter = TMPrinter()
-    drivers = [str(x.absolute()) for x in Path('.').rglob('chromedriver*') if not "chromedriver_autoinstaller" in str(x)]
+    drivers = [str(x.absolute()) for x in Path('.').rglob('chromedriver*') if "chromedriver_autoinstaller" not in str(x)]
     if drivers:
         return drivers[0]
     else:
@@ -126,7 +124,7 @@ def get_driverpath():
         if drivers:
             return path
         else:
-            exit(f"I can't find the chromedriver.\nI installed it in \"{path}\" but it must be in the GHunt directory or PATH, you should move it here.")
+            sys.exit(f"I can't find the chromedriver.\nI installed it in \"{path}\" but it must be in the GHunt directory or PATH, you should move it here.")
 
 
 def get_chrome_options_args(is_headless):

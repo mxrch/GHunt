@@ -1,6 +1,5 @@
 import re
 from io import BytesIO
-import pdb
 
 from PIL import Image
 from selenium.webdriver.common.by import By

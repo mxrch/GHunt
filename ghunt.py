@@ -21,7 +21,7 @@ if __name__ == "__main__":
         print("Available modules :")
         for module in modules:
             print(f"- {module}")
-        exit()
+        sys.exit()
 
     module = sys.argv[1].lower()
     if len(sys.argv) >= 3:

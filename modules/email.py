@@ -2,12 +2,10 @@
 
 import json
 import sys
-import os
 from datetime import datetime
 from io import BytesIO
 from os.path import isfile
 from pathlib import Path
-from pprint import pprint
 
 import httpx
 from PIL import Image
@@ -17,7 +15,6 @@ import config
 from lib.banner import banner
 import lib.gmaps as gmaps
 import lib.youtube as ytb
-from lib.photos import gpics
 from lib.utils import *
 import lib.calendar as gcalendar
 
@@ -26,10 +23,10 @@ def email_hunt(email):
     banner()
 
     if not email:
-        exit("Please give a valid email.\nExample : larry@google.com")
+        sys.exit("Please give a valid email.\nExample : larry@google.com")
 
     if not isfile(config.data_path):
-        exit("Please generate cookies and tokens first, with the check_and_gen.py script.")
+        sys.exit("Please generate cookies and tokens first, with the check_and_gen.py script.")
 
     hangouts_auth = ""
     hangouts_token = ""
