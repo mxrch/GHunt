@@ -4,9 +4,10 @@
 
 ![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/mxrch/ghunt) ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/mxrch/ghunt/CodeQL?label=CodeQL)
 # Description
-GHunt is an OSINT tool to extract information from any Google Account using an email.
+GHunt is a modulable OSINT tool designed to evolve over the years, and incorporates many techniques to investigate Google accounts, or objects.\
+It currently has **email** and **document** modules.
 
-What can GHunt find ?
+## What can GHunt find ?
 
 🗺️ **Email** module:
 - Owner's name
