@@ -152,7 +152,7 @@ if __name__ == '__main__':
             if not cookies[name]:
                 cookies[name] = input(f"{name} => ").strip().strip('\"')
     else:
-        # in case user wants to enter new cookies (for example: for new account)
+        # in case user wants to enter new cookies (example: for new account)
         html = get_authorization_source(cookies_from_file)
         valid = False
         if html:
@@ -170,7 +170,7 @@ if __name__ == '__main__':
             exit("Please put valid cookies. Exiting...")
 
 
-    # validate cookies
+    # Validate cookies
     if new_cookies_entered or not cookies_from_file:
         html = get_authorization_source(cookies)
         if html:
