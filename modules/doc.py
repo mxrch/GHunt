@@ -65,9 +65,11 @@ def doc_hunt(doc_link):
         tmprinter.clear()
         exit("[-] Rate-limit exceeded. Try again later.")
 
+    if '"reason": "keyInvalid"' in req.text:
+        exit("[-] Your key is invalid, try regenerating your cookies & keys.")
+
     tmprinter.clear()
     data = json.loads(req.text)
-    #pprint(data)
 
     # Extracting informations
 

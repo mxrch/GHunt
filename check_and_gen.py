@@ -117,7 +117,7 @@ def get_internal_tokens(driver, cookies, tmprinter):
     driver.get("https://drive.google.com/drive/my-drive")
 
     body = driver.page_source
-    internal_token = body.split("client-channel.google.com")[0][::-1].split(',')[4][::-1].strip('"')
+    internal_token = body.split("appsitemsuggest-pa")[1].split(",")[3].strip('"')
 
     tmprinter.out(f"Waiting for the authorization header, it "
                     "can takes a few minutes...")
