@@ -175,8 +175,7 @@ def get_confidence(data, gmaps_radius):
 
     tmprinter.out("")
 
-    locations = {k: v for k, v in
-                 sorted(locations.items(), key=lambda k: len(k[1]["locations"]), reverse=True)}  # We sort it
+    locations = dict(sorted(locations.items(), key=lambda k: len(k[1]["locations"]), reverse=True))  # We sort it
 
     tmprinter.out("Identification of redundant areas...")
     to_del = []

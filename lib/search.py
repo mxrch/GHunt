@@ -1,7 +1,6 @@
 import json
 import httpx
-
-from pprint import pprint
+import sys
 
 
 def search(query, data_path, gdocs_public_doc, size=1000):
@@ -16,12 +15,12 @@ def search(query, data_path, gdocs_public_doc, size=1000):
     req = httpx.post('https://docs.google.com/document/d/{}/explore/search?token={}'.format(gdocs_public_doc, token),
                      cookies=cookies, data=data)
     if req.status_code != 200:
-        exit("Error (GDocs): request gives {}".format(req.status_code))
+        sys.exit("Error (GDocs): request gives {}".format(req.status_code))
 
     output = json.loads(req.text.replace(")]}'", ""))
     #pprint(output)
     if isinstance(output[0][1], str) and output[0][1].lower() == "xsrf":
-        exit(f"\n[-] Error : XSRF detected.\nIt means your cookies have expired, please generate new ones.")
+        sys.exit(f"\n[-] Error : XSRF detected.\nIt means your cookies have expired, please generate new ones.")
 
     results = []
     for result in output[0][1]:

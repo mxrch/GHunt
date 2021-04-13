@@ -3,7 +3,6 @@ import os
 import stat
 
 from chromedriver_autoinstaller.utils import get_chrome_version, get_major_version
-from selenium import webdriver
 
 
 dir_path = os.path.dirname(os.path.realpath(__file__))

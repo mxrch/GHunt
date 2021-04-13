@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 
 import json
+import sys
 from time import time
 from os.path import isfile
 from pathlib import Path
-from ssl import SSLError
 
 import httpx
 from seleniumwire import webdriver
@@ -77,7 +77,7 @@ def get_hangouts_tokens(driver, cookies, tmprinter):
         tmprinter.out("")
     except SE_TimeoutExepction:
         tmprinter.out("")
-        exit("\n[!] Selenium TimeoutException has occured. Please check your internet connection, proxies, vpns, et cetera.")
+        sys.exit("\n[!] Selenium TimeoutException has occured. Please check your internet connection, proxies, vpns, et cetera.")
 
 
     hangouts_auth = req.headers["Authorization"]
@@ -128,7 +128,7 @@ def get_internal_tokens(driver, cookies, tmprinter):
             break
         elif time() - start > config.browser_waiting_timeout:
             tmprinter.clear()
-            exit("[-] Timeout while fetching the Internal tokens.\nPlease increase the timeout in config.py or try again.")
+            sys.exit("[-] Timeout while fetching the Internal tokens.\nPlease increase the timeout in config.py or try again.")
 
     del driver.request_interceptor
 
@@ -148,7 +148,7 @@ if __name__ == '__main__':
     if not cookies_from_file:
         new_cookies_entered = True
         print("\nEnter these browser cookies found at accounts.google.com :")
-        for name in cookies.keys():
+        for name in cookies:
             if not cookies[name]:
                 cookies[name] = input(f"{name} => ").strip().strip('\"')
     else:
@@ -163,11 +163,11 @@ if __name__ == '__main__':
         new_gen_inp = input("\nDo you want to enter new browser cookies from accounts.google.com ? (Y/n) ").lower()
         if new_gen_inp == "y":
             new_cookies_entered = True
-            for name in cookies.keys():
+            for name in cookies:
                 if not cookies[name]:
                     cookies[name] = input(f"{name} => ").strip().strip('\"')
         elif not valid:
-            exit("Please put valid cookies. Exiting...")
+            sys.exit("Please put valid cookies. Exiting...")
 
 
     # Validate cookies
@@ -176,13 +176,13 @@ if __name__ == '__main__':
         if html:
             print("\n[+] The cookies seems valid !")
         else:
-            exit("\n[-] Seems like the cookies are invalid, try regenerating them.")
+            sys.exit("\n[-] Seems like the cookies are invalid, try regenerating them.")
     
     if not new_cookies_entered:
         cookies = cookies_from_file
         choice = input("Do you want to generate new tokens ? (Y/n) ").lower()
         if choice != "y":
-            exit()
+            sys.exit()
 
     # Start the extraction process
 
@@ -203,7 +203,7 @@ if __name__ == '__main__':
     # Extracting Google Docs token
     trigger = '\"token\":\"'
     if trigger not in html:
-        exit("[-] I can't find the Google Docs token in the source code...\n")
+        sys.exit("[-] I can't find the Google Docs token in the source code...\n")
     else:
         gdoc_token = html.split(trigger)[1][:100].split('"')[0]
         print("Google Docs Token => {}".format(gdoc_token))

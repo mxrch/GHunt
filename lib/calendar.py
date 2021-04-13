@@ -1,9 +1,6 @@
-import httpx
 from dateutil.relativedelta import relativedelta
 from beautifultable import BeautifulTable
 from termcolor import colored
-
-import time
 import json
 from datetime     import datetime, timezone
 from urllib.parse import urlencode
