@@ -22,7 +22,7 @@ from lib.utils import *
 import lib.calendar as gcalendar
 
 
-def email_hunt(email):
+def email_hunt(email,timeout=5):
     banner()
 
     if not email:
@@ -46,11 +46,14 @@ def email_hunt(email):
         internal_token = out["keys"]["internal"]
         cookies = out["cookies"]
 
-    client = httpx.Client(cookies=cookies, headers=config.headers)
+    client = httpx.Client(cookies=cookies, headers=config.headers, timeout=timeout)
 
-    data = is_email_google_account(client, hangouts_auth, cookies, email,
+    try:
+        data = is_email_google_account(client, hangouts_auth, cookies, email,
                                    hangouts_token)
-
+    except Exception as e:
+        print("[-] Unable to identify if email is valid; {}".format(e.__class__))
+        exit()
     is_within_docker = within_docker()
     if is_within_docker:
         print("[+] Docker detected, profile pictures will not be saved.")
@@ -79,21 +82,24 @@ def email_hunt(email):
                         print(f"Name : {name}")
 
         # profile picture
-        profile_pic_link = infos["photo"][0]["url"]
-        req = client.get(profile_pic_link)
+        try:
+            profile_pic_link = infos["photo"][0]["url"]
+            req = client.get(profile_pic_link)
 
-        profile_pic_img = Image.open(BytesIO(req.content))
-        profile_pic_hash = image_hash(profile_pic_img)
-        is_default_profile_pic = detect_default_profile_pic(profile_pic_hash)
+            profile_pic_img = Image.open(BytesIO(req.content))
+            profile_pic_hash = image_hash(profile_pic_img)
+            is_default_profile_pic = detect_default_profile_pic(profile_pic_hash)
 
-        if not is_default_profile_pic and not is_within_docker:
-            print("\n[+] Custom profile picture !")
-            print(f"=> {profile_pic_link}")
-            if config.write_profile_pic and not is_within_docker:
-                open(Path(config.profile_pics_dir) / f'{email}.jpg', 'wb').write(req.content)
-                print("Profile picture saved !")
-        else:
-            print("\n[-] Default profile picture")
+            if not is_default_profile_pic and not is_within_docker:
+                print("\n[+] Custom profile picture !")
+                print(f"=> {profile_pic_link}")
+                if config.write_profile_pic and not is_within_docker:
+                    open(Path(config.profile_pics_dir) / f'{email}.jpg', 'wb').write(req.content)
+                    print("Profile picture saved !")
+            else:
+                print("\n[-] Default profile picture")
+        except:
+            print("[-] Unable to fetch profile picture")
 
         # last edit
         try:

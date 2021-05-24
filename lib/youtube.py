@@ -61,24 +61,35 @@ def youtube_channel_search_gdocs(client, query, data_path, gdocs_public_doc):
 
         retries = 2
         for retry in list(range(retries))[::-1]:
-            req = client.get(profile_url)
-            source = req.text
             try:
-                data = json.loads(
-                    source.split('var ytInitialData = ')[1].split(';</script>')[0])
-                avatar_link = data["metadata"]["channelMetadataRenderer"]["avatar"]["thumbnails"][0]["url"].split('=')[0]
-            except (KeyError, IndexError) as e:
-                if retry == 0:
-                    return False
-                continue
-            else:
-                break
-        req = client.get(avatar_link)
-        img = Image.open(BytesIO(req.content))
-        hash = image_hash(img)
-        title = data["metadata"]["channelMetadataRenderer"]["title"]
-        results["channels"].append({"profile_url": profile_url, "name": title, "hash": hash})
-    return results
+                req = client.get(profile_url)
+                source = req.text
+                try:
+                    data = json.loads(
+                        source.split('var ytInitialData = ')[1].split(';</script>')[0])
+                    avatar_link = data["metadata"]["channelMetadataRenderer"]["avatar"]["thumbnails"][0]["url"].split('=')[0]
+                except (KeyError, IndexError) as e:
+                    if retry == 0:
+                        return False
+                    continue
+                else:
+                    break
+            except Exception as e:
+                print("[-] Connection error; {}".format(e.__class__))
+
+        try:    
+            req = client.get(avatar_link)
+            img = Image.open(BytesIO(req.content))
+            hash = image_hash(img)
+            title = data["metadata"]["channelMetadataRenderer"]["title"]
+            results["channels"].append({"profile_url": profile_url, "name": title, "hash": hash})
+    
+        except Exception as e:
+                print("[-] Connection error; {}".format(e.__class__))
+
+        return results
+
+        
 
 
 def get_channels(client, query, data_path, gdocs_public_doc):

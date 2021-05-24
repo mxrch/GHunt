@@ -30,8 +30,11 @@ class element_has_substring_or_substring(object):
 
 def get_source(gaiaID, client, cookies, headers, is_headless):
     baseurl = f"https://get.google.com/albumarchive/{gaiaID}/albums/profile-photos?hl=en"
-    req = client.get(baseurl)
-    if req.status_code != 200:
+    try:
+        req = client.get(baseurl)
+        if req.status_code != 200:
+            return False
+    except:
         return False
 
     tmprinter = TMPrinter()
@@ -53,7 +56,11 @@ def get_source(gaiaID, client, cookies, headers, is_headless):
         driver.add_cookie({'name': k, 'value': v})
 
     tmprinter.out('Fetching Google Photos "Profile photos" album...')
-    driver.get(baseurl)
+    try:
+        driver.get(baseurl)
+    except Exception as e:
+        print("[-] Connection error; {}".format(e.__class__))
+        return False
 
     tmprinter.out('Fetching the Google Photos albums overview...')
     buttons = driver.find_elements(By.XPATH, "//button")

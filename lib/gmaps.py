@@ -43,9 +43,13 @@ def scrape(gaiaID, client, cookies, config, headers, regex_rev_by_id, is_headles
 
     tmprinter.out("Initial request...")
 
-    req = client.get(base_url)
+    try:
+        req = client.get(base_url)        
+    except Exception as e:
+        print("[-] Connection error; {}".format(e.__class__))
+        return False
+    
     source = req.text
-
     data = source.split(';window.APP_INITIALIZATION_STATE=')[1].split(';window.APP_FLAGS')[0].replace("\\", "")
 
     if "/maps/reviews/data" not in data:
@@ -66,57 +70,70 @@ def scrape(gaiaID, client, cookies, config, headers, regex_rev_by_id, is_headles
     wait = WebDriverWait(driver, 15)
 
     tmprinter.out("Setting cookies...")
-    driver.get("https://www.google.com/robots.txt")
     
-    if not config.gmaps_cookies:
-        cookies = {"CONSENT": config.default_consent_cookie}
-    for k, v in cookies.items():
-        driver.add_cookie({'name': k, 'value': v})
+    try:
+        driver.get("https://www.google.com/robots.txt")
+    
+        if not config.gmaps_cookies:
+            cookies = {"CONSENT": config.default_consent_cookie}
+        for k, v in cookies.items():
+            driver.add_cookie({'name': k, 'value': v})
 
-    tmprinter.out("Fetching reviews page...")
-    driver.get(base_url)
+        tmprinter.out("Fetching reviews page...")
+        driver.get(base_url)
 
-    wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'div.section-scrollbox')))
-    scrollbox = driver.find_element_by_css_selector('div.section-scrollbox')
+        wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'div.section-scrollbox')))
+        scrollbox = driver.find_element_by_css_selector('div.section-scrollbox')
 
-    tab_info = driver.find_elements_by_css_selector('div.section-tab-info')
-    if tab_info:
-        scroll_max = sum([int(x) for x in tab_info[0].text.split() if x.isdigit()])
-    else:
-        return False
+        tab_info = driver.find_elements_by_css_selector('div.section-tab-info')
+        if tab_info:
+            scroll_max = sum([int(x) for x in tab_info[0].text.split() if x.isdigit()])
+        else:
+            return False
 
-    print(f"[+] {scroll_max} reviews found !             ")
+        print(f"[+] {scroll_max} reviews found !             ")
 
-    timeout = scroll_max * 1.25
-    timeout_start = time.time()
-    reviews_elements = driver.find_elements_by_xpath('//div[@data-review-id][@aria-label]')
-    tmprinter.out(f"Fetching reviews... ({len(reviews_elements)}/{scroll_max})")
-    while len(reviews_elements) < scroll_max:
-        driver.execute_script("arguments[0].scrollTop = arguments[0].scrollHeight", scrollbox)
+        timeout = scroll_max * 1.25
+        timeout_start = time.time()
         reviews_elements = driver.find_elements_by_xpath('//div[@data-review-id][@aria-label]')
         tmprinter.out(f"Fetching reviews... ({len(reviews_elements)}/{scroll_max})")
-        if time.time() > timeout_start + timeout:
-            tmprinter.out(f"Timeout while fetching reviews !")
-            break
+        while len(reviews_elements) < scroll_max:
+            driver.execute_script("arguments[0].scrollTop = arguments[0].scrollHeight", scrollbox)
+            reviews_elements = driver.find_elements_by_xpath('//div[@data-review-id][@aria-label]')
+            tmprinter.out(f"Fetching reviews... ({len(reviews_elements)}/{scroll_max})")
+            if time.time() > timeout_start + timeout:
+                tmprinter.out(f"Timeout while fetching reviews !")
+                break
+            
+    except Exception as e:
+        print("[-] Connection error; {}".format(e.__class__))
+        return False
+
+    
 
     tmprinter.out("Fetching internal requests history...")
     requests = [r.url for r in driver.requests if "locationhistory" in r.url]
     tmprinter.out(f"Fetching internal requests... (0/{len(requests)})")
-    for nb, load in enumerate(requests):
-        req = client.get(load)
-        data += req.text.replace('\n', '')
-        tmprinter.out(f"Fetching internal requests... ({nb + 1}/{len(requests)})")
 
-    tmprinter.out(f"Fetching reviews location... (0/{len(reviews_elements)})")
-    reviews = []
-    for nb, review in enumerate(reviews_elements):
-        id = review.get_attribute("data-review-id")
-        location = re.compile(regex_rev_by_id.format(id)).findall(data)[0]
-        date = get_datetime(review.find_element_by_css_selector('span.section-review-publish-date').text)
-        reviews.append({"location": location, "date": date})
-        tmprinter.out(f"Fetching reviews location... ({nb + 1}/{len(reviews_elements)})")
+    try:
+        for nb, load in enumerate(requests):
+            req = client.get(load)
+            data += req.text.replace('\n', '')
+            tmprinter.out(f"Fetching internal requests... ({nb + 1}/{len(requests)})")
 
-    return reviews
+        tmprinter.out(f"Fetching reviews location... (0/{len(reviews_elements)})")
+        reviews = []
+        for nb, review in enumerate(reviews_elements):
+            id = review.get_attribute("data-review-id")
+            location = re.compile(regex_rev_by_id.format(id)).findall(data)[0]
+            date = get_datetime(review.find_element_by_css_selector('span.section-review-publish-date').text)
+            reviews.append({"location": location, "date": date})
+            tmprinter.out(f"Fetching reviews location... ({nb + 1}/{len(reviews_elements)})")
+
+        return reviews
+    except Exception as e:
+        print("[-] Error in conncection; {}".format(e.__class__))
+        return []
 
 
 def avg_location(locs):

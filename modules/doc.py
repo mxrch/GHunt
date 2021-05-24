@@ -17,7 +17,7 @@ from lib.utils import *
 from lib.banner import banner
 
 
-def doc_hunt(doc_link):
+def doc_hunt(doc_link, timeout=5):
     banner()
 
     tmprinter = TMPrinter()
@@ -47,13 +47,16 @@ def doc_hunt(doc_link):
         cookies = out["cookies"]
 
     headers = {**config.headers, **{"X-Origin": "https://drive.google.com"}}
-    client = httpx.Client(cookies=cookies, headers=headers)
+    client = httpx.Client(cookies=cookies, headers=headers, timeout=timeout)
 
     url = f"https://clients6.google.com/drive/v2beta/files/{doc_id}?fields=alternateLink%2CcopyRequiresWriterPermission%2CcreatedDate%2Cdescription%2CdriveId%2CfileSize%2CiconLink%2Cid%2Clabels(starred%2C%20trashed)%2ClastViewedByMeDate%2CmodifiedDate%2Cshared%2CteamDriveId%2CuserPermission(id%2Cname%2CemailAddress%2Cdomain%2Crole%2CadditionalRoles%2CphotoLink%2Ctype%2CwithLink)%2Cpermissions(id%2Cname%2CemailAddress%2Cdomain%2Crole%2CadditionalRoles%2CphotoLink%2Ctype%2CwithLink)%2Cparents(id)%2Ccapabilities(canMoveItemWithinDrive%2CcanMoveItemOutOfDrive%2CcanMoveItemOutOfTeamDrive%2CcanAddChildren%2CcanEdit%2CcanDownload%2CcanComment%2CcanMoveChildrenWithinDrive%2CcanRename%2CcanRemoveChildren%2CcanMoveItemIntoTeamDrive)%2Ckind&supportsTeamDrives=true&enforceSingleParent=true&key={internal_token}"
     
     retries = 100
     for retry in range(retries):
-        req = client.get(url)
+        try:
+            req = client.get(url)
+        except Exception as e:
+            print("[-] Connection error: {}".format(e.__class__))
         if "File not found" in req.text:
             exit("[-] This file does not exist or is not public")
         elif "rateLimitExceeded" in req.text:
@@ -117,17 +120,20 @@ def doc_hunt(doc_link):
         
         # profile picture
         profile_pic_link = owner['photoLink']
-        req = client.get(profile_pic_link)
+        try:
+            req = client.get(profile_pic_link)
+            profile_pic_img = Image.open(BytesIO(req.content))
+            profile_pic_hash = image_hash(profile_pic_img)
+            is_default_profile_pic = detect_default_profile_pic(profile_pic_hash)
 
-        profile_pic_img = Image.open(BytesIO(req.content))
-        profile_pic_hash = image_hash(profile_pic_img)
-        is_default_profile_pic = detect_default_profile_pic(profile_pic_hash)
-
-        if not is_default_profile_pic and not is_within_docker:
-            print("\n[+] Custom profile picture !")
-            print(f"=> {profile_pic_link}")
-            if config.write_profile_pic and not is_within_docker:
-                open(Path(config.profile_pics_dir) / f'{owner["emailAddress"]}.jpg', 'wb').write(req.content)
-                print("Profile picture saved !\n")
-        else:
-            print("\n[-] Default profile picture\n")
+            if not is_default_profile_pic and not is_within_docker:
+                print("\n[+] Custom profile picture !")
+                print(f"=> {profile_pic_link}")
+                if config.write_profile_pic and not is_within_docker:
+                    open(Path(config.profile_pics_dir) / f'{owner["emailAddress"]}.jpg', 'wb').write(req.content)
+                    print("Profile picture saved !\n")
+            else:
+                print("\n[-] Default profile picture\n")
+        except Exception as e:
+            print("[-] Connection error: {}".format(e.__class__))
+        

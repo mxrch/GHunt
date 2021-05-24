@@ -40,14 +40,16 @@ def is_email_google_account(httpx_client, auth, cookies, email, hangouts_token):
         "Content-Type": "application/x-www-form-urlencoded",
         "Origin": "https://hangouts.google.com"
     }
+    try:
+        req = httpx_client.post(host + url, data=body.format(email), headers=headers, cookies=cookies)
+        data = json.loads(req.text)
+        #pprint(data); exit()
+        if not "matches" in data:
+            exit("[-] This email address does not belong to a Google Account.")
 
-    req = httpx_client.post(host + url, data=body.format(email), headers=headers, cookies=cookies)
-    data = json.loads(req.text)
-    #pprint(data); exit()
-    if not "matches" in data:
-        exit("[-] This email address does not belong to a Google Account.")
-
-    return data
+        return data
+    except Exception as e:
+        exit("[-] Could not establish connection; {}".format(e.__class__))
 
 def get_account_name(httpx_client, gaiaID, internal_auth, internal_token, cookies, config):
     # Bypass method
@@ -59,23 +61,29 @@ def get_account_name(httpx_client, gaiaID, internal_auth, internal_token, cookie
     headers = {**config.headers, **req_headers}
 
     url = f"https://people-pa.clients6.google.com/v2/people?person_id={gaiaID}&request_mask.include_container=PROFILE&request_mask.include_container=DOMAIN_PROFILE&request_mask.include_field.paths=person.metadata.best_display_name&core_id_params.enable_private_names=true&key={internal_token}"
-    req = httpx_client.get(url, headers=headers)
-    data = json.loads(req.text)
-
+    
     try:
-        name = data["personResponse"][0]["person"]["metadata"]["bestDisplayName"]["displayName"]
-    except KeyError:
-        pass # We fallback on the classic method
-    else:
-        return name
+        req = httpx_client.get(url, headers=headers)
+        data = json.loads(req.text)
 
-    # Classic method, but requires the target to have at least 1 GMaps contribution
-    req = httpx_client.get(f"https://www.google.com/maps/contrib/{gaiaID}")
-    gmaps_source = req.text
-    match = re.search(r'<meta content="Contributions by (.*?)" itemprop="name">', gmaps_source)
-    if not match:
+        try:
+            name = data["personResponse"][0]["person"]["metadata"]["bestDisplayName"]["displayName"]
+        except KeyError:
+            pass # We fallback on the classic method
+        else:
+            return name
+
+        # Classic method, but requires the target to have at least 1 GMaps contribution
+        req = httpx_client.get(f"https://www.google.com/maps/contrib/{gaiaID}")
+        gmaps_source = req.text
+        match = re.search(r'<meta content="Contributions by (.*?)" itemprop="name">', gmaps_source)
+        if not match:
+            return None
+        return match[1]
+    except Exception as e:
+        print("[-] Could not establish connection; {}".format(e.__class__))
         return None
-    return match[1]
+
 
 def image_hash(img):
     hash = str(imagehash.average_hash(img))

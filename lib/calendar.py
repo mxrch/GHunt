@@ -36,9 +36,10 @@ def fetch(email, client, config):
         client.cookies = cookies
     url_endpoint = f"https://calendar.google.com/calendar/u/0/embed?src={email}"
     print("\nGoogle Calendar : " + url_endpoint)
-    req = client.get(url_endpoint + "&hl=en")
-    source = req.text
+    
     try:
+        req = client.get(url_endpoint + "&hl=en")
+        source = req.text
         # parsing parameters from source code
         calendarId   = source.split('title\":\"')[1].split('\"')[0]
         singleEvents = "true"
@@ -47,21 +48,22 @@ def fetch(email, client, config):
         sanitizeHtml = "true"
         timeMin      = datetime.strptime(source.split('preloadStart\":\"')[1].split('\"')[0], '%Y%m%d').replace(tzinfo=timezone.utc).isoformat()
         API_key      = source.split('developerKey\":\"')[1].split('\"')[0]
-    except IndexError:
+    except Exception:
         return False
 
     json_calendar_endpoint = assemble_api_req(calendarId, singleEvents, maxAttendees, maxResults, sanitizeHtml, timeMin, API_key, email)
-    req = client.get(json_calendar_endpoint)
-    data = json.loads(req.text)
-    events = []
+    
     try:
+        req = client.get(json_calendar_endpoint)
+        data = json.loads(req.text)
+        events = []
         for item in data["items"]:
             title = item["summary"]
             start  = get_datetime_utc(item["start"]["dateTime"])
             end    = get_datetime_utc(item["end"]["dateTime"])
 
             events.append({"title": title, "start": start, "end": end})
-    except KeyError:
+    except Exception:
         return False
 
     return {"status": "available", "events": events}

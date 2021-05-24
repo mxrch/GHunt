@@ -13,10 +13,14 @@ def search(query, data_path, gdocs_public_doc, size=1000):
         token = out["keys"]["gdoc"]
         cookies = out["cookies"]
     data = {"request": '["documentsuggest.search.search_request","{}",[{}],null,1]'.format(query, size)}
-    req = httpx.post('https://docs.google.com/document/d/{}/explore/search?token={}'.format(gdocs_public_doc, token),
+    try:
+        req = httpx.post('https://docs.google.com/document/d/{}/explore/search?token={}'.format(gdocs_public_doc, token),
                      cookies=cookies, data=data)
-    if req.status_code != 200:
-        exit("Error (GDocs): request gives {}".format(req.status_code))
+        if req.status_code != 200:
+            exit("Error (GDocs): request gives {}".format(req.status_code))
+    except Exception as e:
+        print("[-] Connection error; {}".format(e.__class__))
+        return []
 
     output = json.loads(req.text.replace(")]}'", ""))
     #pprint(output)
