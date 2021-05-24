@@ -16,14 +16,14 @@ if __name__ == "__main__":
     modules = ["email", "doc"]
 
     if len(sys.argv) < 3 or sys.argv[1].lower() not in modules:
-        print("Usage: {} <module> <URL> <timeout>".format(sys.argv[0]))        
+        print("Usage: {} <module> <email|URL> <timeout>".format(sys.argv[0]))        
         print("Available modules :")
         for module in modules:
             print(f"- {module}")
         exit()
     elif len(sys.argv) == 4 and not sys.argv[3].isnumeric():
         print("Timeout should be a number")
-        print("Usage: {} <module> <URL> <timeout>".format(sys.argv[0]))
+        print("Usage: {} <module> <email|URL> <timeout>".format(sys.argv[0]))
         print("Available modules :")
         for module in modules:
             print(f"- {module}")
