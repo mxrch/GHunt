@@ -35,7 +35,8 @@ if __name__ == "__main__":
     else:
         data = None 
 
+    timeout = 5 if len(sys.argv) == 3 else int(sys.argv[3])
     if module == "email":
-        email_hunt(data,int(sys.argv[3]))
+        email_hunt(data,timeout)
     elif module == "doc":
-        doc_hunt(data,int(sys.argv[3]))
+        doc_hunt(data,timeout)
