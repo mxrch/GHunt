@@ -4,12 +4,16 @@
 
 ![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/mxrch/ghunt) ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/mxrch/ghunt/CodeQL?label=CodeQL)
 # Description
-GHunt is an OSINT tool to extract information from any Google Account using an email.
+GHunt is a modulable OSINT tool designed to evolve over the years, and incorporates many techniques to investigate Google accounts, or objects.\
+It currently has **email** and **document** modules.
 
-It can currently extract:
+## What can GHunt find ?
+
+🗺️ **Email** module:
 - Owner's name
-- Last time the profile was edited
 - Google ID
+- Last time the profile was edited
+- Profile picture (+ detect custom picture)
 - If the account is a Hangouts Bot
 - Activated Google services (YouTube, Photos, Maps, News360, Hangouts, etc.)
 - Possible YouTube channel
@@ -21,6 +25,15 @@ It can currently extract:
 - ~~Phones models (P)~~
 - ~~Phones firmwares (P)~~
 - ~~Installed softwares (P)~~
+
+🗺️ **Document** module:
+- Owner's name
+- Owner's Google ID
+- Owner's profile picture (+ detect custom picture)
+- Creation date
+- Last time the document was edited
+- Public permissions
+- Your permissions
 
 The features marked with a **(P)** require the target account to have the default setting of `Allow the people you share content with to download your photos and videos` on the Google AlbumArchive, or if the target has ever used Picasa linked to their Google account.\
 More info [here](https://github.com/mxrch/GHunt#%EF%B8%8F-protecting-yourself).
@@ -58,6 +71,7 @@ Then, any of the scripts can be invoked through:
 ```
 docker run -v ghunt-resources:/usr/src/app/resources -ti mxrch/ghunt check_and_gen.py
 docker run -v ghunt-resources:/usr/src/app/resources -ti mxrch/ghunt ghunt.py email <email_address>
+docker run -v ghunt-resources:/usr/src/app/resources -ti mxrch/ghunt ghunt.py doc <document_link>
 ```
 
 ## Manual installation
@@ -82,7 +96,10 @@ If you don't have cookies stored (ex: first launch), you will be asked for the 5
 
 Then, you can run the tool like this:
 ```bash
-python3 ghunt.py email myemail@gmail.com
+python3 ghunt.py email larry@google.com
+```
+```bash
+python3 ghunt.py doc https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms
 ```
 
 ⚠️ I suggest you make an empty account just for this or use an account where you never login because depending on your browser/location, re-logging in into the Google Account used for the cookies can deauthorize them.
