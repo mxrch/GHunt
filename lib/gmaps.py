@@ -112,7 +112,11 @@ def scrape(gaiaID, client, cookies, config, headers, regex_rev_by_id, is_headles
     for nb, review in enumerate(reviews_elements):
         id = review.get_attribute("data-review-id")
         location = re.compile(regex_rev_by_id.format(id)).findall(data)[0]
-        date = get_datetime(review.find_element_by_tag_name('div').text.split("\n")[2])
+        try:
+            stars = review.find_element_by_css_selector('span[aria-label$="stars "]')
+        except Exception:
+            stars = review.find_element_by_css_selector('span[aria-label$="star "]')
+        date = get_datetime(stars.find_element_by_xpath("following-sibling::span").text)
         reviews.append({"location": location, "date": date})
         tmprinter.out(f"Fetching reviews location... ({nb + 1}/{len(reviews_elements)})")
 
