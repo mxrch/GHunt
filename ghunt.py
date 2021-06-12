@@ -5,8 +5,6 @@ import os
 from pathlib import Path
 
 from lib.utils import *
-from modules.doc import doc_hunt
-from modules.email import email_hunt
 
 
 if __name__ == "__main__":
@@ -30,6 +28,8 @@ if __name__ == "__main__":
         data = None 
 
     if module == "email":
+        from modules.email import email_hunt
         email_hunt(data)
     elif module == "doc":
+        from modules.doc import doc_hunt
         doc_hunt(data)
