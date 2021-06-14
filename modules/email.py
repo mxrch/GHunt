@@ -65,8 +65,10 @@ def email_hunt(email):
         email = user["lookupId"]
         infos = data["people"][gaiaID]
 
-        # get name
-        name = get_account_name(client, gaiaID, internal_auth, internal_token, cookies, config)
+        # get name & profile picture
+        account = get_account_data(client, gaiaID, internal_auth, internal_token, config)
+        name = account["name"]
+        
         if name:
             print(f"Name : {name}")
         else:
@@ -79,8 +81,8 @@ def email_hunt(email):
                         print(f"Name : {name}")
 
         # profile picture
-        profile_pic_link = infos["photo"][0]["url"]
-        req = client.get(profile_pic_link)
+        profile_pic_url = account["profile_pic_url"]
+        req = client.get(profile_pic_url)
 
         profile_pic_img = Image.open(BytesIO(req.content))
         profile_pic_hash = image_hash(profile_pic_img)
@@ -88,7 +90,7 @@ def email_hunt(email):
 
         if not is_default_profile_pic and not is_within_docker:
             print("\n[+] Custom profile picture !")
-            print(f"=> {profile_pic_link}")
+            print(f"=> {profile_pic_url}")
             if config.write_profile_pic and not is_within_docker:
                 open(Path(config.profile_pics_dir) / f'{email}.jpg', 'wb').write(req.content)
                 print("Profile picture saved !")
@@ -106,7 +108,6 @@ def email_hunt(email):
         print(f"\nEmail : {email}\nGoogle ID : {gaiaID}\n")
 
         # is bot?
-        profile_pic = infos["photo"][0]["url"]
         if "extendedData" in infos:
             isBot = infos["extendedData"]["hangoutsExtendedData"]["isBot"]
             if isBot:
@@ -160,7 +161,7 @@ def email_hunt(email):
         reviews = gmaps.scrape(gaiaID, client, cookies, config, config.headers, config.regexs["review_loc_by_id"], config.headless)
 
         if reviews:
-            confidence, locations = gmaps.get_confidence(reviews, config.gmaps_radius)
+            confidence, locations = gmaps.get_confidence(geolocator, reviews, config.gmaps_radius)
             print(f"\n[+] Probable location (confidence => {confidence}) :")
 
             loc_names = []

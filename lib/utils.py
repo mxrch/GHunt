@@ -49,7 +49,7 @@ def is_email_google_account(httpx_client, auth, cookies, email, hangouts_token):
 
     return data
 
-def get_account_name(httpx_client, gaiaID, internal_auth, internal_token, cookies, config):
+def get_account_data(httpx_client, gaiaID, internal_auth, internal_token, config):
     # Bypass method
     req_headers = {
         "Origin": "https://drive.google.com",
@@ -58,10 +58,19 @@ def get_account_name(httpx_client, gaiaID, internal_auth, internal_token, cookie
     }
     headers = {**config.headers, **req_headers}
 
-    url = f"https://people-pa.clients6.google.com/v2/people?person_id={gaiaID}&request_mask.include_container=PROFILE&request_mask.include_container=DOMAIN_PROFILE&request_mask.include_field.paths=person.metadata.best_display_name&core_id_params.enable_private_names=true&key={internal_token}"
+    url = f"https://people-pa.clients6.google.com/v2/people?person_id={gaiaID}&request_mask.include_container=PROFILE&request_mask.include_container=DOMAIN_PROFILE&request_mask.include_field.paths=person.metadata.best_display_name&request_mask.include_field.paths=person.photo&request_mask.include_field.paths=person.email&core_id_params.enable_private_names=true&key={internal_token}"
     req = httpx_client.get(url, headers=headers)
     data = json.loads(req.text)
 
+    name = get_account_name(httpx_client, gaiaID, data, internal_auth, internal_token, config)
+    try:
+        profile_pic_url = data["personResponse"][0]["person"]["photo"][0]["url"]
+    except:
+        profile_pic_url = None
+
+    return {"name": name, "profile_pic_url": profile_pic_url}
+
+def get_account_name(httpx_client, gaiaID, data, internal_auth, internal_token, config):
     try:
         name = data["personResponse"][0]["person"]["metadata"]["bestDisplayName"]["displayName"]
     except KeyError:

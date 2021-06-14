@@ -1,7 +1,8 @@
 regexs = {
     "albums": r'href=\"\.\/albumarchive\/\d*?\/album\/(.*?)\" jsaction.*?>(?:<.*?>){5}(.*?)<\/div><.*?>(\d*?) ',
     "photos": r'\],\"(https:\/\/lh\d\.googleusercontent\.com\/.*?)\",\[\"\d{21}\"(?:.*?,){16}\"(.*?)\"',
-    "review_loc_by_id": r'{}\",.*?\[\[null,null,(.*?),(.*?)\]'
+    "review_loc_by_id": r'{}\",.*?\[\[null,null,(.*?),(.*?)\]',
+    "gplus": r"plus\.google\.com\/\d*\""
 }
 
 headers = {
@@ -26,3 +27,4 @@ profile_pics_dir = "profile_pics"
 gmaps_cookies = False
 calendar_cookies = False
 default_consent_cookie = "YES+FR.fr+V10+BX"
+default_pref_cookie = "tz=Europe.Paris&f6=40000000&hl=en" # To set the lang settings to english

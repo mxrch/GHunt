@@ -141,7 +141,7 @@ if __name__ == '__main__':
 
     tmprinter = TMPrinter()
 
-    cookies = {"SID": "", "SSID": "", "APISID": "", "SAPISID": "", "HSID": "", "CONSENT": config.default_consent_cookie}
+    cookies = {"SID": "", "SSID": "", "APISID": "", "SAPISID": "", "HSID": "", "CONSENT": config.default_consent_cookie, "PREF": config.default_pref_cookie}
 
     new_cookies_entered = False
 

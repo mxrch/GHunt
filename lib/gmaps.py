@@ -159,8 +159,7 @@ def translate_confidence(percents):
         return "Extremely low"
 
 
-def get_confidence(data, gmaps_radius):
-    geolocator = Nominatim(user_agent="nominatim")
+def get_confidence(geolocator, data, gmaps_radius):
     tmprinter = TMPrinter()
     radius = gmaps_radius
 

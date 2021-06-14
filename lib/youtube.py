@@ -1,12 +1,66 @@
 import json
 import urllib.parse
 from io import BytesIO
+from urllib.parse import unquote as parse_url
 
 from PIL import Image
 
 from lib.search import search as gdoc_search
 from lib.utils import *
 
+
+def get_channel_data(client, channel_url):
+    data = None
+
+    retries = 2
+    for retry in list(range(retries))[::-1]:
+        req = client.get(f"{channel_url}/about")
+        source = req.text
+        try:
+            data = json.loads(source.split('var ytInitialData = ')[1].split(';</script>')[0])
+        except (KeyError, IndexError):
+            if retry == 0:
+                return False
+            continue
+        else:
+            break
+
+    handle = data["metadata"]["channelMetadataRenderer"]["vanityChannelUrl"].split("/")[-1]
+    tabs = [x[list(x.keys())[0]] for x in data["contents"]["twoColumnBrowseResultsRenderer"]["tabs"]]
+    about_tab = [x for x in tabs if x["title"].lower() == "about"][0]
+    channel_details = about_tab["content"]["sectionListRenderer"]["contents"][0]["itemSectionRenderer"]["contents"][0]["channelAboutFullMetadataRenderer"]
+
+    out = {
+        "name": None,
+        "description": None,
+        "channel_urls": [],
+        "email_contact": False,
+        "views": None,
+        "joined_date": None,
+        "primary_links": [],
+        "country": None
+        }
+
+    out["name"] = data["metadata"]["channelMetadataRenderer"]["title"]
+
+    out["channel_urls"].append(data["metadata"]["channelMetadataRenderer"]["channelUrl"])
+    out["channel_urls"].append(f"https://www.youtube.com/c/{handle}")
+    out["channel_urls"].append(f"https://www.youtube.com/user/{handle}")
+
+    out["email_contact"] = "businessEmailLabel" in channel_details
+
+    out["description"] = channel_details["description"]["simpleText"] if "description" in channel_details else None
+    out["views"] = channel_details["viewCountText"]["simpleText"].split(" ")[0] if "viewCountText" in channel_details else None
+    out["joined_date"] = channel_details["joinedDateText"]["runs"][1]["text"] if "joinedDateText" in channel_details else None
+    out["country"] = channel_details["country"]["simpleText"] if "country" in channel_details else None
+
+    if "primaryLinks" in channel_details:
+        for primary_link in channel_details["primaryLinks"]:
+            title = primary_link["title"]["simpleText"]
+            url = parse_url(primary_link["navigationEndpoint"]["urlEndpoint"]["url"].split("&q=")[-1])
+            out["primary_links"].append({"title": title, "url": url})
+
+    return out
 
 def youtube_channel_search(client, query):
     try:
