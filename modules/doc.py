@@ -29,7 +29,7 @@ def doc_hunt(doc_link):
     if is_within_docker:
         print("[+] Docker detected, profile pictures will not be saved.")
 
-    doc_id = ''.join([x for x in doc_link.split("?")[0].split("/") if len(x) == 44])
+    doc_id = ''.join([x for x in doc_link.split("?")[0].split("/") if len(x) in (33, 44)])
     if doc_id:
         print(f"\nDocument ID : {doc_id}\n")
     else:

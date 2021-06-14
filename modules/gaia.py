@@ -72,7 +72,7 @@ def gaia_hunt(gaiaID):
     else:
         print("\n[-] Default profile picture")
 
-    print(f"\nGaia ID : {gaiaID}\n")
+    print(f"\nGaia ID : {gaiaID}")
 
     # check YouTube
     if name:
