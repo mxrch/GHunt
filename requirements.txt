@@ -9,3 +9,4 @@ colorama
 chromedriver-autoinstaller
 beautifultable
 termcolor
+wayback
