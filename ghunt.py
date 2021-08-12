@@ -1,22 +1,24 @@
 #!/usr/bin/env python3
 
-import sys
 import os
+import sys
 from pathlib import Path
 
-from lib.utils import *
 from modules.doc import doc_hunt
 from modules.email import email_hunt
 from modules.gaia import gaia_hunt
 from modules.youtube import youtube_hunt
 
-
 if __name__ == "__main__":
-    
     # We change the current working directory to allow using GHunt from anywhere
     os.chdir(Path(__file__).parents[0])
 
-    modules = ["email", "doc", "gaia", "youtube"]
+    modules = {
+        "doc": doc_hunt,
+        "email": email_hunt,
+        "gaia": gaia_hunt,
+        "youtube": youtube_hunt,
+    }
 
     if len(sys.argv) <= 1 or sys.argv[1].lower() not in modules:
         print("Please choose a module.\n")
@@ -26,16 +28,5 @@ if __name__ == "__main__":
         exit()
 
     module = sys.argv[1].lower()
-    if len(sys.argv) >= 3:
-        data = sys.argv[2]
-    else:
-        data = None 
-
-    if module == "email":
-        email_hunt(data)
-    elif module == "doc":
-        doc_hunt(data)
-    elif module == "gaia":
-        gaia_hunt(data)
-    elif module == "youtube":
-        youtube_hunt(data)
+    data = sys.argv[2] if len(sys.argv) >= 3 else None
+    modules[module](data)
