@@ -168,10 +168,10 @@ class ExifEater():
                             dates = "?"
                         print(f"- {location} ({n} pic{picx(n)}) [{dates}]")
 
-        software = self.software
-        if software:
-            print(f"\n[+] {len(software)} software{picx(len(software))} found !")
-            for software, data in software.items():
+        softwares = self.software
+        if softwares:
+            print(f"\n[+] {len(softwares)} software{picx(len(softwares))} found !")
+            for software, data in softwares.items():
                 n = len(data["Valid"] + data["Invalid"])
                 for validity, dateslist in data.items():
                     if dateslist and ((validity == "Valid") or (validity == "Invalid" and not data["Valid"])):
@@ -184,5 +184,5 @@ class ExifEater():
                             dates = "?"
                         print(f"- {software} ({n} pic{picx(n)}) [{dates}]")
 
-        if not devices and not locations and not software:
+        if not devices and not locations and not softwares:
             print("=> Nothing found")
