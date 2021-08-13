@@ -24,7 +24,7 @@ It currently has **email** and **document** modules.
 - ~~Public photos (P)~~
 - ~~Phones models (P)~~
 - ~~Phones firmwares (P)~~
-- ~~Installed softwares (P)~~
+- ~~Installed software (P)~~
 
 🗺️ **Document** module:
 - Owner's name

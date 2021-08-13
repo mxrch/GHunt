@@ -71,7 +71,7 @@ def doc_hunt(doc_link):
     tmprinter.clear()
     data = json.loads(req.text)
 
-    # Extracting informations
+    # Extracting information
 
     # Dates
 

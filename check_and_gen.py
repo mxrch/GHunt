@@ -77,7 +77,7 @@ def get_hangouts_tokens(driver, cookies, tmprinter):
         tmprinter.out("")
     except SE_TimeoutExepction:
         tmprinter.out("")
-        exit("\n[!] Selenium TimeoutException has occured. Please check your internet connection, proxies, vpns, et cetera.")
+        exit("\n[!] Selenium TimeoutException has occurred. Please check your internet connection, proxies, vpns, et cetera.")
 
 
     hangouts_auth = req.headers["Authorization"]

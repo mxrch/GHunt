@@ -11,7 +11,7 @@ class ExifEater():
 
     def __init__(self):
         self.devices = {}
-        self.softwares = {}
+        self.software = {}
         self.locations = {}
         self.geolocator = Nominatim(user_agent="nominatim")
 
@@ -92,9 +92,9 @@ class ExifEater():
                                                                                               "Invalid": []}
                     self.devices[metadata["Model"]]["Firmwares"][metadata["Software"]][is_date_valid].append(date)
             elif "Software" in metadata:
-                if metadata["Software"] not in self.softwares:
-                    self.softwares[metadata["Software"]] = {"Valid": [], "Invalid": []}
-                self.softwares[metadata["Software"]][is_date_valid].append(date)
+                if metadata["Software"] not in self.software:
+                    self.software[metadata["Software"]] = {"Valid": [], "Invalid": []}
+                self.software[metadata["Software"]][is_date_valid].append(date)
 
     def give_back(self):
         return self.locations, self.devices
@@ -114,7 +114,7 @@ class ExifEater():
             else:
                 return f'{dates["min"]} -> {dates["max"]}'
 
-        # pprint((self.devices, self.softwares, self.locations))
+        # pprint((self.devices, self.software, self.locations))
 
         devices = self.devices
         if devices:
@@ -168,10 +168,10 @@ class ExifEater():
                             dates = "?"
                         print(f"- {location} ({n} pic{picx(n)}) [{dates}]")
 
-        softwares = self.softwares
-        if softwares:
-            print(f"\n[+] {len(softwares)} software{picx(len(softwares))} found !")
-            for software, data in softwares.items():
+        software = self.software
+        if software:
+            print(f"\n[+] {len(software)} software{picx(len(software))} found !")
+            for software, data in software.items():
                 n = len(data["Valid"] + data["Invalid"])
                 for validity, dateslist in data.items():
                     if dateslist and ((validity == "Valid") or (validity == "Invalid" and not data["Valid"])):
@@ -184,5 +184,5 @@ class ExifEater():
                             dates = "?"
                         print(f"- {software} ({n} pic{picx(n)}) [{dates}]")
 
-        if not devices and not locations and not softwares:
+        if not devices and not locations and not software:
             print("=> Nothing found")
