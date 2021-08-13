@@ -10,7 +10,7 @@ jobs:
       - run: pip install bandit black codespell flake8 isort mypy pytest pyupgrade safety
       - run: bandit --recursive --skip B105,B110,B303,B404 .
       - run: black --check . || true
-      - run: codespell || true  # See PR #266
+      - run: codespell --ignore-words-list="softwares" || true  # See PR #266
       - run: flake8 . --count --select=C,E501,E9,F63,F7,F82 --max-complexity=34 --max-line-length=1056 --show-source --statistics
       - run: flake8 . --count --exit-zero --max-complexity=10 --max-line-length=88 --show-source --statistics
       - run: isort --check-only --profile black . || true
