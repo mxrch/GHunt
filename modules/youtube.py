@@ -73,7 +73,7 @@ def analyze_snapshots(client, wb_client, channel_url, dates):
             if re.compile(config.regexs["gplus"]).findall(req.text):
                 body = bs(req.text, 'html.parser')
                 #print(record)
-                print(f'[+] Snapshot : {record.timestamp.strftime("%m/%d/%Y")}')
+                print(f'[+] Snapshot : {record.timestamp.strftime("%d/%m/%Y")}')
                 break
     else:
         return None

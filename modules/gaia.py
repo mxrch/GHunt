@@ -42,6 +42,10 @@ def gaia_hunt(gaiaID):
 
     client = httpx.Client(cookies=cookies, headers=config.headers)
 
+    account = get_account_data(client, gaiaID, internal_auth, internal_token, config)
+    if not account:
+        exit("[-] No account linked to this Gaia ID.")
+
     is_within_docker = within_docker()
     if is_within_docker:
         print("[+] Docker detected, profile pictures will not be saved.")
@@ -49,7 +53,7 @@ def gaia_hunt(gaiaID):
     geolocator = Nominatim(user_agent="nominatim")
 
     # get name & profile picture
-    account = get_account_data(client, gaiaID, internal_auth, internal_token, config)
+
     name = account["name"]
 
     if name:
