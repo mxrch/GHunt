@@ -11,7 +11,7 @@ It currently has **email** and **document** modules.
 
 🗺️ **Email** module:
 - Owner's name
-- Google ID
+- Gaia ID
 - Last time the profile was edited
 - Profile picture (+ detect custom picture)
 - If the account is a Hangouts Bot
@@ -28,12 +28,30 @@ It currently has **email** and **document** modules.
 
 🗺️ **Document** module:
 - Owner's name
-- Owner's Google ID
+- Owner's Gaia ID
 - Owner's profile picture (+ detect custom picture)
 - Creation date
 - Last time the document was edited
 - Public permissions
 - Your permissions
+
+🗺️ **Youtube** module:
+- Owner's Gaia ID (through Wayback Machine)
+- Detect if the email is visible
+- Country
+- Description
+- Total views
+- Joined date
+- Primary links (social networks)
+- All infos accessible by the Gaia module
+
+🗺️ **Gaia** module:
+- Owner's name
+- Profile picture (+ detect custom picture)
+- Possible YouTube channel
+- Possible other usernames
+- Google Maps reviews (M)
+- Possible physical location (M)
 
 The features marked with a **(P)** require the target account to have the default setting of `Allow the people you share content with to download your photos and videos` on the Google AlbumArchive, or if the target has ever used Picasa linked to their Google account.\
 More info [here](https://github.com/mxrch/GHunt#%EF%B8%8F-protecting-yourself).
