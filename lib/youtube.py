@@ -99,7 +99,7 @@ def youtube_channel_search_gdocs(client, query, data_path, gdocs_public_doc):
     channels = []
 
     for result in search_results:
-        sanitized = "https://youtube.com/" + ('/'.join(result["link"].split('/')[3:5]))
+        sanitized = "https://youtube.com/" + ('/'.join(result["link"].split('/')[3:5]).split("?")[0])
         if sanitized not in channels:
             channels.append(sanitized)
 
