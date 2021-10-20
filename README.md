@@ -5,7 +5,7 @@
 ![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/mxrch/ghunt) ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/mxrch/ghunt/CodeQL?label=CodeQL)
 # Description
 GHunt is a modulable OSINT tool designed to evolve over the years, and incorporates many techniques to investigate Google accounts, or objects.\
-It currently has **email** and **document** modules.
+It currently has **email**, **document**, **youtube** and **gaia** modules.
 
 ## What can GHunt find ?
 
@@ -110,7 +110,7 @@ Adapt the command to your operating system if needed.
 # Usage
 For the first run and sometime after, you'll need to check the validity of your cookies.\
 To do this, run `check_and_gen.py`. \
-If you don't have cookies stored (ex: first launch), you will be asked for the 5 required cookies. If they are valid, it will generate the Authentication token and the Google Docs & Hangouts tokens.
+If you don't have cookies stored (ex: first launch), you will be asked for the required cookies. If they are valid, it will generate the Authentication token and the Google Docs & Hangouts tokens.
 
 Then, you can run the tool like this:
 ```bash
@@ -122,13 +122,23 @@ python3 ghunt.py doc https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBd
 
 ⚠️ I suggest you make an empty account just for this or use an account where you never login because depending on your browser/location, re-logging in into the Google Account used for the cookies can deauthorize them.
 
-# Where I find these 5 cookies ?
-1. Log in to accounts.google.com
-2. After that, open the Dev Tools window and navigate to the Storage tab (Shift + F9 on Firefox) (It's called "Application" on Chrome)\
-If you don't know how to open it, just right-click anywhere and click "Inspect Element".
-3. Then you'll find every cookie you need, including the 5 ones.
+# Where I get these cookies ?
 
-![cookies](https://files.catbox.moe/9jy200.png)
+## Auto (faster)
+You can download the GHunt Companion extension that will automate the cookies extraction in 1-click !\
+\
+[![Firefox](https://ffp4g1ylyit3jdyti1hqcvtb-wpengine.netdna-ssl.com/addons/files/2015/11/get-the-addon.png)](https://addons.mozilla.org/fr/firefox/addon/ghunt-companion/)&nbsp;&nbsp;&nbsp;[![Chrome](https://storage.googleapis.com/web-dev-uploads/image/WlD8wC6g8khYWPJUsQceQkhXSlv1/UV4C4ybeBTsZt43U4xis.png)](https://chrome.google.com/webstore/detail/ghunt-companion/dpdcofblfbmmnikcbmmiakkclocadjab)&nbsp;&nbsp;&nbsp;[![Edge](https://user-images.githubusercontent.com/11660256/111323589-4f4c7c00-866a-11eb-80ff-da7de777d7c0.png)](https://microsoftedge.microsoft.com/addons/detail/ghunt-companion/jhgmpcigklnbjglpipnbnjhdncoihhdj)
+
+You just need to launch the check_and_gen.py file and choose the extraction mode you want to use, between putting GHunt in listening mode, or copy/paste the encoded cookies in base64.
+
+## Manual
+1. Be logged-in to myaccount.google.com
+2. After that, open the Dev Tools window and navigate to the Network tab\
+If you don't know how to open it, just right-click anywhere and click "Inspect Element".
+3. Go to myaccount.google.com, and in the browser requests, select the GET on "accounts.google.com" that gives a 302 redirect
+4. Then you'll find every cookie you need in the "cookies" section.
+
+![cookies](https://files.catbox.moe/15j8pg.png)
 
 # 🛡️ Protecting yourself
 Regarding the collection of metadata from your Google Photos account:
