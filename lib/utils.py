@@ -43,8 +43,14 @@ def is_email_google_account(httpx_client, auth, cookies, email, hangouts_token):
 
     req = httpx_client.post(host + url, data=body.format(email), headers=headers, cookies=cookies)
     data = json.loads(req.text)
-    #pprint(data); exit()
-    if not "matches" in data:
+    #pprint(data)
+    if "error" in data and "Request had invalid authentication credentials" in data["error"]["message"]:
+        exit("[-] Cookies/Tokens seems expired, please verify them.")
+    elif "error" in data:
+        print("[-] Error :")
+        pprint(data)
+        exit()
+    elif not "matches" in data:
         exit("[-] This email address does not belong to a Google Account.")
 
     return data
@@ -60,10 +66,14 @@ def get_account_data(httpx_client, gaiaID, internal_auth, internal_token, config
 
     url = f"https://people-pa.clients6.google.com/v2/people?person_id={gaiaID}&request_mask.include_container=PROFILE&request_mask.include_container=DOMAIN_PROFILE&request_mask.include_field.paths=person.metadata.best_display_name&request_mask.include_field.paths=person.photo&request_mask.include_field.paths=person.email&core_id_params.enable_private_names=true&key={internal_token}"
     req = httpx_client.get(url, headers=headers)
-    if "Request had invalid authentication credentials." in req.text:
-        exit("[-] Invalid cookies, please re-generate them.")
     data = json.loads(req.text)
     #pprint(data)
+    if "error" in data and "Request had invalid authentication credentials" in data["error"]["message"]:
+        exit("[-] Cookies/Tokens seems expired, please verify them.")
+    elif "error" in data:
+        print("[-] Error :")
+        pprint(data)
+        exit()
     if data["personResponse"][0]["status"].lower() == "not_found":
         return False
 
@@ -92,11 +102,11 @@ def get_account_name(httpx_client, gaiaID, data, internal_auth, internal_token, 
     return match[1]
 
 def image_hash(img):
-    hash = str(imagehash.average_hash(img))
-    return hash
+    flathash = imagehash.average_hash(img)
+    return flathash
 
-def detect_default_profile_pic(hash):
-    if hash in ['00001818183c7e7e', 'ffffc3c3e7c38181', '00003c3c3c3c0000']:
+def detect_default_profile_pic(flathash):
+    if flathash - imagehash.hex_to_flathash("000018183c3c0000", 8) < 10 :
         return True
     return False
 
@@ -159,3 +169,10 @@ def get_chrome_options_args(is_headless):
         chrome_options.add_argument("--single-process")
         chrome_options.add_argument("--disable-features=VizDisplayCompositor")
     return chrome_options
+
+def inject_osid(cookies, service, config):
+    with open(config.data_path, 'r') as f:
+        out = json.loads(f.read())
+
+    cookies["OSID"] = out["osids"][service]
+    return cookies

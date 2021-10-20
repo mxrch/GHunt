@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 
+from lib import modwall; modwall.check() # We check the requirements
+
 import sys
 import os
 from pathlib import Path
 
+from lib import modwall
 from lib.utils import *
 from modules.doc import doc_hunt
 from modules.email import email_hunt

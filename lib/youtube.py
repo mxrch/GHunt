@@ -86,7 +86,7 @@ def youtube_channel_search(client, query):
                 "canonicalBaseUrl"]
             req = client.get(avatar_link)
             img = Image.open(BytesIO(req.content))
-            hash = image_hash(img)
+            hash = str(image_hash(img))
             results["channels"].append({"profile_url": profile_url, "name": title, "hash": hash})
         return results
     except (KeyError, IndexError):
@@ -115,13 +115,13 @@ def youtube_channel_search_gdocs(client, query, data_path, gdocs_public_doc):
 
         retries = 2
         for retry in list(range(retries))[::-1]:
-            req = client.get(profile_url)
+            req = client.get(profile_url, follow_redirects=True)
             source = req.text
             try:
-                data = json.loads(
-                    source.split('var ytInitialData = ')[1].split(';</script>')[0])
+                data = json.loads(source.split('var ytInitialData = ')[1].split(';</script>')[0])
                 avatar_link = data["metadata"]["channelMetadataRenderer"]["avatar"]["thumbnails"][0]["url"].split('=')[0]
             except (KeyError, IndexError) as e:
+                #import pdb; pdb.set_trace()
                 if retry == 0:
                     return False
                 continue
@@ -129,7 +129,7 @@ def youtube_channel_search_gdocs(client, query, data_path, gdocs_public_doc):
                 break
         req = client.get(avatar_link)
         img = Image.open(BytesIO(req.content))
-        hash = image_hash(img)
+        hash = str(image_hash(img))
         title = data["metadata"]["channelMetadataRenderer"]["title"]
         results["channels"].append({"profile_url": profile_url, "name": title, "hash": hash})
     return results
@@ -157,7 +157,7 @@ def get_confidence(data, query, hash):
         for channel_nb, channel in enumerate(source["channels"]):
             score = 0
 
-            if hash == channel["hash"]:
+            if hash == imagehash.hex_to_flathash(channel["hash"], 8):
                 score += score_steps * 4
             if query == channel["name"]:
                 score += score_steps * 3

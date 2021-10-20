@@ -1,17 +1,23 @@
 #!/usr/bin/env python3
 
+from lib import modwall; modwall.check() # We check the requirements
+
 import json
 from time import time
 from os.path import isfile
 from pathlib import Path
 from ssl import SSLError
+import base64
+from copy import deepcopy
 
 import httpx
 from seleniumwire import webdriver
 from selenium.common.exceptions import TimeoutException as SE_TimeoutExepction
+from bs4 import BeautifulSoup as bs
 
 import config
 from lib.utils import *
+from lib import listener
 
 
 # We change the current working directory to allow using GHunt from anywhere
@@ -36,22 +42,25 @@ def get_saved_cookies():
 def get_authorization_source(cookies):
     ''' returns html source of hangouts page if user authorized '''
     req = httpx.get("https://docs.google.com/document/u/0/?usp=direct_url",
-                    cookies=cookies, headers=config.headers, allow_redirects=False)
+                    cookies=cookies, headers=config.headers)
 
     if req.status_code == 200:
         req2 = httpx.get("https://hangouts.google.com", cookies=cookies,
-                         headers=config.headers, allow_redirects=False)
+                         headers=config.headers)
         if "myaccount.google.com" in req2.text:
             return req.text
     return None
 
 
-def save_tokens(hangouts_auth, gdoc_token, hangouts_token, internal_token, internal_auth, cookies):
+def save_tokens(hangouts_auth, gdoc_token, hangouts_token, internal_token, internal_auth, cac_key, cookies, osid):
     ''' save tokens to file '''
     output = {
         "hangouts_auth": hangouts_auth, "internal_auth": internal_auth,
-        "keys": {"gdoc": gdoc_token, "hangouts": hangouts_token, "internal": internal_token},
-        "cookies": cookies
+        "keys": {"gdoc": gdoc_token, "hangouts": hangouts_token, "internal": internal_token, "clientauthconfig": cac_key},
+        "cookies": cookies,
+        "osids": {
+            "cloudconsole": osid
+        }
     }
     with open(config.data_path, 'w') as f:
         f.write(json.dumps(output))
@@ -134,6 +143,51 @@ def get_internal_tokens(driver, cookies, tmprinter):
 
     return internal_auth, internal_token
 
+def gen_osid(cookies, domain, service):
+    req = httpx.get(f"https://accounts.google.com/ServiceLogin?service={service}&osid=1&continue=https://{domain}/&followup=https://{domain}/&authuser=0",
+                    cookies=cookies, headers=config.headers)
+
+    body = bs(req.text, 'html.parser')
+    
+    params = {x.attrs["name"]:x.attrs["value"] for x in body.find_all("input", {"type":"hidden"})}
+
+    headers = {**config.headers, **{"Content-Type": "application/x-www-form-urlencoded"}}
+    req = httpx.post(f"https://{domain}/accounts/SetOSID", cookies=cookies, data=params, headers=headers)
+
+    osid_header = [x for x in req.headers["set-cookie"].split(", ") if x.startswith("OSID")]
+    if not osid_header:
+        exit("[-] No OSID header detected, exiting...")
+
+    osid = osid_header[0].split("OSID=")[1].split(";")[0]
+    
+    return osid
+
+def get_clientauthconfig_key(cookies):
+    """ Extract the Client Auth Config API token."""
+
+    req = httpx.get("https://console.cloud.google.com",
+                    cookies=cookies, headers=config.headers)
+
+    if req.status_code == 200 and "pantheon_apiKey" in req.text:
+        cac_key = req.text.split('pantheon_apiKey\\x22:')[1].split(",")[0].strip('\\x22')
+        return cac_key
+    exit("[-] I can't find the Client Auth Config API...")
+
+def check_cookies(cookies):
+    wanted = ["authuser", "continue", "osidt", "ifkv"]
+
+    req = httpx.get(f"https://accounts.google.com/ServiceLogin?service=cloudconsole&osid=1&continue=https://console.cloud.google.com/&followup=https://console.cloud.google.com/&authuser=0",
+                    cookies=cookies, headers=config.headers)
+
+    body = bs(req.text, 'html.parser')
+    
+    params = [x.attrs["name"] for x in body.find_all("input", {"type":"hidden"})]
+    for param in wanted:
+        if param not in params:
+            return False
+
+    return True
+
 if __name__ == '__main__':
 
     driverpath = get_driverpath()
@@ -141,31 +195,55 @@ if __name__ == '__main__':
 
     tmprinter = TMPrinter()
 
-    cookies = {"SID": "", "SSID": "", "APISID": "", "SAPISID": "", "HSID": "", "CONSENT": config.default_consent_cookie, "PREF": config.default_pref_cookie}
+    cookies = {"SID": "", "SSID": "", "APISID": "", "SAPISID": "", "HSID": "", "LSID": "", "__Secure-3PSID": "", "CONSENT": config.default_consent_cookie, "PREF": config.default_pref_cookie}
 
     new_cookies_entered = False
 
     if not cookies_from_file:
-        new_cookies_entered = True
         print("\nEnter these browser cookies found at accounts.google.com :")
         for name in cookies.keys():
             if not cookies[name]:
                 cookies[name] = input(f"{name} => ").strip().strip('\"')
+        new_cookies_entered = True
     else:
         # in case user wants to enter new cookies (example: for new account)
         html = get_authorization_source(cookies_from_file)
+        valid_cookies = check_cookies(cookies_from_file)
         valid = False
-        if html:
+        if html and valid_cookies:
             print("\n[+] The cookies seems valid !")
             valid = True
         else:
             print("\n[-] Seems like the cookies are invalid.")
         new_gen_inp = input("\nDo you want to enter new browser cookies from accounts.google.com ? (Y/n) ").lower()
         if new_gen_inp == "y":
+
+            choices = ("You can facilitate configuring GHunt by using the GHunt Companion extension on Firefox, Chrome, Edge and Opera here :\n"
+                "=> https://github.com/mxrch/ghunt_companion\n\n"
+                "[1] (Companion) Put GHunt on listening mode (currently not compatible with docker)\n"
+                "[2] (Companion) Paste base64-encoded cookies\n"
+                "[3] Enter manually all cookies\n\n"
+                "Choice => ")
+
+            choice = input(choices)
+            if choice not in ["1","2","3"]:
+                exit("Please choose a valid choice. Exiting...")
+
+            if choice == "1":
+                received_cookies = listener.run()
+                cookies = json.loads(base64.b64decode(received_cookies))
+
+            elif choice == "2":
+                received_cookies = input("Paste the cookies here => ")
+                cookies = json.loads(base64.b64decode(received_cookies))
+
+            elif choice == "3":
+                for name in cookies.keys():
+                    if not cookies[name]:
+                        cookies[name] = input(f"{name} => ").strip().strip('\"')
+
             new_cookies_entered = True
-            for name in cookies.keys():
-                if not cookies[name]:
-                    cookies[name] = input(f"{name} => ").strip().strip('\"')
+            
         elif not valid:
             exit("Please put valid cookies. Exiting...")
 
@@ -208,14 +286,21 @@ if __name__ == '__main__':
         gdoc_token = html.split(trigger)[1][:100].split('"')[0]
         print("Google Docs Token => {}".format(gdoc_token))
 
+    print("Generating OSID for the Cloud Console...")
+    osid = gen_osid(cookies, "console.cloud.google.com", "cloudconsole")
+    cookies_with_osid = deepcopy(cookies)
+    cookies_with_osid["OSID"] = osid
     # Extracting Internal People API tokens
-    internal_auth, internal_token = get_internal_tokens(driver, cookies, tmprinter)
+    internal_auth, internal_token = get_internal_tokens(driver, cookies_with_osid, tmprinter)
     print(f"Internal APIs Token => {internal_token}")
     print(f"Internal APIs Authorization => {internal_auth}")
 
     # Extracting Hangouts tokens
-    auth_token, hangouts_token = get_hangouts_tokens(driver, cookies, tmprinter)
+    auth_token, hangouts_token = get_hangouts_tokens(driver, cookies_with_osid, tmprinter)
     print(f"Hangouts Authorization => {auth_token}")
     print(f"Hangouts Token => {hangouts_token}")
 
-    save_tokens(auth_token, gdoc_token, hangouts_token, internal_token, internal_auth, cookies)
+    cac_key = get_clientauthconfig_key(cookies_with_osid)
+    print(f"Client Auth Config API Key => {cac_key}")
+
+    save_tokens(auth_token, gdoc_token, hangouts_token, internal_token, internal_auth, cac_key, cookies, osid)

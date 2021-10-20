@@ -120,8 +120,8 @@ def doc_hunt(doc_link):
         req = client.get(profile_pic_link)
 
         profile_pic_img = Image.open(BytesIO(req.content))
-        profile_pic_hash = image_hash(profile_pic_img)
-        is_default_profile_pic = detect_default_profile_pic(profile_pic_hash)
+        profile_pic_flathash = image_hash(profile_pic_img)
+        is_default_profile_pic = detect_default_profile_pic(profile_pic_flathash)
 
         if not is_default_profile_pic and not is_within_docker:
             print("\n[+] Custom profile picture !")

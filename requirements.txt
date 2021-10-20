@@ -1,7 +1,7 @@
 geopy
-httpx
+httpx>=0.20.0
 selenium-wire
-selenium
+selenium>=4.0.0
 imagehash
 pillow
 python-dateutil
