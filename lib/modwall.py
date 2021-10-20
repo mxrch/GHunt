@@ -1,5 +1,4 @@
 from pkg_resources import parse_requirements, parse_version, working_set
-import importlib
 
 
 def print_help_and_exit():
