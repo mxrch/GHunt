@@ -76,6 +76,28 @@ It requires the "Profile photos" album to be public (it is by default)
 
 # Installation
 
+## Manual installation
+- Make sure you have Python 3.7+ installed. (I developed it with Python 3.8.1)
+- Some Python modules are required which are contained in `requirements.txt` and will be installed below.
+
+### 1. Chromedriver & Google Chrome
+This project uses Selenium and automatically downloads the correct driver for your Chrome version. \
+⚠️ So just make sure to have Google Chrome installed.
+
+### 2. Cloning
+Open your terminal, and execute the following commands :
+```bash
+git clone https://github.com/mxrch/ghunt
+cd ghunt
+```
+
+### 3. Requirements
+In the GHunt folder, run:
+```bash
+python3 -m pip install -r requirements.txt
+```
+Adapt the command to your operating system if needed.
+
 ## Docker
 The Docker image is automatically built and pushed to Dockerhub after each push on this repo.\
 You can pull the Docker image with:
@@ -91,21 +113,6 @@ docker run -v ghunt-resources:/usr/src/app/resources -ti mxrch/ghunt check_and_g
 docker run -v ghunt-resources:/usr/src/app/resources -ti mxrch/ghunt ghunt.py email <email_address>
 docker run -v ghunt-resources:/usr/src/app/resources -ti mxrch/ghunt ghunt.py doc <document_link>
 ```
-
-## Manual installation
-- Make sure you have Python 3.7+ installed. (I developed it with Python 3.8.1)
-- Some Python modules are required which are contained in `requirements.txt` and will be installed below.
-
-### 1. Chromedriver & Google Chrome
-This project uses Selenium and automatically downloads the correct driver for your Chrome version. \
-⚠️ So just make sure to have Google Chrome installed.
-
-### 2. Requirements
-In the GHunt folder, run:
-```bash
-python3 -m pip install -r requirements.txt
-```
-Adapt the command to your operating system if needed.
 
 # Usage
 For the first run and sometime after, you'll need to check the validity of your cookies.\
