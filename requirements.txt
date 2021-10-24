@@ -11,3 +11,4 @@ beautifultable
 termcolor
 wayback
 bs4
+packaging
