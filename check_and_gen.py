@@ -33,9 +33,9 @@ def get_saved_cookies():
                 print("[+] Detected stored cookies, checking it")
                 return cookies
         except Exception:
-            print("[-] Stored cookies are corrupted")
+            print("[-] Stored cookies are corrupted\n")
             return False
-    print("[-] No stored cookies found")
+    print("[-] No stored cookies found\n")
     return False
 
 
@@ -188,6 +188,33 @@ def check_cookies(cookies):
 
     return True
 
+def getting_cookies(cookies):
+    choices = ("You can facilitate configuring GHunt by using the GHunt Companion extension on Firefox, Chrome, Edge and Opera here :\n"
+                "=> https://github.com/mxrch/ghunt_companion\n\n"
+                "[1] (Companion) Put GHunt on listening mode (currently not compatible with docker)\n"
+                "[2] (Companion) Paste base64-encoded cookies\n"
+                "[3] Enter manually all cookies\n\n"
+                "Choice => ")
+
+    choice = input(choices)
+    if choice not in ["1","2","3"]:
+        exit("Please choose a valid choice. Exiting...")
+
+    if choice == "1":
+        received_cookies = listener.run()
+        cookies = json.loads(base64.b64decode(received_cookies))
+
+    elif choice == "2":
+        received_cookies = input("Paste the cookies here => ")
+        cookies = json.loads(base64.b64decode(received_cookies))
+
+    elif choice == "3":
+        for name in cookies.keys():
+            if not cookies[name]:
+                cookies[name] = input(f"{name} => ").strip().strip('\"')
+
+    return cookies
+
 if __name__ == '__main__':
 
     driverpath = get_driverpath()
@@ -200,10 +227,7 @@ if __name__ == '__main__':
     new_cookies_entered = False
 
     if not cookies_from_file:
-        print("\nEnter these browser cookies found at accounts.google.com :")
-        for name in cookies.keys():
-            if not cookies[name]:
-                cookies[name] = input(f"{name} => ").strip().strip('\"')
+        cookies = getting_cookies(cookies)
         new_cookies_entered = True
     else:
         # in case user wants to enter new cookies (example: for new account)
@@ -217,31 +241,7 @@ if __name__ == '__main__':
             print("\n[-] Seems like the cookies are invalid.")
         new_gen_inp = input("\nDo you want to enter new browser cookies from accounts.google.com ? (Y/n) ").lower()
         if new_gen_inp == "y":
-
-            choices = ("You can facilitate configuring GHunt by using the GHunt Companion extension on Firefox, Chrome, Edge and Opera here :\n"
-                "=> https://github.com/mxrch/ghunt_companion\n\n"
-                "[1] (Companion) Put GHunt on listening mode (currently not compatible with docker)\n"
-                "[2] (Companion) Paste base64-encoded cookies\n"
-                "[3] Enter manually all cookies\n\n"
-                "Choice => ")
-
-            choice = input(choices)
-            if choice not in ["1","2","3"]:
-                exit("Please choose a valid choice. Exiting...")
-
-            if choice == "1":
-                received_cookies = listener.run()
-                cookies = json.loads(base64.b64decode(received_cookies))
-
-            elif choice == "2":
-                received_cookies = input("Paste the cookies here => ")
-                cookies = json.loads(base64.b64decode(received_cookies))
-
-            elif choice == "3":
-                for name in cookies.keys():
-                    if not cookies[name]:
-                        cookies[name] = input(f"{name} => ").strip().strip('\"')
-
+            cookies = getting_cookies(cookies)
             new_cookies_entered = True
             
         elif not valid:
