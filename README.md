@@ -21,6 +21,10 @@ It currently has **email**, **document**, **youtube** and **gaia** modules.
 - Google Maps reviews (M)
 - Possible physical location (M)
 - Events from Google Calendar (C)
+- Organizations (work & education) (A)
+- Contact emails (A)
+- Contact phones (A)
+- Addresses (A)
 - ~~Public photos (P)~~
 - ~~Phones models (P)~~
 - ~~Phones firmwares (P)~~
@@ -52,13 +56,19 @@ It currently has **email**, **document**, **youtube** and **gaia** modules.
 - Possible other usernames
 - Google Maps reviews (M)
 - Possible physical location (M)
+- Organizations (work & education) (A)
+- Contact emails (A)
+- Contact phones (A)
+- Addresses (A)
 
 The features marked with a **(P)** require the target account to have the default setting of `Allow the people you share content with to download your photos and videos` on the Google AlbumArchive, or if the target has ever used Picasa linked to their Google account.\
 More info [here](https://github.com/mxrch/GHunt#%EF%B8%8F-protecting-yourself).
 
 Those marked with a **(M)** require the Google Maps reviews of the target to be public (they are by default).
 
-Those marked with a **(C)** requires user to have Google Calendar set on public (default it is closed) 
+Those marked with a **(C)** require user to have Google Calendar set on public (default it is closed).
+
+Those marked with a **(A)** require user to have the additional info set [on profile](https://myaccount.google.com/profile) with privacy option "Anyone" enabled.
 
 # Screenshots
 <p align="center">

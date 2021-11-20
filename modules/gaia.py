@@ -52,31 +52,59 @@ def gaia_hunt(gaiaID):
 
     geolocator = Nominatim(user_agent="nominatim")
 
-    # get name & profile picture
-
+    # get name & other info
     name = account["name"]
-
     if name:
         print(f"Name : {name}")
 
-    # profile picture
-    profile_pic_url = account["profile_pic_url"]
-    req = client.get(profile_pic_url)
+    organizations = account["organizations"]
+    if organizations:
+        print(f"Organizations : {organizations}")
 
-    profile_pic_img = Image.open(BytesIO(req.content))
-    profile_pic_flathash = image_hash(profile_pic_img)
-    is_default_profile_pic = detect_default_profile_pic(profile_pic_flathash)
+    locations = account["locations"]
+    if locations:
+        print(f"Locations : {locations}")
 
-    if not is_default_profile_pic and not is_within_docker:
-        print("\n[+] Custom profile picture !")
-        print(f"=> {profile_pic_url}")
-        if config.write_profile_pic and not is_within_docker:
-            open(Path(config.profile_pics_dir) / f'{gaiaID}.jpg', 'wb').write(req.content)
-            print("Profile picture saved !")
+    # get profile picture
+    if account.get("profile_pic_url"):
+        profile_pic_url = account["profile_pic_url"]
+        req = client.get(profile_pic_url)
+
+        # TODO: make sure it's necessary now
+        profile_pic_img = Image.open(BytesIO(req.content))
+        profile_pic_flathash = image_hash(profile_pic_img)
+        is_default_profile_pic = detect_default_profile_pic(profile_pic_flathash)
+
+        if not is_default_profile_pic:
+            print("\n[+] Custom profile picture !")
+            print(f"=> {profile_pic_url}")
+            if config.write_profile_pic and not is_within_docker:
+                open(Path(config.profile_pics_dir) / f'{gaiaID}.jpg', 'wb').write(req.content)
+                print("Profile picture saved !")
     else:
         print("\n[-] Default profile picture")
 
+    # cover profile picture
+    if account.get("cover_pic_url"):
+        cover_pic_url = account["cover_pic_url"]
+        req = client.get(cover_pic_url)
+
+        print("\n[+] Custom profile cover picture !")
+        print(f"=> {cover_pic_url}")
+        if config.write_profile_pic and not is_within_docker:
+            open(Path(config.profile_pics_dir) / f'cover_{email}.jpg', 'wb').write(req.content)
+            print("Cover profile picture saved !")
+
+
     print(f"\nGaia ID : {gaiaID}")
+
+    emails = account["emails_set"]
+    if emails:
+        print(f"Contact emails : {', '.join(map(str, emails.values()))}")
+
+    phones = account["phones"]
+    if phones:
+        print(f"Contact phones : {phones}")
 
     # check YouTube
     if name:
