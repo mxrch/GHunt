@@ -66,8 +66,8 @@ def gaia_hunt(gaiaID):
         print(f"Locations : {locations}")
 
     # get profile picture
-    if account.get("profile_pic_url"):
-        profile_pic_url = account["profile_pic_url"]
+    profile_pic_url = account.get("profile_pics") and account["profile_pics"][0].url
+    if profile_pic_url:
         req = client.get(profile_pic_url)
 
         # TODO: make sure it's necessary now
@@ -81,12 +81,12 @@ def gaia_hunt(gaiaID):
             if config.write_profile_pic and not is_within_docker:
                 open(Path(config.profile_pics_dir) / f'{gaiaID}.jpg', 'wb').write(req.content)
                 print("Profile picture saved !")
-    else:
-        print("\n[-] Default profile picture")
+        else:
+            print("\n[-] Default profile picture")
 
     # cover profile picture
-    if account.get("cover_pic_url"):
-        cover_pic_url = account["cover_pic_url"]
+    cover_pic = account.get("cover_pics") and account["cover_pics"][0]
+    if cover_pic and not cover_pic.is_default:
         req = client.get(cover_pic_url)
 
         print("\n[+] Custom profile cover picture !")

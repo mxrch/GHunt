@@ -29,10 +29,18 @@ class TMPrinter():
 def within_docker():
     return Path('/.dockerenv').is_file()
 
+class Picture:
+    def __init__(self, url, is_default=False):
+        self.url = url
+        self.is_default = is_default
+
 class Contact:
     def __init__(self, val, is_primary=True):
         self.value = val
         self.is_secondary = not is_primary
+
+    def is_normalized(self, val):
+        return val.replace('.', '').lower() == self.value.replace('.', '').lower()
 
     def __str__(self):
         printable_value = self.value
@@ -112,22 +120,14 @@ def get_account_data(httpx_client, gaiaID, internal_auth, internal_token, config
 
     profile_data = data["personResponse"][0]["person"]
 
-    profile_pic_url = None
-    try:
-        profile_pic_data = profile_data["photo"][0]
-        if not profile_pic_data.get("isDefault"):
-            profile_pic_url = profile_pic_data["url"]
-    except:
-        pass
+    profile_pics = []
+    for p in profile_data["photo"]:
+        profile_pics.append(Picture(p["url"], p.get("isDefault", False)))
 
     # mostly is default
-    cover_pic_url = None
-    try:
-        cover_pic_data = profile_data["coverPhoto"][0]
-        if not cover_pic_data.get("isDefault"):
-            cover_pic_url = cover_pic_data["imageUrl"]
-    except:
-        pass
+    cover_pics = []
+    for p in profile_data["coverPhoto"]:
+        cover_pics.append(Picture(p["imageUrl"], p["isDefault"]))
 
     emails = update_emails({}, profile_data)
 
@@ -148,7 +148,7 @@ def get_account_data(httpx_client, gaiaID, internal_auth, internal_token, config
     if "organization" in profile_data:
         organizations = (f'{o["name"]} ({o["type"]})' for o in profile_data["organization"])
 
-    return {"name": name, "profile_pic_url": profile_pic_url, "cover_pic_url": cover_pic_url,
+    return {"name": name, "profile_pics": profile_pics, "cover_pics": cover_pics,
             "organizations": ', '.join(organizations), "locations": ', '.join(locations),
             "emails_set": emails, "phones": ', '.join(phones)}
 

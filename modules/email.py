@@ -89,8 +89,8 @@ def email_hunt(email):
             print(f"Locations : {locations}")
 
         # profile picture
-        if account.get("profile_pic_url"):
-            profile_pic_url = account["profile_pic_url"]
+        profile_pic_url = account.get("profile_pics") and account["profile_pics"][0].url
+        if profile_pic_url:
             req = client.get(profile_pic_url)
 
             # TODO: make sure it's necessary now
@@ -104,12 +104,13 @@ def email_hunt(email):
                 if config.write_profile_pic and not is_within_docker:
                     open(Path(config.profile_pics_dir) / f'{email}.jpg', 'wb').write(req.content)
                     print("Profile picture saved !")
-        else:
-            print("\n[-] Default profile picture")
+            else:
+                print("\n[-] Default profile picture")
 
         # cover profile picture
-        if account.get("cover_pic_url"):
-            cover_pic_url = account["cover_pic_url"]
+        cover_pic = account.get("cover_pics") and account["cover_pics"][0]
+        if cover_pic and not cover_pic.is_default:
+            cover_pic_url = cover_pic.url
             req = client.get(cover_pic_url)
 
             print("\n[+] Custom profile cover picture !")
@@ -127,9 +128,17 @@ def email_hunt(email):
             last_edit = None
             print(f"\nLast profile edit : Not found")
 
-        print(f"\nEmail : {email}\nGaia ID : {gaiaID}\n")
-
+        canonical_email = ""
         emails = update_emails(account["emails_set"], infos)
+        if emails and len(list(emails)) == 1:
+            if list(emails.values())[0].is_normalized(email):
+                new_email = list(emails.keys())[0]
+                if email != new_email:
+                    canonical_email = f' (canonical email is {new_email})'
+                emails = []
+
+        print(f"\nEmail : {email}{canonical_email}\nGaia ID : {gaiaID}\n")
+
         if emails:
             print(f"Contact emails : {', '.join(map(str, emails.values()))}")
 
