@@ -1,0 +1,23 @@
+name: 'build'
+
+on:
+  push:
+    branches:
+    - master
+  pull_request:
+
+jobs:
+  build:
+    name: 'Build'
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Build:checkout"
+        uses: actions/checkout@v2
+      - name: 'Build:dockerimage'
+        uses: docker/build-push-action@v1
+        with:
+          registry: ghcr.io
+          username: "mxrch"
+          password: ${{ secrets.PAT }}
+          repository: mxrch/ghunt
+          tags: latest
