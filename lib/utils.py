@@ -29,6 +29,45 @@ class TMPrinter():
 def within_docker():
     return Path('/.dockerenv').is_file()
 
+class Picture:
+    def __init__(self, url, is_default=False):
+        self.url = url
+        self.is_default = is_default
+
+class Contact:
+    def __init__(self, val, is_primary=True):
+        self.value = val
+        self.is_secondary = not is_primary
+
+    def is_normalized(self, val):
+        return val.replace('.', '').lower() == self.value.replace('.', '').lower()
+
+    def __str__(self):
+        printable_value = self.value
+        if self.is_secondary:
+            printable_value += ' (secondary)'
+        return printable_value
+
+def update_emails(emails, data):
+    """
+        Typically canonical user email
+        May not be present in the list method response
+    """
+    if not "email" in data:
+        return emails
+
+    for e in data["email"]:
+        is_primary = e.get("signupEmailMetadata", {}).get("primary")
+        email = Contact(e["value"], is_primary)
+
+        if email.value in emails:
+            if is_primary:
+                emails[email.value].is_secondary = False
+        else:
+            emails[email.value] = email
+
+    return emails
+
 def is_email_google_account(httpx_client, auth, cookies, email, hangouts_token):
     host = "https://people-pa.clients6.google.com"
     url = "/v2/people/lookup?key={}".format(hangouts_token)
@@ -64,10 +103,10 @@ def get_account_data(httpx_client, gaiaID, internal_auth, internal_token, config
     }
     headers = {**config.headers, **req_headers}
 
-    url = f"https://people-pa.clients6.google.com/v2/people?person_id={gaiaID}&request_mask.include_container=PROFILE&request_mask.include_container=DOMAIN_PROFILE&request_mask.include_field.paths=person.metadata.best_display_name&request_mask.include_field.paths=person.photo&request_mask.include_field.paths=person.email&core_id_params.enable_private_names=true&key={internal_token}"
+    url = f"https://people-pa.clients6.google.com/v2/people?person_id={gaiaID}&request_mask.include_container=PROFILE&request_mask.include_container=DOMAIN_PROFILE&request_mask.include_field.paths=person.metadata.best_display_name&request_mask.include_field.paths=person.photo&request_mask.include_field.paths=person.cover_photo&request_mask.include_field.paths=person.email&request_mask.include_field.paths=person.organization&request_mask.include_field.paths=person.location&request_mask.include_field.paths=person.email&requestMask.includeField.paths=person.phone&core_id_params.enable_private_names=true&requestMask.includeField.paths=person.read_only_profile_info&key={internal_token}"
     req = httpx_client.get(url, headers=headers)
     data = json.loads(req.text)
-    #pprint(data)
+    # pprint(data)
     if "error" in data and "Request had invalid authentication credentials" in data["error"]["message"]:
         exit("[-] Cookies/Tokens seems expired, please verify them.")
     elif "error" in data:
@@ -78,12 +117,40 @@ def get_account_data(httpx_client, gaiaID, internal_auth, internal_token, config
         return False
 
     name = get_account_name(httpx_client, gaiaID, data, internal_auth, internal_token, config)
-    try:
-        profile_pic_url = data["personResponse"][0]["person"]["photo"][0]["url"]
-    except:
-        profile_pic_url = None
 
-    return {"name": name, "profile_pic_url": profile_pic_url}
+    profile_data = data["personResponse"][0]["person"]
+
+    profile_pics = []
+    for p in profile_data["photo"]:
+        profile_pics.append(Picture(p["url"], p.get("isDefault", False)))
+
+    # mostly is default
+    cover_pics = []
+    for p in profile_data["coverPhoto"]:
+        cover_pics.append(Picture(p["imageUrl"], p["isDefault"]))
+
+    emails = update_emails({}, profile_data)
+
+    # absent if user didn't enter or hide them
+    phones = []
+    if "phone" in profile_data:
+        for p in profile_data["phone"]:
+            phones.append(f'{p["value"]} ({p["type"]})')
+
+    # absent if user didn't enter or hide them
+    locations = []
+    if "location" in profile_data:
+        for l in profile_data["location"]:
+            locations.append(l["value"] if not l.get("current") else f'{l["value"]} (current)')
+
+    # absent if user didn't enter or hide them
+    organizations = []
+    if "organization" in profile_data:
+        organizations = (f'{o["name"]} ({o["type"]})' for o in profile_data["organization"])
+
+    return {"name": name, "profile_pics": profile_pics, "cover_pics": cover_pics,
+            "organizations": ', '.join(organizations), "locations": ', '.join(locations),
+            "emails_set": emails, "phones": ', '.join(phones)}
 
 def get_account_name(httpx_client, gaiaID, data, internal_auth, internal_token, config):
     try:

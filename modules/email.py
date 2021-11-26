@@ -80,22 +80,44 @@ def email_hunt(email):
                         name = infos["name"][i]["displayName"]
                         print(f"Name : {name}")
 
+        organizations = account["organizations"]
+        if organizations:
+            print(f"Organizations : {organizations}")
+
+        locations = account["locations"]
+        if locations:
+            print(f"Locations : {locations}")
+
         # profile picture
-        profile_pic_url = account["profile_pic_url"]
-        req = client.get(profile_pic_url)
+        profile_pic_url = account.get("profile_pics") and account["profile_pics"][0].url
+        if profile_pic_url:
+            req = client.get(profile_pic_url)
 
-        profile_pic_img = Image.open(BytesIO(req.content))
-        profile_pic_flathash = image_hash(profile_pic_img)
-        is_default_profile_pic = detect_default_profile_pic(profile_pic_flathash)
+            # TODO: make sure it's necessary now
+            profile_pic_img = Image.open(BytesIO(req.content))
+            profile_pic_flathash = image_hash(profile_pic_img)
+            is_default_profile_pic = detect_default_profile_pic(profile_pic_flathash)
 
-        if not is_default_profile_pic and not is_within_docker:
-            print("\n[+] Custom profile picture !")
-            print(f"=> {profile_pic_url}")
+            if not is_default_profile_pic:
+                print("\n[+] Custom profile picture !")
+                print(f"=> {profile_pic_url}")
+                if config.write_profile_pic and not is_within_docker:
+                    open(Path(config.profile_pics_dir) / f'{email}.jpg', 'wb').write(req.content)
+                    print("Profile picture saved !")
+            else:
+                print("\n[-] Default profile picture")
+
+        # cover profile picture
+        cover_pic = account.get("cover_pics") and account["cover_pics"][0]
+        if cover_pic and not cover_pic.is_default:
+            cover_pic_url = cover_pic.url
+            req = client.get(cover_pic_url)
+
+            print("\n[+] Custom profile cover picture !")
+            print(f"=> {cover_pic_url}")
             if config.write_profile_pic and not is_within_docker:
-                open(Path(config.profile_pics_dir) / f'{email}.jpg', 'wb').write(req.content)
-                print("Profile picture saved !")
-        else:
-            print("\n[-] Default profile picture")
+                open(Path(config.profile_pics_dir) / f'cover_{email}.jpg', 'wb').write(req.content)
+                print("Cover profile picture saved !")
 
         # last edit
         try:
@@ -105,7 +127,24 @@ def email_hunt(email):
         except KeyError:
             last_edit = None
             print(f"\nLast profile edit : Not found")
-        print(f"\nEmail : {email}\nGoogle ID : {gaiaID}\n")
+
+        canonical_email = ""
+        emails = update_emails(account["emails_set"], infos)
+        if emails and len(list(emails)) == 1:
+            if list(emails.values())[0].is_normalized(email):
+                new_email = list(emails.keys())[0]
+                if email != new_email:
+                    canonical_email = f' (canonical email is {new_email})'
+                emails = []
+
+        print(f"\nEmail : {email}{canonical_email}\nGaia ID : {gaiaID}\n")
+
+        if emails:
+            print(f"Contact emails : {', '.join(map(str, emails.values()))}")
+
+        phones = account["phones"]
+        if phones:
+            print(f"Contact phones : {phones}")
 
         # is bot?
         if "extendedData" in infos:
