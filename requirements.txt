@@ -1,6 +1,6 @@
 geopy
 httpx>=0.20.0
-selenium-wire==4.5.4
+selenium-wire>=4.5.5
 selenium>=4.0.0
 imagehash
 pillow

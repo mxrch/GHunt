@@ -273,7 +273,7 @@ if __name__ == '__main__':
     tmprinter.out("Starting browser...")
     driver = webdriver.Chrome(
         executable_path=driverpath, seleniumwire_options=options,
-        chrome_options=chrome_options
+        options=chrome_options
     )
     driver.header_overrides = config.headers
 
