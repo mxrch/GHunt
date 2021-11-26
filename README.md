@@ -113,15 +113,15 @@ The Docker image is automatically built and pushed to Dockerhub after each push 
 You can pull the Docker image with:
 
 ```
-docker pull mxrch/ghunt
+docker pull ghcr.io/mxrch/ghunt
 ```
 
 Then, any of the scripts can be invoked through:
 
 ```
-docker run -v ghunt-resources:/usr/src/app/resources -ti mxrch/ghunt check_and_gen.py
-docker run -v ghunt-resources:/usr/src/app/resources -ti mxrch/ghunt ghunt.py email <email_address>
-docker run -v ghunt-resources:/usr/src/app/resources -ti mxrch/ghunt ghunt.py doc <document_link>
+docker run -v ghunt-resources:/usr/src/app/resources -ti ghcr.io/mxrch/ghunt check_and_gen.py
+docker run -v ghunt-resources:/usr/src/app/resources -ti ghcr.io/mxrch/ghunt ghunt.py email <email_address>
+docker run -v ghunt-resources:/usr/src/app/resources -ti ghcr.io/mxrch/ghunt ghunt.py doc <document_link>
 ```
 
 # Usage
