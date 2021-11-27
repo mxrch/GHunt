@@ -1,5 +1,6 @@
 __pycache__/
 lib/__pycache__/
+modules/__pycache__/
 profile_pics/*.jpg
 resources/
 chromedriver

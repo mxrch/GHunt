@@ -1,7 +1,7 @@
 geopy
-httpx
-selenium-wire
-selenium
+httpx>=0.20.0
+selenium-wire>=4.5.5
+selenium>=4.0.0
 imagehash
 pillow
 python-dateutil
@@ -10,3 +10,6 @@ chromedriver-autoinstaller
 beautifultable
 termcolor
 webdriver-manager
+wayback
+bs4
+packaging

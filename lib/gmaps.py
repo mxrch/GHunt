@@ -62,7 +62,7 @@ def scrape(gaiaID, client, cookies, config, headers, regex_rev_by_id, is_headles
     tmprinter.out("Starting browser...")
 
     driverpath = get_driverpath()
-    driver = webdriver.Chrome(ChromeDriverManager().install(), seleniumwire_options=options, chrome_options=chrome_options)
+    driver = webdriver.Chrome(executable_path=driverpath, seleniumwire_options=options, options=chrome_options)
     driver.header_overrides = headers
     wait = WebDriverWait(driver, 15)
 
@@ -78,15 +78,16 @@ def scrape(gaiaID, client, cookies, config, headers, regex_rev_by_id, is_headles
     driver.get(base_url)
 
     wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'div.section-scrollbox')))
-    scrollbox = driver.find_element_by_css_selector('div.section-scrollbox')
+    scrollbox = driver.find_element(By.CSS_SELECTOR, 'div.section-scrollbox')
 
-    tab_info = driver.find_elements_by_css_selector('div.section-tab-info')
-    if tab_info:
-        scroll_max = sum([int(x) for x in tab_info[0].text.split() if x.isdigit()])
+    tab_info = scrollbox.find_element(By.TAG_NAME, "div")
+    if tab_info and tab_info.text:
+        scroll_max = sum([int(x) for x in tab_info.text.split() if x.isdigit()])
     else:
         return False
 
-    print(f"[+] {scroll_max} reviews found !             ")
+    tmprinter.clear()
+    print(f"[+] {scroll_max} reviews found !")
 
     timeout = scroll_max * 1.25
     timeout_start = time.time()
@@ -110,13 +111,23 @@ def scrape(gaiaID, client, cookies, config, headers, regex_rev_by_id, is_headles
 
     tmprinter.out(f"Fetching reviews location... (0/{len(reviews_elements)})")
     reviews = []
+    rating = 0
     for nb, review in enumerate(reviews_elements):
         id = review.get_attribute("data-review-id")
         location = re.compile(regex_rev_by_id.format(id)).findall(data)[0]
-        date = get_datetime(review.find_element_by_css_selector('span.section-review-publish-date').text)
+        try:
+            stars = review.find_element(By.CSS_SELECTOR, 'span[aria-label$="stars "]')
+        except Exception:
+            stars = review.find_element(By.CSS_SELECTOR, 'span[aria-label$="star "]')
+        rating += int(stars.get_attribute("aria-label").strip().split()[0])
+        date = get_datetime(stars.find_element(By.XPATH, "following-sibling::span").text)
         reviews.append({"location": location, "date": date})
         tmprinter.out(f"Fetching reviews location... ({nb + 1}/{len(reviews_elements)})")
 
+    rating_avg = rating / len(reviews)
+    tmprinter.clear()
+    print(f"[+] Average rating : {int(rating_avg) if int(rating_avg) / round(rating_avg, 1) == 1 else round(rating_avg, 1)}/5 stars !")
+    # 4.9 => 4.9, 5.0 => 5, we don't show the 0
     return reviews
 
 
@@ -149,8 +160,7 @@ def translate_confidence(percents):
         return "Extremely low"
 
 
-def get_confidence(data, gmaps_radius):
-    geolocator = Nominatim(user_agent="nominatim")
+def get_confidence(geolocator, data, gmaps_radius):
     tmprinter = TMPrinter()
     radius = gmaps_radius
 
@@ -226,7 +236,13 @@ def get_confidence(data, gmaps_radius):
         confidence = translate_confidence(panel / maxscore * 100)
         for nb, loc in enumerate(locs):
             avg = avg_location(loc["locations"])
-            location = geolocator.reverse(f"{avg[0]}, {avg[1]}").raw["address"]
+            #import pdb; pdb.set_trace()
+            while True:
+                try:
+                    location = geolocator.reverse(f"{avg[0]}, {avg[1]}", timeout=10).raw["address"]
+                    break
+                except:
+                    pass
             location = sanitize_location(location)
             locs[nb]["avg"] = location
             del locs[nb]["locations"]

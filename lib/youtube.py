@@ -1,12 +1,66 @@
 import json
 import urllib.parse
 from io import BytesIO
+from urllib.parse import unquote as parse_url
 
 from PIL import Image
 
 from lib.search import search as gdoc_search
 from lib.utils import *
 
+
+def get_channel_data(client, channel_url):
+    data = None
+
+    retries = 2
+    for retry in list(range(retries))[::-1]:
+        req = client.get(f"{channel_url}/about")
+        source = req.text
+        try:
+            data = json.loads(source.split('var ytInitialData = ')[1].split(';</script>')[0])
+        except (KeyError, IndexError):
+            if retry == 0:
+                return False
+            continue
+        else:
+            break
+
+    handle = data["metadata"]["channelMetadataRenderer"]["vanityChannelUrl"].split("/")[-1]
+    tabs = [x[list(x.keys())[0]] for x in data["contents"]["twoColumnBrowseResultsRenderer"]["tabs"]]
+    about_tab = [x for x in tabs if x["title"].lower() == "about"][0]
+    channel_details = about_tab["content"]["sectionListRenderer"]["contents"][0]["itemSectionRenderer"]["contents"][0]["channelAboutFullMetadataRenderer"]
+
+    out = {
+        "name": None,
+        "description": None,
+        "channel_urls": [],
+        "email_contact": False,
+        "views": None,
+        "joined_date": None,
+        "primary_links": [],
+        "country": None
+        }
+
+    out["name"] = data["metadata"]["channelMetadataRenderer"]["title"]
+
+    out["channel_urls"].append(data["metadata"]["channelMetadataRenderer"]["channelUrl"])
+    out["channel_urls"].append(f"https://www.youtube.com/c/{handle}")
+    out["channel_urls"].append(f"https://www.youtube.com/user/{handle}")
+
+    out["email_contact"] = "businessEmailLabel" in channel_details
+
+    out["description"] = channel_details["description"]["simpleText"] if "description" in channel_details else None
+    out["views"] = channel_details["viewCountText"]["simpleText"].split(" ")[0] if "viewCountText" in channel_details else None
+    out["joined_date"] = channel_details["joinedDateText"]["runs"][1]["text"] if "joinedDateText" in channel_details else None
+    out["country"] = channel_details["country"]["simpleText"] if "country" in channel_details else None
+
+    if "primaryLinks" in channel_details:
+        for primary_link in channel_details["primaryLinks"]:
+            title = primary_link["title"]["simpleText"]
+            url = parse_url(primary_link["navigationEndpoint"]["urlEndpoint"]["url"].split("&q=")[-1])
+            out["primary_links"].append({"title": title, "url": url})
+
+    return out
 
 def youtube_channel_search(client, query):
     try:
@@ -32,7 +86,7 @@ def youtube_channel_search(client, query):
                 "canonicalBaseUrl"]
             req = client.get(avatar_link)
             img = Image.open(BytesIO(req.content))
-            hash = image_hash(img)
+            hash = str(image_hash(img))
             results["channels"].append({"profile_url": profile_url, "name": title, "hash": hash})
         return results
     except (KeyError, IndexError):
@@ -45,7 +99,7 @@ def youtube_channel_search_gdocs(client, query, data_path, gdocs_public_doc):
     channels = []
 
     for result in search_results:
-        sanitized = "https://youtube.com/" + ('/'.join(result["link"].split('/')[3:5]))
+        sanitized = "https://youtube.com/" + ('/'.join(result["link"].split('/')[3:5]).split("?")[0])
         if sanitized not in channels:
             channels.append(sanitized)
 
@@ -61,13 +115,13 @@ def youtube_channel_search_gdocs(client, query, data_path, gdocs_public_doc):
 
         retries = 2
         for retry in list(range(retries))[::-1]:
-            req = client.get(profile_url)
+            req = client.get(profile_url, follow_redirects=True)
             source = req.text
             try:
-                data = json.loads(
-                    source.split('window["ytInitialData"] = ')[1].split('window["ytInitialPlayerResponse"]')[0].split(';\n')[0])
+                data = json.loads(source.split('var ytInitialData = ')[1].split(';</script>')[0])
                 avatar_link = data["metadata"]["channelMetadataRenderer"]["avatar"]["thumbnails"][0]["url"].split('=')[0]
             except (KeyError, IndexError) as e:
+                #import pdb; pdb.set_trace()
                 if retry == 0:
                     return False
                 continue
@@ -75,10 +129,9 @@ def youtube_channel_search_gdocs(client, query, data_path, gdocs_public_doc):
                 break
         req = client.get(avatar_link)
         img = Image.open(BytesIO(req.content))
-        hash = image_hash(img)
+        hash = str(image_hash(img))
         title = data["metadata"]["channelMetadataRenderer"]["title"]
         results["channels"].append({"profile_url": profile_url, "name": title, "hash": hash})
-
     return results
 
 
@@ -104,7 +157,7 @@ def get_confidence(data, query, hash):
         for channel_nb, channel in enumerate(source["channels"]):
             score = 0
 
-            if hash == channel["hash"]:
+            if hash == imagehash.hex_to_flathash(channel["hash"], 8):
                 score += score_steps * 4
             if query == channel["name"]:
                 score += score_steps * 3
