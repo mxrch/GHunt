@@ -29,4 +29,4 @@ jobs:
         with:
           context: .
           push: ${{ GitHub.event_name != 'pull_request' }}
-          tags: latest
+          tags: ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:latest
