@@ -14,10 +14,10 @@ jobs:
       - name: "Build:checkout"
         uses: actions/checkout@v2
       - name: 'Build:dockerimage'
-        uses: docker/build-push-action@v1
+        uses: docker/build-push-action@v2
         with:
           registry: ghcr.io
           username: "mxrch"
-          password: ${{ secrets.PAT }}
+          password: ${{ secrets.GHCR_TOKEN }}
           repository: mxrch/ghunt
           tags: latest
