@@ -9,6 +9,7 @@ colorama
 chromedriver-autoinstaller
 beautifultable
 termcolor
+webdriver-manager
 wayback
 bs4
 packaging

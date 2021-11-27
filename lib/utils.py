@@ -1,6 +1,7 @@
 import imagehash
+from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.options import Options
-import chromedriver_autoinstaller
+from seleniumwire.webdriver import Chrome
 
 from lib.os_detect import Os
 
@@ -202,22 +203,33 @@ def sanitize_location(location):
 
 
 def get_driverpath():
-    tmprinter = TMPrinter()
-    drivers = [str(x.absolute()) for x in Path('.').rglob('chromedriver*') if not "chromedriver_autoinstaller" in str(x)]
-    if drivers:
-        return drivers[0]
+    driver_path = shutil.which("chromedriver")
+    if driver_path:
+        return driver_path
+    if within_docker():
+        chromedrivermanager_silent = ChromeDriverManager(print_first_line=False, log_level=0, path="/usr/src/app")
     else:
-        driver = shutil.which("chromedriver")
-        if driver:
-            return driver
-        tmprinter.out("I can't find the chromedriver, so I'm downloading and installing it for you...")
-        path = chromedriver_autoinstaller.install(cwd=True)
-        tmprinter.out("")
-        drivers = [str(x.absolute()) for x in Path('.').rglob('chromedriver*') if x.name.lower() == "chromedriver" or x.name.lower() == "chromedriver.exe"]
-        if drivers:
-            return path
+        chromedrivermanager_silent = ChromeDriverManager(print_first_line=False, log_level=0)
+    driver = chromedrivermanager_silent.driver
+    driverpath_with_version = chromedrivermanager_silent.driver_cache.find_driver(driver.browser_version, driver.get_name(), driver.get_os_type(), driver.get_version())
+    driverpath_without_version = chromedrivermanager_silent.driver_cache.find_driver("", driver.get_name(), driver.get_os_type(), "")
+    if driverpath_with_version:
+        return driverpath_with_version
+    elif not driverpath_with_version and driverpath_without_version:
+        print("[Webdrivers Manager] I'm updating the chromedriver...")
+        if within_docker():
+            driver_path = ChromeDriverManager(path="/usr/src/app").install()
         else:
-            exit(f"I can't find the chromedriver.\nI installed it in \"{path}\" but it must be in the GHunt directory or PATH, you should move it here.")
+            driver_path = ChromeDriverManager().install()
+        print("[Webdrivers Manager] The chromedriver has been updated !\n")
+    else:
+        print("[Webdrivers Manager] I can't find the chromedriver, so I'm downloading and installing it for you...")
+        if within_docker():
+            driver_path = ChromeDriverManager(path="/usr/src/app").install()
+        else:
+            driver_path = ChromeDriverManager().install()
+        print("[Webdrivers Manager] The chromedriver has been installed !\n")
+    return driver_path
 
 
 def get_chrome_options_args(is_headless):

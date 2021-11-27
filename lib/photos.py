@@ -7,6 +7,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from seleniumwire import webdriver
+from webdriver_manager.chrome import ChromeDriverManager
 
 from lib.metadata import ExifEater
 from lib.utils import *
