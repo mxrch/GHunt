@@ -6,7 +6,6 @@ imagehash
 pillow
 python-dateutil
 colorama
-chromedriver-autoinstaller
 beautifultable
 termcolor
 webdriver-manager
