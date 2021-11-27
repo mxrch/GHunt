@@ -17,7 +17,7 @@ RUN groupadd -o -g ${GID} -r app && adduser --system --home /home/app --ingroup 
 
 COPY --chown=app:app requirements.txt docker/download_chromedriver.py ./
 
-RUN pip install --no-cache-dir -r requirements.txt && \
+RUN python3 -m pip install --no-cache-dir -r requirements.txt && \
     python3 download_chromedriver.py
 
 COPY --chown=app:app . .

@@ -235,10 +235,10 @@ if __name__ == '__main__':
         valid_cookies = check_cookies(cookies_from_file)
         valid = False
         if html and valid_cookies:
-            print("\n[+] The cookies seems valid !")
+            print("[+] The cookies seems valid !")
             valid = True
         else:
-            print("\n[-] Seems like the cookies are invalid.")
+            print("[-] Seems like the cookies are invalid.")
         new_gen_inp = input("\nDo you want to enter new browser cookies from accounts.google.com ? (Y/n) ").lower()
         if new_gen_inp == "y":
             cookies = getting_cookies(cookies)
