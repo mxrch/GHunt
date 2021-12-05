@@ -1,6 +1,4 @@
 regexs = {
-    "albums": r'href=\"\.\/albumarchive\/\d*?\/album\/(.*?)\" jsaction.*?>(?:<.*?>){5}(.*?)<\/div><.*?>(\d*?) ',
-    "photos": r'\],\"(https:\/\/lh\d\.googleusercontent\.com\/.*?)\",\[\"\d{21}\"(?:.*?,){16}\"(.*?)\"',
     "review_loc_by_id": r'{}\",.*?\[\[null,null,(.*?),(.*?)\]',
     "gplus": r"plus\.google\.com\/\d*\""
 }
@@ -14,7 +12,7 @@ headless         = True # if True, it doesn't show the browser while scraping GM
 ytb_hunt_always  = True # if True, search the Youtube channel everytime
 gmaps_radius     = 30 # in km. The radius distance to create groups of gmaps reviews.
 gdocs_public_doc = "1jaEEHZL32t1RUN5WuZEnFpqiEPf_APYKrRBG9LhLdvE"  # The public Google Doc to use it as an endpoint, to use Google's Search.
-data_path        = "resources/data.txt"
+creds_path        = "resources/data.txt"
 browser_waiting_timeout = 120
 
 # Profile pictures options
@@ -28,3 +26,6 @@ gmaps_cookies = False
 calendar_cookies = False
 default_consent_cookie = "YES+FR.fr+V10+BX"
 default_pref_cookie = "tz=Europe.Paris&f6=40000000&hl=en" # To set the lang settings to english
+
+# If someone want to use GHunt as a lib, he maybe doesn't want all the prints, but just the JSON output
+silent_mode = False

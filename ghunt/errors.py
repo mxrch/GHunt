@@ -1,0 +1,2 @@
+class GHuntKnowledgeError(BaseException):
+    pass
