@@ -6,6 +6,5 @@ resources/
 chromedriver
 chromedriver.exe
 data.txt
-login.py
 .DS_Store
 debug.log

@@ -8,7 +8,7 @@ from ghunt.lib.utils import gprint
 
 class GHuntCreds():
     """
-    This objects stores all the needed credentials that GHunt uses,
+    This object stores all the needed credentials that GHunt uses,
     such as cookies, OSIDs, keys and tokens.
     """
     
