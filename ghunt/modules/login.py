@@ -65,7 +65,6 @@ def get_gdrive_api_key(cookies: Dict[str, str]) -> str:
 
 def get_pantheon_api_key(cookies: Dict[str, str]):
     """Extracts the Pantheon API Key."""
-
     req = httpx.get("https://console.cloud.google.com",
                     cookies=cookies, headers=gb.config.headers)
 
