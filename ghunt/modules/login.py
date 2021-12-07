@@ -34,7 +34,7 @@ def save_cookies_and_keys(ghunt_creds: GHuntCreds, creds_path: str):
 def gen_osids(cookies: Dict[str, str], osids: Dict[str, str]) -> Dict[str, str]:
     """
         Generate OSIDs of given services names,
-        contained in the \"osids\" dict argument.
+        contained in the "osids" dict argument.
     """
     for service in osids:
         domain = get_domain_of_service(service)
