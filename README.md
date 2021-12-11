@@ -1,6 +1,6 @@
 ![screenshot](https://files.catbox.moe/8a5nzs.png)
 
-![Python minimum version](https://img.shields.io/badge/Python-3.7%2B-brightgreen)
+![Python minimum version](https://img.shields.io/badge/Python-3.8%2B-brightgreen)
 
 ![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/mxrch/ghunt) ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/mxrch/ghunt/CodeQL?label=CodeQL)
 # Description
@@ -87,7 +87,7 @@ It requires the "Profile photos" album to be public (it is by default)
 # Installation
 
 ## Manual installation
-- Make sure you have Python 3.7+ installed. (I developed it with Python 3.8.1)
+- Make sure you have Python 3.8+ installed. (I developed it with Python 3.8.1)
 - Some Python modules are required which are contained in `requirements.txt` and will be installed below.
 
 ### 1. Chromedriver & Google Chrome
