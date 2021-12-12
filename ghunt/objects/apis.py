@@ -17,7 +17,7 @@ class EndpointConfig():
 class HttpAPI():
     def _load_api(self, creds: GHuntCreds, headers: dict[str, str]):
         if not creds.are_creds_loaded():
-            raise GHuntInsufficientCreds(f"This endpoints requires a loaded GhuntCreds object, but it isn't loaded.")
+            raise GHuntInsufficientCreds(f"This API requires a loaded GhuntCreds object, but it is not.")
 
         if not is_headers_syntax_good(headers):
             raise GHuntCorruptedHeadersError(f"The provided headers when loading the endpoint seems corrupted, please check it : {headers}")
@@ -25,7 +25,7 @@ class HttpAPI():
         self.key_origin = None
         if (key_name := self.require_key):
             if not creds.keys.get(key_name):
-                raise GHuntInsufficientCreds(f"This endpoints requires the {key_name} API key in the GhuntCreds object, but it isn't loaded.")
+                raise GHuntInsufficientCreds(f"This API requires the {key_name} API key in the GhuntCreds object, but it isn't loaded.")
             key_origin = get_origin_of_key(key_name)
             self.headers = {**headers, "Origin": key_origin, "Referer": key_origin, "X-Goog-Api-Key": creds.keys.get(key_name)}
             self.key_origin = key_origin
@@ -39,12 +39,12 @@ class HttpAPI():
 
         if require_sapisidhash:
             if not (sapisidhash := self.creds.cookies.get("SAPISID")):
-                raise GHuntInsufficientCreds(f"This endpoints requires the SAPISID cookie in the GhuntCreds object, but it isn't loaded.")
+                raise GHuntInsufficientCreds(f"This endpoint requires the SAPISID cookie in the GhuntCreds object, but it isn't loaded.")
             headers = {**self.headers, "Authorization": f"SAPISIDHASH {gen_sapisidhash(sapisidhash, self.key_origin)}"}
         
         if require_cookies:
             if not self.creds.cookies:
-                raise GHuntInsufficientCreds(f"This endpoints requires the cookies in the GhuntCreds object, but they aren't loaded.")
+                raise GHuntInsufficientCreds(f"This endpoint requires the cookies in the GhuntCreds object, but they aren't loaded.")
 
         self.creds = self.creds
         self.loaded_endpoints[endpoint_name] = EndpointConfig(headers, sapisidhash, self.creds.cookies)
