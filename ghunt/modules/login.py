@@ -30,7 +30,7 @@ def save_cookies_and_keys(ghunt_creds: GHuntCreds, creds_path: str):
 def gen_osids(cookies: Dict[str, str], osids: Dict[str, str]) -> Dict[str, str]:
     """
         Generate OSIDs of given services names,
-        contained in the \"osids\" dict argument.
+        contained in the "osids" dict argument.
     """
     for service in osids:
         domain = get_domain_of_service(service)
@@ -70,7 +70,6 @@ def get_hangouts_api_key(cookies: Dict[str, str]) -> str:
 
 def get_pantheon_api_key(cookies: Dict[str, str]):
     """Extracts the Pantheon API Key."""
-
     req = httpx.get("https://console.cloud.google.com",
                     cookies=cookies, headers=gb.config.headers)
 
