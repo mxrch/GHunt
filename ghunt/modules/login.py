@@ -1,11 +1,7 @@
 #!/usr/bin/env python3
 
 import json
-from time import time
-from pathlib import Path
 import base64
-from copy import deepcopy
-import os
 from typing import *
 
 import httpx
@@ -56,12 +52,21 @@ def gen_osids(cookies: Dict[str, str], osids: Dict[str, str]) -> Dict[str, str]:
 
     return osids
 
+# API Keys Extraction
+
 def get_gdrive_api_key(cookies: Dict[str, str]) -> str:
     """Extracts the GDrive API Key."""
     req = httpx.get("https://drive.google.com/drive/my-drive", cookies=cookies)
     gdrive_api_key = req.text.split("appsitemsuggest-pa")[1].split(",")[3].strip('"')
     
     return gdrive_api_key
+
+def get_hangouts_api_key(cookies: Dict[str, str]) -> str:
+    """Extracts the Hangouts API Key."""
+    req = httpx.get("https://hangouts.google.com", cookies=cookies)
+    hangouts_api_key = req.text.split('data:[["')[1].split('"')[0]
+    
+    return hangouts_api_key
 
 def get_pantheon_api_key(cookies: Dict[str, str]):
     """Extracts the Pantheon API Key."""
@@ -74,6 +79,8 @@ def get_pantheon_api_key(cookies: Dict[str, str]):
         return pantheon_api_key
 
     exit("[-] I can't find the Pantheon API Key...")
+
+# Tokens extractions
 
 def get_gdocs_token(cookies: Dict[str, str]) -> str:
     """Extracts the Google Docs token."""
@@ -207,10 +214,10 @@ def check_and_login() -> None:
     ghunt_creds.keys["gdrive"] = get_gdrive_api_key(cookies_with_cloudconsole_osid)
     print(f'Google Drive API Key => {ghunt_creds.keys["gdrive"]}')
 
-    ghunt_creds.keys["pantheon_key"] = get_pantheon_api_key(cookies_with_cloudconsole_osid)
-    print(f'Pantheon API Key => {ghunt_creds.keys["pantheon_key"]}')
+    ghunt_creds.keys["hangouts"] = get_hangouts_api_key(cookies_with_cloudconsole_osid)
+    print(f'Google Hangouts API Key => {ghunt_creds.keys["hangouts"]}')
+
+    ghunt_creds.keys["pantheon"] = get_pantheon_api_key(cookies_with_cloudconsole_osid)
+    print(f'Pantheon API Key => {ghunt_creds.keys["pantheon"]}')
 
     save_cookies_and_keys(ghunt_creds, gb.config.creds_path)
-
-if __name__ == '__main__':
-    check_and_login()

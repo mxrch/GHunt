@@ -1,4 +1,4 @@
-from ghunt.lib.utils import TMPrinter
+from ghunt.objects.utils import TMPrinter
 # This file is only intended to serve global variables at a project-wide level.
 
 

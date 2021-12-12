@@ -18,13 +18,13 @@ class GHuntCreds():
         osids: Dict[str, str] = {},
         keys: Dict[str, str] = {},
         tokens: Dict[str, str] = {},
-        creds_path: str = gb.config.creds_path
+        creds_path: str = ""
     ) -> None:
         self.cookies = cookies
         self.osids = osids
         self.keys = keys
         self.tokens = tokens
-        self.creds_path = creds_path
+        self.creds_path = creds_path if creds_path else gb.config.creds_path
 
     def are_creds_loaded(self) -> bool:
         return all([self.cookies, self.osids, self.keys, self.tokens])
