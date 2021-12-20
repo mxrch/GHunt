@@ -7,6 +7,11 @@
 GHunt is a modulable OSINT tool designed to evolve over the years, and incorporates many techniques to investigate Google accounts, or objects.\
 It currently has **email**, **document**, **youtube** and **gaia** modules.
 
+🔥 **_GHunt is being completely refactored_**, to allow use as a Python library, removing Selenium and Google Chrome dependencies, using definition types and async, to prepare for v2.\
+You can track the progress on this project here: https://github.com/mxrch/GHunt/projects/1 \
+And on this branch : https://github.com/mxrch/GHunt/tree/refactor \
+Please understand that the activity of the master branch will now be reduced, and therefore the pull requests too.
+
 ## What can GHunt find ?
 
 🗺️ **Email** module:
