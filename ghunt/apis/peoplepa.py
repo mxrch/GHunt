@@ -1,12 +1,13 @@
-from ghunt.errors import GHuntCorruptedHeadersError
 from ghunt.objects.base import GHuntCreds
 from ghunt.errors import *
 import ghunt.globals as gb
 from ghunt.objects.apis import HttpAPI
+from ghunt.parsers.people import Person
 
 import httpx
 
 import inspect
+import json
 
 
 class PeoplePaHttp(HttpAPI):
@@ -21,7 +22,7 @@ class PeoplePaHttp(HttpAPI):
 
         self._load_api(creds, headers)
 
-    async def people_lookup(self, as_client: httpx.AsyncClient, email: str, params_template="just_gaia_id"):
+    async def people_lookup(self, as_client: httpx.AsyncClient, email: str, params_template="just_gaia_id") -> tuple[bool, Person]:
         endpoint_name = inspect.currentframe().f_code.co_name
 
         verb = "GET"
@@ -33,21 +34,45 @@ class PeoplePaHttp(HttpAPI):
                 "id": email,
                 "type": "EMAIL",
                 "matchType": "EXACT",
-                "requestMask.includeField.paths": "person.name" # We need at least one requestmask
+                "requestMask.includeField.paths": "person.email"
             },
             "max_details": {
                 "id": email,
                 "type": "EMAIL",
-                "matchType": "EXACT",
-                "extensionSet.extensionNames": [
+                "match_type": "EXACT",
+                "extension_set.extension_names": [
                     "HANGOUTS_ADDITIONAL_DATA",
                     "HANGOUTS_OFF_NETWORK_GAIA_LOOKUP",
                     "HANGOUTS_PHONE_DATA",
-                    "TLS_FILL_FIELD",
                     "DYNAMITE_ADDITIONAL_DATA",
                     "DYNAMITE_ORGANIZATION_INFO",
                     "GPLUS_ADDITIONAL_DATA"
-                    ]
+                ],
+                "request_mask.include_field.paths": [
+                    "person.metadata.best_display_name",
+                    "person.photo",
+                    "person.cover_photo",
+                    "person.interaction_settings",
+                    "person.legacy_fields",
+                    "person.metadata",
+                    "person.in_app_reachability",
+                    "person.name",
+                    "person.read_only_profile_info",
+                    "person.sort_keys",
+                    "person.email"
+                ],
+                "request_mask.include_container": [
+                    "AFFINITY",
+                    "PROFILE",
+                    "DOMAIN_PROFILE",
+                    "ACCOUNT",
+                    "EXTERNAL_ACCOUNT",
+                    "CIRCLE",
+                    "DOMAIN_CONTACT",
+                    "DEVICE_CONTACT",
+                    "GOOGLE_GROUP",
+                    "CONTACT"
+                ]
             }
         }
 
@@ -55,4 +80,15 @@ class PeoplePaHttp(HttpAPI):
             raise GHuntParamsTemplateError(f"The asked template {params_template} for the endpoint {endpoint_name} wasn't recognized by GHunt.")
 
         self._load_endpoint(endpoint_name, require_sapisidhash, require_cookies)
-        await self._query(as_client, verb, endpoint_name, base_url, params_templates[params_template])
+        req = await self._query(as_client, verb, endpoint_name, base_url, params_templates[params_template])
+
+        # Parsing
+        data = json.loads(req.text)
+        person = Person()
+        if not data:
+            return False, person
+        
+        person_data = list(data["people"].values())[0]
+        await person._scrape(as_client, person_data)
+
+        return True, person

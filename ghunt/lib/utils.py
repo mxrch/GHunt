@@ -1,10 +1,13 @@
 from pathlib import Path
+from PIL import Image
 import hashlib
 from typing import *
 from time import time
 from copy import deepcopy
 
 import httpx
+import imagehash
+from io import BytesIO
 
 from ghunt import globals as gb
 
@@ -33,3 +36,15 @@ def is_headers_syntax_good(headers: dict[str, str]) -> bool:
         return True
     except:
         return False
+
+async def get_image_flathash(as_client: httpx.AsyncClient, image_url: str):
+    req = await as_client.get(image_url)
+    img = Image.open(BytesIO(req.content))
+    flathash = imagehash.average_hash(img)
+    return flathash
+
+async def is_default_profile_pic(as_client: httpx.AsyncClient, image_url: str):
+    flathash = await get_image_flathash(as_client, image_url)
+    if flathash - imagehash.hex_to_flathash("000018183c3c0000", 8) < 10 :
+        return True
+    return False

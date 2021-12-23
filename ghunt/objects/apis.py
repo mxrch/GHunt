@@ -49,16 +49,16 @@ class HttpAPI():
         self.creds = self.creds
         self.loaded_endpoints[endpoint_name] = EndpointConfig(headers, sapisidhash, self.creds.cookies)
 
-    async def _query(self, as_client: httpx.AsyncClient, verb: str, endpoint_name: str, base_url: str, params_template: dict[str, any]):
+    async def _query(self, as_client: httpx.AsyncClient, verb: str, endpoint_name: str, base_url: str, params_template: dict[str, any]) -> httpx.Response:
         endpoint = self.loaded_endpoints[endpoint_name]
 
         if verb == "GET":
             req = await as_client.get(f"{self.scheme}://{self.hostname}{base_url}",
                 params=params_template, headers=endpoint.headers, cookies=endpoint.cookies)
-            print(req.text)
         elif verb == "POST":
             req = await as_client.post(f"{self.scheme}://{self.hostname}{base_url}",
                 data=params_template, headers=endpoint.headers, cookies=endpoint.cookies)
-            print(req.text)
         else:
             raise GHuntUnknownVerbError(f"The provided verb {verb} wasn't recognized by GHunt.")
+
+        return req

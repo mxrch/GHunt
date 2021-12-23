@@ -12,3 +12,6 @@ class GHuntInsufficientCreds(BaseException):
 
 class GHuntParamsTemplateError(BaseException):
     pass
+
+class GHuntAPIResponseParsingError(BaseException):
+    pass
