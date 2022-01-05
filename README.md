@@ -121,7 +121,7 @@ You can pull the Docker image with:
 docker pull ghcr.io/mxrch/ghunt
 ```
 
-Then, you can use the `docker_check_and_gen.sh` and `docker_hunt.sh` to invoke GHunt through Docker, or you can use these commants :
+Then, you can use the `docker_check_and_gen.sh` and `docker_hunt.sh` to invoke GHunt through Docker, or you can use these commands :
 
 ```
 docker run -v ghunt-resources:/usr/src/app/resources -ti ghcr.io/mxrch/ghunt check_and_gen.py
