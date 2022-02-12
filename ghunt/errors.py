@@ -15,3 +15,6 @@ class GHuntParamsTemplateError(BaseException):
 
 class GHuntAPIResponseParsingError(BaseException):
     pass
+
+class GHuntObjectsMergingError(BaseException):
+    pass

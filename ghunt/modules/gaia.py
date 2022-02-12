@@ -1,13 +1,12 @@
 from ghunt.objects.base import GHuntCreds
 from ghunt.apis.peoplepa import PeoplePaHttp
-from ghunt.lib import gmaps
 from ghunt import globals as gb
+from ghunt.lib import gmaps
 
 import httpx
 
 
-async def hunt(as_client: httpx.AsyncClient, email_address: str):
-
+async def hunt(as_client: httpx.AsyncClient, gaia_id: str):
     if not as_client:
         as_client = httpx.AsyncClient()
 
@@ -17,7 +16,7 @@ async def hunt(as_client: httpx.AsyncClient, email_address: str):
     gb.rc.print("\n🪁 Google Account data", style="dodger_blue2")
 
     people_pa = PeoplePaHttp(ghunt_creds)
-    is_found, target = await people_pa.people_lookup(as_client, email_address, params_template="max_details")
+    is_found, target = await people_pa.people(as_client, gaia_id, params_template="max_details")
     if not is_found:
         await as_client.aclose()
         exit("[-] The target wasn't found.")
@@ -43,11 +42,6 @@ async def hunt(as_client: httpx.AsyncClient, email_address: str):
                 print(f"=> {target.coverPhotos[container].url}\n")
 
         print(f"Last profile edit : {target.sourceIds[container].lastUpdated}\n")
-        
-        if container in target.emails:
-            print(f"Email : {target.emails[container].value}")
-        else:
-            print(f"Email : {email_address}\n")
 
         print(f"Gaia ID : {target.personId}\n")
 

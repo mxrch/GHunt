@@ -3,6 +3,7 @@ from PIL import Image
 import hashlib
 from typing import *
 from time import time
+from datetime import datetime, timezone
 from copy import deepcopy
 
 import httpx
@@ -37,7 +38,7 @@ def is_headers_syntax_good(headers: dict[str, str]) -> bool:
     except:
         return False
 
-async def get_image_flathash(as_client: httpx.AsyncClient, image_url: str):
+async def get_image_flathash(as_client: httpx.AsyncClient, image_url: str) -> imagehash.ImageHash:
     req = await as_client.get(image_url)
     img = Image.open(BytesIO(req.content))
     flathash = imagehash.average_hash(img)
@@ -48,3 +49,27 @@ async def is_default_profile_pic(as_client: httpx.AsyncClient, image_url: str):
     if flathash - imagehash.hex_to_flathash("000018183c3c0000", 8) < 10 :
         return True
     return False
+
+def get_class_name(obj) -> str:
+        return str(obj).strip("<>").split(" ")[0]
+
+def get_datetime_utc(date_str):
+    """Converts ISO to datetime object in UTC"""
+    date = datetime.fromisoformat(date_str)
+    margin = date.utcoffset()
+    return date.replace(tzinfo=timezone.utc) - margin
+
+def ppnb(nb: float) -> float|int:
+    """
+        Pretty print float number
+        Ex: 3.9 -> 3.9
+            4.0 -> 4
+            4.1 -> 4.1
+    """
+    try:
+        return int(nb) if nb % int(nb) == 0.0 else nb
+    except ZeroDivisionError:
+        if nb == 0.0:
+            return 0
+        else:
+            return nb

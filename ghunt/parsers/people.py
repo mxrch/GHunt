@@ -2,6 +2,7 @@ from datetime import datetime
 
 from ghunt.errors import *
 from ghunt.lib.utils import is_default_profile_pic
+from ghunt.objects.apis import Parser
 
 import httpx
 
@@ -81,13 +82,9 @@ class PersonPhoto():
 
 class PersonEmail():
     def __init__(self):
-        self.primary: bool = False
-        self.classification: str = ""
         self.value: str = ""
     
     def _scrape(self, email_data: dict[str, any]):
-        self.primary = email_data.get("signupEmailMetadata", {}).get("primary")
-        self.classification = email_data.get("classification")
         self.value = email_data.get("value")
 
 class PersonName():
@@ -129,7 +126,7 @@ class PersonInAppReachability():
 class PersonContainers(dict):
     pass
 
-class Person():
+class Person(Parser):
     def __init__(self):
         self.personId: str = ""
         self.sourceIds: dict[str, PersonSourceIds] = PersonContainers() # All the fetched containers

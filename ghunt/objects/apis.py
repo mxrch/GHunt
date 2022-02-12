@@ -1,9 +1,9 @@
 from ghunt.errors import GHuntCorruptedHeadersError
-from ghunt.lib.knowledge import get_origin_of_key
+from ghunt.lib.knowledge import get_origin_of_key, get_api_key
 from ghunt.objects.base import GHuntCreds
 from ghunt.lib.utils import gen_sapisidhash, is_headers_syntax_good
 from ghunt.errors import *
-import ghunt.globals as gb
+from ghunt.lib.utils import get_class_name
 
 import httpx
 
@@ -24,10 +24,10 @@ class HttpAPI():
 
         self.key_origin = None
         if (key_name := self.require_key):
-            if not creds.keys.get(key_name):
+            if not get_api_key(key_name):
                 raise GHuntInsufficientCreds(f"This API requires the {key_name} API key in the GhuntCreds object, but it isn't loaded.")
             key_origin = get_origin_of_key(key_name)
-            self.headers = {**headers, "Origin": key_origin, "Referer": key_origin, "X-Goog-Api-Key": creds.keys.get(key_name)}
+            self.headers = {**headers, "Origin": key_origin, "Referer": key_origin, "X-Goog-Api-Key": get_api_key(key_name)}
             self.key_origin = key_origin
 
         self.creds = creds
@@ -62,3 +62,29 @@ class HttpAPI():
             raise GHuntUnknownVerbError(f"The provided verb {verb} wasn't recognized by GHunt.")
 
         return req
+
+class Parser():
+    def _merge(self, obj) -> any:
+        """Merging two objects of the same class."""
+
+        def recursive_merge(obj1, obj2, module_name: str) -> any:
+            directions = [(obj1, obj2), (obj2, obj1)]
+            for direction in directions:
+                from_obj, target_obj = direction
+                for attr_name, attr_value in from_obj.__dict__.items():
+                    class_name = get_class_name(attr_value)
+                    if class_name.startswith(module_name) and attr_name in target_obj.__dict__:
+                        merged_obj = recursive_merge(attr_value, target_obj.__dict__[attr_name], module_name)
+                        target_obj.__dict__[attr_name] = merged_obj
+
+                    elif not attr_name in target_obj.__dict__ or \
+                        (attr_value and not target_obj.__dict__.get(attr_name)):
+                        target_obj.__dict__[attr_name] = attr_value
+            return obj1
+
+        class_name = get_class_name(self)
+        module_name = self.__module__
+        if not get_class_name(obj).startswith(class_name):
+            raise GHuntObjectsMergingError("The two objects being merged aren't from the same class.")
+
+        self = recursive_merge(self, obj, module_name)

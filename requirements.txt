@@ -3,7 +3,7 @@ httpx>=0.20.0
 imagehash
 pillow
 python-dateutil
-colorama
+rich
 beautifultable
 termcolor
 wayback
