@@ -5,7 +5,7 @@ pillow
 python-dateutil
 rich
 beautifultable
-termcolor
 wayback
 bs4
 packaging
+alive-progress
