@@ -19,7 +19,7 @@ async def hunt(as_client: httpx.AsyncClient, gaia_id: str):
     is_found, target = await people_pa.people(as_client, gaia_id, params_template="max_details")
     if not is_found:
         await as_client.aclose()
-        exit("[-] The target wasn't found.")
+        exit("\n[-] The target wasn't found.")
 
     containers = target.sourceIds
     for container in containers:

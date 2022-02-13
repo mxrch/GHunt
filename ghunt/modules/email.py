@@ -20,7 +20,7 @@ async def hunt(as_client: httpx.AsyncClient, email_address: str):
     is_found, target = await people_pa.people_lookup(as_client, email_address, params_template="max_details")
     if not is_found:
         await as_client.aclose()
-        exit("[-] The target wasn't found.")
+        exit("\n[-] The target wasn't found.")
 
     containers = target.sourceIds
     for container in containers:

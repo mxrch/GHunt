@@ -161,7 +161,7 @@ class PeoplePaHttp(HttpAPI):
         # Parsing
         data = json.loads(req.text)
         person = Person()
-        if not data:
+        if data["personResponse"][0]["status"] == "NOT_FOUND":
             return False, person
         
         person_data = data["personResponse"][0]["person"]
