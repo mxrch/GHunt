@@ -9,3 +9,4 @@ wayback
 bs4
 packaging
 alive-progress
+trio
