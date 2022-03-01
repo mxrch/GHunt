@@ -8,8 +8,7 @@ WORKDIR /usr/src/app
 RUN groupadd -o -g ${GID} -r app && adduser --system --home /home/app --ingroup app --uid ${UID} app && \
     chown -R app:app /usr/src/app && \
     apt-get update && \
-    apt-get install -y curl unzip gnupg chromium chromium-driver && \
-    rm -rf /var/lib/apt/lists/*
+    apt-get install -y curl unzip gnupg chromium chromium-driver
 
 COPY --chown=app:app requirements.txt docker/download_chromedriver.py ./
 
