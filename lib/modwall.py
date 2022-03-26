@@ -26,7 +26,7 @@ def check():
             print(f"[-] [modwall] I can't find the library {req['key']}, did you correctly installed the libraries specified in requirements.txt ? 😤\n")
             print_help_and_exit()
         else:
-            if req["specs"] and (specs := req["specs"][0]):
+            if req["specs"] and (specs != req["specs"][0]):
                 op, version = specs
                 if not check_versions(installed_mods[req["key"]], op, version):
                     print(f"[-] [modwall] The library {req['key']} version is {installed_mods[req['key']]} but it requires {op} {version}\n")
