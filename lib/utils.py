@@ -211,24 +211,16 @@ def get_driverpath():
     else:
         chromedrivermanager_silent = ChromeDriverManager(print_first_line=False, log_level=0)
     driver = chromedrivermanager_silent.driver
-    driverpath_with_version = chromedrivermanager_silent.driver_cache.find_driver(driver.browser_version, driver.get_name(), driver.get_os_type(), driver.get_version())
-    driverpath_without_version = chromedrivermanager_silent.driver_cache.find_driver("", driver.get_name(), driver.get_os_type(), "")
-    if driverpath_with_version:
-        return driverpath_with_version
-    elif not driverpath_with_version and driverpath_without_version:
+    driverpath = chromedrivermanager_silent.driver_cache.find_driver(driver)
+    if driverpath:
+        return driverpath
+    else:
         print("[Webdrivers Manager] I'm updating the chromedriver...")
         if within_docker():
             driver_path = ChromeDriverManager(path="/usr/src/app").install()
         else:
             driver_path = ChromeDriverManager().install()
         print("[Webdrivers Manager] The chromedriver has been updated !\n")
-    else:
-        print("[Webdrivers Manager] I can't find the chromedriver, so I'm downloading and installing it for you...")
-        if within_docker():
-            driver_path = ChromeDriverManager(path="/usr/src/app").install()
-        else:
-            driver_path = ChromeDriverManager().install()
-        print("[Webdrivers Manager] The chromedriver has been installed !\n")
     return driver_path
 
 
