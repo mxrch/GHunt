@@ -179,7 +179,7 @@ Then, uncheck the only option there:
 ![setting](https://files.catbox.moe/b8879l.jpg)
 
 
-On another note, the target account will **also** be vulnerable if they have ever used **Picasa** linked to their Google account in any way, shape or form. For more details on this, read PinkDev1's comment on [issue #10](https://github.com/mxrch/GHunt/issues/10).\
+On another note, the target account will **also** be vulnerable if they have ever used **Picasa** linked to their Google account in any way, shape or form. For more details on this, read ItsIgnacioPortal's comment on [issue #10](https://github.com/mxrch/GHunt/issues/10).\
 For now, the only (known) solution to this is to delete the Picasa albums from your AlbumArchive. 
 
 # Thanks
