@@ -4,6 +4,7 @@ from lib import modwall; modwall.check() # We check the requirements
 
 import json
 from time import time
+import os
 from os.path import isfile
 from pathlib import Path
 from ssl import SSLError
@@ -69,28 +70,8 @@ def save_tokens(hangouts_auth, gdoc_token, hangouts_token, internal_token, inter
 def get_hangouts_tokens(driver, cookies, tmprinter):
     ''' gets auth and hangouts token '''
 
-    tmprinter.out("Setting cookies...")
-    driver.get("https://hangouts.google.com/robots.txt")
-    for k, v in cookies.items():
-        driver.add_cookie({'name': k, 'value': v})
-
-    tmprinter.out("Fetching Hangouts homepage...")
-    driver.get("https://hangouts.google.com")
-
-    tmprinter.out("Waiting for the /v2/people/me/blockedPeople request, it "
-                  "can takes a few minutes...")
-    try:
-        req = driver.wait_for_request('/v2/people/me/blockedPeople', timeout=config.browser_waiting_timeout)
-        tmprinter.out("Request found !")
-        driver.close()
-        tmprinter.out("")
-    except SE_TimeoutExepction:
-        tmprinter.out("")
-        exit("\n[!] Selenium TimeoutException has occured. Please check your internet connection, proxies, vpns, et cetera.")
-
-
-    hangouts_auth = req.headers["Authorization"]
-    hangouts_token = req.url.split("key=")[1]
+    hangouts_token = "AIzaSyD7InnYR3VKdb4j2rMUEbTCIr2VyEazl6k"
+    hangouts_auth = f"SAPISIDHASH {gen_sapisidhash(cookies['SAPISID'], 'https://hangouts.google.com')}"
 
     return (hangouts_auth, hangouts_token)
 

@@ -1,6 +1,6 @@
 import hashlib
 import re
-import time
+from time import time
 from datetime import datetime
 
 from dateutil.relativedelta import relativedelta
@@ -90,14 +90,14 @@ def scrape(gaiaID, client, cookies, config, headers, regex_rev_by_id, is_headles
     print(f"[+] {scroll_max} reviews found !")
 
     timeout = scroll_max * 1.25
-    timeout_start = time.time()
+    timeout_start = time()
     reviews_elements = driver.find_elements_by_xpath('//div[@data-review-id][@aria-label]')
     tmprinter.out(f"Fetching reviews... ({len(reviews_elements)}/{scroll_max})")
     while len(reviews_elements) < scroll_max:
         driver.execute_script("arguments[0].scrollTop = arguments[0].scrollHeight", scrollbox)
         reviews_elements = driver.find_elements_by_xpath('//div[@data-review-id][@aria-label]')
         tmprinter.out(f"Fetching reviews... ({len(reviews_elements)}/{scroll_max})")
-        if time.time() > timeout_start + timeout:
+        if time() > timeout_start + timeout:
             tmprinter.out(f"Timeout while fetching reviews !")
             break
 

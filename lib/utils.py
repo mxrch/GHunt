@@ -1,17 +1,17 @@
 import imagehash
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.options import Options
-from seleniumwire.webdriver import Chrome
 
 from lib.os_detect import Os
 
 from pathlib import Path
 import shutil
-import subprocess, os
 from os.path import isfile
 import json
 import re
 from pprint import pprint
+from time import time
+import hashlib
 
 
 class TMPrinter():
@@ -247,3 +247,6 @@ def inject_osid(cookies, service, config):
 
     cookies["OSID"] = out["osids"][service]
     return cookies
+
+def gen_sapisidhash(sapisid: str, origin: str, timestamp: str = str(int(time()))) -> str:
+    return f"{timestamp}_{hashlib.sha1(' '.join([timestamp, sapisid, origin]).encode()).hexdigest()}"
