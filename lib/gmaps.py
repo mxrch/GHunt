@@ -1,37 +1,31 @@
-import hashlib
-import re
-from time import time
 from datetime import datetime
-
 from dateutil.relativedelta import relativedelta
 from geopy import distance
-from geopy.geocoders import Nominatim
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from seleniumwire import webdriver
-from webdriver_manager.chrome import ChromeDriverManager
-
 from lib.utils import *
 
 
 def scrape(gaiaID, client, cookies, config, headers, regex_rev_by_id, is_headless):
-    def get_datetime(datepublished):
-        if datepublished.split()[0] == "a":
+    def get_datetime(date_published):
+        if date_published.split()[0] == "a":
             nb = 1
         else:
-            nb = int(datepublished.split()[0])
-        if "minute" in datepublished:
+            nb = int(date_published.split()[0])
+        if "minute" in date_published:
             delta = relativedelta(minutes=nb)
-        elif "hour" in datepublished:
+        elif "hour" in date_published:
             delta = relativedelta(hours=nb)
-        elif "day" in datepublished:
+        elif "day" in date_published:
             delta = relativedelta(days=nb)
-        elif "week" in datepublished:
+        elif "week" in date_published:
             delta = relativedelta(weeks=nb)
-        elif "month" in datepublished:
+        elif "month" in date_published:
             delta = relativedelta(months=nb)
-        elif "year" in datepublished:
+        elif "year" in date_published:
             delta = relativedelta(years=nb)
         else:
             delta = relativedelta()
@@ -61,8 +55,8 @@ def scrape(gaiaID, client, cookies, config, headers, regex_rev_by_id, is_headles
 
     tmprinter.out("Starting browser...")
 
-    driverpath = get_driverpath()
-    driver = webdriver.Chrome(executable_path=driverpath, seleniumwire_options=options, options=chrome_options)
+    driver_path = get_driverpath()
+    driver = webdriver.Chrome(executable_path=driver_path, seleniumwire_options=options, options=chrome_options)
     driver.header_overrides = headers
     wait = WebDriverWait(driver, 15)
 
@@ -75,59 +69,63 @@ def scrape(gaiaID, client, cookies, config, headers, regex_rev_by_id, is_headles
         driver.add_cookie({'name': k, 'value': v})
 
     tmprinter.out("Fetching reviews page...")
-    driver.get(base_url)
-
-    wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'div.section-scrollbox')))
-    scrollbox = driver.find_element(By.CSS_SELECTOR, 'div.section-scrollbox')
-
-    tab_info = scrollbox.find_element(By.TAG_NAME, "div")
-    if tab_info and tab_info.text:
-        scroll_max = sum([int(x) for x in tab_info.text.split() if x.isdigit()])
-    else:
-        return False
-
-    tmprinter.clear()
-    print(f"[+] {scroll_max} reviews found !")
-
-    timeout = scroll_max * 1.25
-    timeout_start = time()
-    reviews_elements = driver.find_elements_by_xpath('//div[@data-review-id][@aria-label]')
-    tmprinter.out(f"Fetching reviews... ({len(reviews_elements)}/{scroll_max})")
-    while len(reviews_elements) < scroll_max:
-        driver.execute_script("arguments[0].scrollTop = arguments[0].scrollHeight", scrollbox)
-        reviews_elements = driver.find_elements_by_xpath('//div[@data-review-id][@aria-label]')
-        tmprinter.out(f"Fetching reviews... ({len(reviews_elements)}/{scroll_max})")
-        if time() > timeout_start + timeout:
-            tmprinter.out(f"Timeout while fetching reviews !")
-            break
-
-    tmprinter.out("Fetching internal requests history...")
-    requests = [r.url for r in driver.requests if "locationhistory" in r.url]
-    tmprinter.out(f"Fetching internal requests... (0/{len(requests)})")
-    for nb, load in enumerate(requests):
-        req = client.get(load)
-        data += req.text.replace('\n', '')
-        tmprinter.out(f"Fetching internal requests... ({nb + 1}/{len(requests)})")
-
-    tmprinter.out(f"Fetching reviews location... (0/{len(reviews_elements)})")
     reviews = []
-    rating = 0
-    for nb, review in enumerate(reviews_elements):
-        id = review.get_attribute("data-review-id")
-        location = re.compile(regex_rev_by_id.format(id)).findall(data)[0]
-        try:
-            stars = review.find_element(By.CSS_SELECTOR, 'span[aria-label$="stars "]')
-        except Exception:
-            stars = review.find_element(By.CSS_SELECTOR, 'span[aria-label$="star "]')
-        rating += int(stars.get_attribute("aria-label").strip().split()[0])
-        date = get_datetime(stars.find_element(By.XPATH, "following-sibling::span").text)
-        reviews.append({"location": location, "date": date})
-        tmprinter.out(f"Fetching reviews location... ({nb + 1}/{len(reviews_elements)})")
+    try:
+        driver.get(base_url)
 
-    rating_avg = rating / len(reviews)
-    tmprinter.clear()
-    print(f"[+] Average rating : {int(rating_avg) if int(rating_avg) / round(rating_avg, 1) == 1 else round(rating_avg, 1)}/5 stars !")
-    # 4.9 => 4.9, 5.0 => 5, we don't show the 0
+        #wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'div.section-scrollbox')))
+        #scrollbox = driver.find_element(By.CSS_SELECTOR, 'div.section-scrollbox')
+
+        tab_info = driver.find_element(by=By.XPATH, value="//span[contains(@aria-label, 'review') and contains(@aria-label, 'rating')]")
+        if tab_info and tab_info.text:
+            scroll_max = sum([int(x) for x in tab_info.text.split() if x.isdigit()])
+        else:
+            return False
+
+        tmprinter.clear()
+        print(f"[+] {scroll_max} reviews found !")
+
+        scrollbox = tab_info.find_element(By.XPATH, "../../../..")
+        timeout = scroll_max * 2.5
+        timeout_start = time()
+        reviews_elements = driver.find_elements(by=By.XPATH, value="//div[@data-review-id][@aria-label]")
+        tmprinter.out(f"Fetching reviews... ({len(reviews_elements)}/{scroll_max})")
+        while len(reviews_elements) < scroll_max:
+            driver.execute_script("arguments[0].scrollTop = arguments[0].scrollHeight", scrollbox)
+            reviews_elements = driver.find_elements(by=By.XPATH, value='//div[@data-review-id][@aria-label]')
+            tmprinter.out(f"Fetching reviews... ({len(reviews_elements)}/{scroll_max})")
+            if time() > timeout_start + timeout:
+                tmprinter.out(f"Timeout while fetching reviews !")
+                break
+
+        tmprinter.out("Fetching internal requests history...")
+        requests = [r.url for r in driver.requests if "locationhistory" in r.url]
+        tmprinter.out(f"Fetching internal requests... (0/{len(requests)})")
+        for nb, load in enumerate(requests):
+            req = client.get(load)
+            data += req.text.replace('\n', '')
+            tmprinter.out(f"Fetching internal requests... ({nb + 1}/{len(requests)})")
+
+        tmprinter.out(f"Fetching reviews location... (0/{len(reviews_elements)})")
+        rating = 0
+        for nb, review in enumerate(reviews_elements):
+            id = review.get_attribute("data-review-id")
+            location = re.compile(regex_rev_by_id.format(id)).findall(data)[0]
+            try:
+                stars = review.find_element(By.CSS_SELECTOR, 'span[aria-label$="stars "]')
+            except Exception:
+                stars = review.find_element(By.CSS_SELECTOR, 'span[aria-label$="star "]')
+            rating += int(stars.get_attribute("aria-label").strip().split()[0])
+            date = get_datetime(stars.find_element(By.XPATH, "following-sibling::span").text)
+            reviews.append({"location": location, "date": date})
+            tmprinter.out(f"Fetching reviews location... ({nb + 1}/{len(reviews_elements)})")
+
+        rating_avg = rating / len(reviews)
+        tmprinter.clear()
+        print(f"[+] Average rating : {int(rating_avg) if int(rating_avg) / round(rating_avg, 1) == 1 else round(rating_avg, 1)}/5 stars !")
+        # 4.9 => 4.9, 5.0 => 5, we don't show the 0
+    except TimeoutException as e:
+        print("Error fetching reviews, it is likely that Google has changed the layout of the reviews page.")
     return reviews
 
 
