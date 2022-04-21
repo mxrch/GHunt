@@ -16,7 +16,6 @@ def search(query, data_path, gdocs_public_doc, size=1000):
     data = {"request": '["documentsuggest.search.search_request","{}",[{}],null,1]'.format(query, size)}
 
     retries = 10
-    time_to_wait = 5
     for retry in list(range(retries))[::-1]:
         req = httpx.post('https://docs.google.com/document/d/{}/explore/search?token={}'.format(gdocs_public_doc, token),
                         cookies=cookies, data=data)

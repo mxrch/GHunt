@@ -173,7 +173,7 @@ def get_confidence(data, query, hash):
         for channel in source["channels"]:
             found_better = False
             for source2 in data:
-                for channel2 in source["channels"]:
+                for channel2 in source2["channels"]:
                     if channel["profile_url"] == channel2["profile_url"]:
                         if channel2["score"] > channel["score"]:
                             found_better = True
