@@ -203,7 +203,7 @@ def sanitize_location(location):
 
 
 def get_driverpath():
-    driver_path = shutil.which("chromedriver")
+    driver_path = shutil.which("chromedriver") or shutil.which("chromium.chromedriver")
     if driver_path:
         return driver_path
     if within_docker():

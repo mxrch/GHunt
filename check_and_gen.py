@@ -78,10 +78,10 @@ def get_hangouts_tokens(driver, cookies, tmprinter):
 def drive_interceptor(request):
     global internal_auth, internal_token
 
-    if request.url.endswith(('.woff2', '.css', '.png', '.jpeg', '.svg', '.gif')):
+    if request.url.endswith(('.woff2', '.css', '.jpeg', '.svg')):
         request.abort()
     elif request.path != "/drive/my-drive" and "Accept" in request.headers and \
-        any([x in request.headers["Accept"] for x in ["image", "font-woff"]]):
+        any([x in request.headers["Accept"] for x in ["font-woff"]]):
         request.abort()
     if "authorization" in request.headers and "_" in request.headers["authorization"] and \
         request.headers["authorization"]:
