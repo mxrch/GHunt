@@ -8,7 +8,7 @@ python-dateutil
 colorama
 beautifultable
 termcolor
-webdriver-manager
+webdriver-manager==3.5.4
 wayback
 bs4
 packaging
