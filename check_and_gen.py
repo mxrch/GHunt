@@ -25,7 +25,7 @@ from lib import listener
 os.chdir(Path(__file__).parents[0])
 
 def get_saved_cookies():
-    ''' returns cookie cache if exists '''
+    ''' Returns cookie cache if exists '''
     if isfile(config.data_path):
         try:
             with open(config.data_path, 'r') as f:
@@ -41,7 +41,9 @@ def get_saved_cookies():
 
 
 def get_authorization_source(cookies):
-    ''' returns html source of hangouts page if user authorized '''
+    ''' Returns html source of hangouts page
+        if user authorized
+    '''
     req = httpx.get("https://docs.google.com/document/u/0/?usp=direct_url",
                     cookies=cookies, headers=config.headers)
 
@@ -53,8 +55,8 @@ def get_authorization_source(cookies):
     return None
 
 
-def save_tokens(hangouts_auth, gdoc_token, hangouts_token, internal_token, internal_auth, cac_key, cookies, osid):
-    ''' save tokens to file '''
+def save_tokens(gdoc_token, hangouts_auth, hangouts_token, internal_token, internal_auth, cac_key, cookies, osid):
+    '''Ssave tokens to file '''
     output = {
         "hangouts_auth": hangouts_auth, "internal_auth": internal_auth,
         "keys": {"gdoc": gdoc_token, "hangouts": hangouts_token, "internal": internal_token, "clientauthconfig": cac_key},
@@ -67,62 +69,23 @@ def save_tokens(hangouts_auth, gdoc_token, hangouts_token, internal_token, inter
         f.write(json.dumps(output))
 
 
-def get_hangouts_tokens(driver, cookies, tmprinter):
-    ''' gets auth and hangouts token '''
+def get_hangouts_tokens(cookies):
+    """ Return the API key used by Hangouts for
+        Internal People API and a generated SAPISID hash."""
 
-    hangouts_token = "AIzaSyD7InnYR3VKdb4j2rMUEbTCIr2VyEazl6k"
+    hangouts_key = "AIzaSyD7InnYR3VKdb4j2rMUEbTCIr2VyEazl6k"
     hangouts_auth = f"SAPISIDHASH {gen_sapisidhash(cookies['SAPISID'], 'https://hangouts.google.com')}"
 
-    return (hangouts_auth, hangouts_token)
+    return (hangouts_auth, hangouts_key)
 
-def drive_interceptor(request):
-    global internal_auth, internal_token
+def get_people_tokens(cookies):
+    """ Return the API key used by Drive for
+        Internal People API and a generated SAPISID hash."""
 
-    if request.url.endswith(('.woff2', '.css', '.png', '.jpeg', '.svg', '.gif')):
-        request.abort()
-    elif request.path != "/drive/my-drive" and "Accept" in request.headers and \
-        any([x in request.headers["Accept"] for x in ["image", "font-woff"]]):
-        request.abort()
-    if "authorization" in request.headers and "_" in request.headers["authorization"] and \
-        request.headers["authorization"]:
-        internal_auth = request.headers["authorization"]
+    people_key = "AIzaSyAy9VVXHSpS2IJpptzYtGbLP3-3_l0aBk4"
+    people_auth = f"SAPISIDHASH {gen_sapisidhash(cookies['SAPISID'], 'https://drive.google.com')}"
 
-def get_internal_tokens(driver, cookies, tmprinter):
-    """ Extract the mysterious token used for Internal People API
-        and some Drive requests, with the Authorization header"""
-
-    global internal_auth, internal_token
-
-    internal_auth = ""
-
-    tmprinter.out("Setting cookies...")
-    driver.get("https://drive.google.com/robots.txt")
-    for k, v in cookies.items():
-        driver.add_cookie({'name': k, 'value': v})
-
-    start = time()
-
-    tmprinter.out("Fetching Drive homepage...")
-    driver.request_interceptor = drive_interceptor
-    driver.get("https://drive.google.com/drive/my-drive")
-
-    body = driver.page_source
-    internal_token = body.split("appsitemsuggest-pa")[1].split(",")[3].strip('"')
-
-    tmprinter.out(f"Waiting for the authorization header, it "
-                    "can takes a few minutes...")
-
-    while True:
-        if internal_auth and internal_token:
-            tmprinter.clear()
-            break
-        elif time() - start > config.browser_waiting_timeout:
-            tmprinter.clear()
-            exit("[-] Timeout while fetching the Internal tokens.\nPlease increase the timeout in config.py or try again.")
-
-    del driver.request_interceptor
-
-    return internal_auth, internal_token
+    return (people_key, people_auth)
 
 def gen_osid(cookies, domain, service):
     req = httpx.get(f"https://accounts.google.com/ServiceLogin?service={service}&osid=1&continue=https://{domain}/&followup=https://{domain}/&authuser=0",
@@ -221,7 +184,7 @@ if __name__ == '__main__':
         else:
             print("[-] Seems like the cookies are invalid.")
         new_gen_inp = input("\nDo you want to enter new browser cookies from accounts.google.com ? (Y/n) ").lower()
-        if new_gen_inp == "y":
+        if new_gen_inp in ["y", ""]:
             cookies = getting_cookies(cookies)
             new_cookies_entered = True
             
@@ -240,7 +203,7 @@ if __name__ == '__main__':
     if not new_cookies_entered:
         cookies = cookies_from_file
         choice = input("Do you want to generate new tokens ? (Y/n) ").lower()
-        if choice != "y":
+        if choice not in ["y", ""]:
             exit()
 
     # Start the extraction process
@@ -272,16 +235,16 @@ if __name__ == '__main__':
     cookies_with_osid = deepcopy(cookies)
     cookies_with_osid["OSID"] = osid
     # Extracting Internal People API tokens
-    internal_auth, internal_token = get_internal_tokens(driver, cookies_with_osid, tmprinter)
-    print(f"Internal APIs Token => {internal_token}")
-    print(f"Internal APIs Authorization => {internal_auth}")
+    people_key, people_auth = get_people_tokens(cookies_with_osid)
+    print(f"People API Key => {people_key}")
+    print(f"People API Auth => {people_auth}")
 
     # Extracting Hangouts tokens
-    auth_token, hangouts_token = get_hangouts_tokens(driver, cookies_with_osid, tmprinter)
-    print(f"Hangouts Authorization => {auth_token}")
-    print(f"Hangouts Token => {hangouts_token}")
+    hangouts_key, hangouts_token = get_hangouts_tokens(cookies_with_osid)
+    print(f"Hangouts Key => {hangouts_token}")
+    print(f"Hangouts Auth => {hangouts_key}")
 
     cac_key = get_clientauthconfig_key(cookies_with_osid)
     print(f"Client Auth Config API Key => {cac_key}")
 
-    save_tokens(auth_token, gdoc_token, hangouts_token, internal_token, internal_auth, cac_key, cookies, osid)
+    save_tokens(gdoc_token, hangouts_key, hangouts_token, people_key, people_auth, cac_key, cookies, osid)
