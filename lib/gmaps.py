@@ -1,7 +1,7 @@
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from geopy import distance
-from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
@@ -75,8 +75,12 @@ def scrape(gaiaID, client, cookies, config, headers, regex_rev_by_id, is_headles
 
         #wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'div.section-scrollbox')))
         #scrollbox = driver.find_element(By.CSS_SELECTOR, 'div.section-scrollbox')
-
-        tab_info = driver.find_element(by=By.XPATH, value="//span[contains(@aria-label, 'review') and contains(@aria-label, 'rating')]")
+        tab_info = None
+        try:
+            tab_info = driver.find_element(by=By.XPATH, value="//span[contains(@aria-label, 'review') and contains(@aria-label, 'rating')]")
+        except NoSuchElementException:
+            pass
+        
         if tab_info and tab_info.text:
             scroll_max = sum([int(x) for x in tab_info.text.split() if x.isdigit()])
         else:
