@@ -12,4 +12,4 @@ webdriver-manager==3.5.4
 wayback
 bs4
 packaging
-aiohttp==3.8.1 # Avoid this weird error : AttributeError: module 'aiohttp._http_writer' has no attribute '_serialize_headers'
+aiohttp==3.8.3 # Avoid this weird error : AttributeError: module 'aiohttp._http_writer' has no attribute '_serialize_headers'
