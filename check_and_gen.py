@@ -56,7 +56,7 @@ def get_authorization_source(cookies):
 
 
 def save_tokens(gdoc_token, hangouts_auth, hangouts_token, internal_token, internal_auth, cac_key, cookies, osid):
-    '''Ssave tokens to file '''
+    ''' Save tokens to file '''
     output = {
         "hangouts_auth": hangouts_auth, "internal_auth": internal_auth,
         "keys": {"gdoc": gdoc_token, "hangouts": hangouts_token, "internal": internal_token, "clientauthconfig": cac_key},
