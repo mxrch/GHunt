@@ -40,26 +40,21 @@ def get_saved_cookies():
     return False
 
 
-def get_authorization_source(cookies):
-    ''' Returns html source of hangouts page
+def get_authorization_source(driver):
+    ''' Returns html source of docs page
         if user authorized
     '''
-    req = httpx.get("https://docs.google.com/document/u/0/?usp=direct_url",
-                    cookies=cookies, headers=config.headers)
-
-    if req.status_code == 200:
-        req2 = httpx.get("https://hangouts.google.com", cookies=cookies,
-                         headers=config.headers)
-        if "myaccount.google.com" in req2.text:
-            return req.text
+    driver.get('https://docs.google.com/document/u/0/')
+    if "myaccount.google.com" in driver.page_source:
+            return driver.page_source
     return None
 
 
-def save_tokens(gdoc_token, hangouts_auth, hangouts_token, internal_token, internal_auth, cac_key, cookies, osid):
+def save_tokens(gdoc_token, chat_key, chat_auth, internal_token, internal_auth, cac_key, cookies, osid):
     '''Ssave tokens to file '''
     output = {
-        "hangouts_auth": hangouts_auth, "internal_auth": internal_auth,
-        "keys": {"gdoc": gdoc_token, "hangouts": hangouts_token, "internal": internal_token, "clientauthconfig": cac_key},
+        "chat_auth": chat_auth, "internal_auth": internal_auth,
+        "keys": {"gdoc": gdoc_token, "chat": chat_key, "internal": internal_token, "clientauthconfig": cac_key},
         "cookies": cookies,
         "osids": {
             "cloudconsole": osid
@@ -69,14 +64,14 @@ def save_tokens(gdoc_token, hangouts_auth, hangouts_token, internal_token, inter
         f.write(json.dumps(output))
 
 
-def get_hangouts_tokens(cookies):
-    """ Return the API key used by Hangouts for
+def get_chat_tokens(cookies):
+    """ Return the API key used by Google Chat for
         Internal People API and a generated SAPISID hash."""
 
-    hangouts_key = "AIzaSyD7InnYR3VKdb4j2rMUEbTCIr2VyEazl6k"
-    hangouts_auth = f"SAPISIDHASH {gen_sapisidhash(cookies['SAPISID'], 'https://hangouts.google.com')}"
+    chat_key = "AIzaSyB0RaagJhe9JF2mKDpMml645yslHfLI8iA"
+    chat_auth = f"SAPISIDHASH {gen_sapisidhash(cookies['SAPISID'], 'https://chat.google.com')}"
 
-    return (hangouts_auth, hangouts_key)
+    return (chat_key, chat_auth)
 
 def get_people_tokens(cookies):
     """ Return the API key used by Drive for
@@ -159,9 +154,29 @@ def getting_cookies(cookies):
 
     return cookies
 
+def get_driver(cookies = {}):
+    driverpath = get_driverpath()
+    
+    chrome_options = get_chrome_options_args(config.headless)
+    options = {
+        'connection_timeout': None  # Never timeout, otherwise it floods errors
+    }
+
+    tmprinter.out("Starting browser...")
+    driver = webdriver.Chrome(
+        executable_path=driverpath, seleniumwire_options=options,
+        options=chrome_options
+    )
+    driver.header_overrides = config.headers
+    driver.get('https://www.google.com/robots.txt')
+    for k, v in cookies.items():
+        driver.add_cookie({'name': k, 'value': v, 'domain': '.google.com'})
+    return driver
+
 if __name__ == '__main__':
 
-    driverpath = get_driverpath()
+    driver = None
+
     cookies_from_file = get_saved_cookies()
 
     tmprinter = TMPrinter()
@@ -175,7 +190,8 @@ if __name__ == '__main__':
         new_cookies_entered = True
     else:
         # in case user wants to enter new cookies (example: for new account)
-        html = get_authorization_source(cookies_from_file)
+        driver = get_driver(cookies_from_file)
+        html = get_authorization_source(driver)
         valid_cookies = check_cookies(cookies_from_file)
         valid = False
         if html and valid_cookies:
@@ -190,11 +206,13 @@ if __name__ == '__main__':
             
         elif not valid:
             exit("Please put valid cookies. Exiting...")
-
+    
+    if not driver:
+        driver = get_driver(cookies)
 
     # Validate cookies
     if new_cookies_entered or not cookies_from_file:
-        html = get_authorization_source(cookies)
+        html = get_authorization_source(driver)
         if html:
             print("\n[+] The cookies seems valid !")
         else:
@@ -207,19 +225,6 @@ if __name__ == '__main__':
             exit()
 
     # Start the extraction process
-
-    # We first initialize the browser driver
-    chrome_options = get_chrome_options_args(config.headless)
-    options = {
-        'connection_timeout': None  # Never timeout, otherwise it floods errors
-    }
-
-    tmprinter.out("Starting browser...")
-    driver = webdriver.Chrome(
-        executable_path=driverpath, seleniumwire_options=options,
-        options=chrome_options
-    )
-    driver.header_overrides = config.headers
 
     print("Extracting the tokens...\n")
     # Extracting Google Docs token
@@ -239,12 +244,13 @@ if __name__ == '__main__':
     print(f"People API Key => {people_key}")
     print(f"People API Auth => {people_auth}")
 
-    # Extracting Hangouts tokens
-    hangouts_key, hangouts_token = get_hangouts_tokens(cookies_with_osid)
-    print(f"Hangouts Key => {hangouts_token}")
-    print(f"Hangouts Auth => {hangouts_key}")
+
+    # Extracting Chat tokens
+    chat_key, chat_auth = get_chat_tokens(cookies_with_osid)
+    print(f"Chat Key => {chat_key}")
+    print(f"Chat Auth => {chat_auth}")
 
     cac_key = get_clientauthconfig_key(cookies_with_osid)
     print(f"Client Auth Config API Key => {cac_key}")
 
-    save_tokens(gdoc_token, hangouts_key, hangouts_token, people_key, people_auth, cac_key, cookies, osid)
+    save_tokens(gdoc_token, chat_key, chat_auth, people_key, people_auth, cac_key, cookies, osid)

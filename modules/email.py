@@ -30,9 +30,9 @@ def email_hunt(email):
 
     if not isfile(config.data_path):
         exit("Please generate cookies and tokens first, with the check_and_gen.py script.")
-
-    hangouts_auth = ""
-    hangouts_token = ""
+    
+    chat_auth = ""
+    chat_key = ""
     internal_auth = ""
     internal_token = ""
 
@@ -40,16 +40,16 @@ def email_hunt(email):
 
     with open(config.data_path, 'r') as f:
         out = json.loads(f.read())
-        hangouts_auth = out["hangouts_auth"]
-        hangouts_token = out["keys"]["hangouts"]
+        chat_auth = out["chat_auth"]
+        chat_key = out["keys"]["chat"]
         internal_auth = out["internal_auth"]
         internal_token = out["keys"]["internal"]
         cookies = out["cookies"]
 
     client = httpx.Client(cookies=cookies, headers=config.headers)
 
-    data = is_email_google_account(client, hangouts_auth, cookies, email,
-                                   hangouts_token)
+    data = is_email_google_account(client, chat_auth, cookies, email,
+                                   chat_key)
 
     is_within_docker = within_docker()
     if is_within_docker:
