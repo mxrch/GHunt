@@ -50,11 +50,11 @@ def get_authorization_source(driver):
     return None
 
 
-def save_tokens(gdoc_token, hangouts_auth, hangouts_token, internal_token, internal_auth, cac_key, cookies, osid):
+def save_tokens(gdoc_token, chat_key, chat_auth, internal_token, internal_auth, cac_key, cookies, osid):
     '''Ssave tokens to file '''
     output = {
-        "hangouts_auth": hangouts_auth, "internal_auth": internal_auth,
-        "keys": {"gdoc": gdoc_token, "hangouts": hangouts_token, "internal": internal_token, "clientauthconfig": cac_key},
+        "chat_auth": chat_auth, "internal_auth": internal_auth,
+        "keys": {"gdoc": gdoc_token, "chat": chat_key, "internal": internal_token, "clientauthconfig": cac_key},
         "cookies": cookies,
         "osids": {
             "cloudconsole": osid
@@ -64,14 +64,14 @@ def save_tokens(gdoc_token, hangouts_auth, hangouts_token, internal_token, inter
         f.write(json.dumps(output))
 
 
-def get_hangouts_tokens(cookies):
-    """ Return the API key used by Hangouts for
+def get_chat_tokens(cookies):
+    """ Return the API key used by Google Chat for
         Internal People API and a generated SAPISID hash."""
 
-    hangouts_key = "AIzaSyD7InnYR3VKdb4j2rMUEbTCIr2VyEazl6k"
-    hangouts_auth = f"SAPISIDHASH {gen_sapisidhash(cookies['SAPISID'], 'https://hangouts.google.com')}"
+    chat_key = "AIzaSyB0RaagJhe9JF2mKDpMml645yslHfLI8iA"
+    chat_auth = f"SAPISIDHASH {gen_sapisidhash(cookies['SAPISID'], 'https://chat.google.com')}"
 
-    return (hangouts_auth, hangouts_key)
+    return (chat_key, chat_auth)
 
 def get_people_tokens(cookies):
     """ Return the API key used by Drive for
@@ -244,12 +244,13 @@ if __name__ == '__main__':
     print(f"People API Key => {people_key}")
     print(f"People API Auth => {people_auth}")
 
-    # Extracting Hangouts tokens
-    hangouts_key, hangouts_token = get_hangouts_tokens(cookies_with_osid)
-    print(f"Hangouts Key => {hangouts_token}")
-    print(f"Hangouts Auth => {hangouts_key}")
+
+    # Extracting Chat tokens
+    chat_key, chat_auth = get_chat_tokens(cookies_with_osid)
+    print(f"Chat Key => {chat_key}")
+    print(f"Chat Auth => {chat_auth}")
 
     cac_key = get_clientauthconfig_key(cookies_with_osid)
     print(f"Client Auth Config API Key => {cac_key}")
 
-    save_tokens(gdoc_token, hangouts_key, hangouts_token, people_key, people_auth, cac_key, cookies, osid)
+    save_tokens(gdoc_token, chat_key, chat_auth, people_key, people_auth, cac_key, cookies, osid)
