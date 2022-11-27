@@ -22,23 +22,17 @@ if __name__ == "__main__":
     modules = ["email", "doc", "gaia", "youtube"]
 
     if len(sys.argv) <= 1 or sys.argv[1].lower() not in modules:
-        print("Please choose a module.\n")
-        print("Available modules :")
+        print("Please choose a module.\nAvailable modules :\n")
         for module in modules:
             print(f"- {module}")
         exit()
 
     module = sys.argv[1].lower()
+
     if len(sys.argv) >= 3:
         data = sys.argv[2]
     else:
         data = None 
-
-    if module == "email":
-        email_hunt(data)
-    elif module == "doc":
-        doc_hunt(data)
-    elif module == "gaia":
-        gaia_hunt(data)
-    elif module == "youtube":
-        youtube_hunt(data)
+   
+    # Get rid of the repeating if-statements by applying an eval
+    eval(f"{module}_hunt(data)")
