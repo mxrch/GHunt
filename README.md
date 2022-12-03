@@ -103,6 +103,7 @@ This project is under [AGPL Licence](https://choosealicense.com/licenses/agpl-3.
 - [novitae](https://github.com/novitae) for being my Python colleague
 - All the people on [Malfrats Industries](https://discord.gg/sg2YcrC6x9) and elsewhere for the beta test !
 - The HideAndSec team 💗 (blog : https://hideandsec.sh)
+- [Med Amine Jouini](https://dribbble.com/jouiniamine) for his beautiful rework of the Google logo, which I was inspired by *a lot*.
 
 ## Sponsors
 
