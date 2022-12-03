@@ -1,3 +1,4 @@
+import pathlib
 from typing import *
 from pathlib import Path
 import json
@@ -31,9 +32,9 @@ class GHuntCreds(SmartObj):
 
         if not creds_path:
             cwd_path = Path().home()
-            ghunt_folder = cwd_path / ".malfrats/ghunt"
-            if not ghunt_folder.is_dir():
-                ghunt_folder.mkdir(parents=True, exist_ok=True)
+            ghunt_folder = pathlib.Path(__file__).parent.resolve()
+            # if not ghunt_folder.is_dir():
+            #     ghunt_folder.mkdir(parents=True, exist_ok=True)
             creds_path = ghunt_folder / "creds.m"
         self.creds_path: str = creds_path
 
