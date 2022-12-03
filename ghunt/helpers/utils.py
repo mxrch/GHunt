@@ -1,3 +1,4 @@
+from __future__ import annotations
 from pathlib import Path
 from PIL import Image
 import hashlib
@@ -8,7 +9,6 @@ from dateutil.parser import isoparse
 from copy import deepcopy
 import jsonpickle
 import json
-from __future__ import annotations
 import httpx
 import imagehash
 from io import BytesIO
