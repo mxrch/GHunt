@@ -59,7 +59,8 @@ class GHuntCreds(SmartObj):
 
                 if not silent:
                     gb.rc.print("[+] Authenticated !", style="sea_green3")
-            except Exception:
+            except Exception as e:
+                print(e)
                 if not silent:
                     print("[-] Stored cookies are corrupted\n")
         else:
