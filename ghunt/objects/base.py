@@ -36,7 +36,7 @@ class GHuntCreds(SmartObj):
             # if not ghunt_folder.is_dir():
             #     ghunt_folder.mkdir(parents=True, exist_ok=True)
             creds_path = ghunt_folder / "creds.m"
-        print('creds_path:'+creds_path)
+        print('creds_path:'+str(creds_path))
         self.creds_path: str = creds_path
 
     def are_creds_loaded(self) -> bool:
