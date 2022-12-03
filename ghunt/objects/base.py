@@ -49,7 +49,7 @@ class GHuntCreds(SmartObj):
                 with open(self.creds_path, "r", encoding="utf-8") as f:
                     raw = f.read()
                 data = json.loads(base64.b64decode(raw).decode())
-                print('data:'+data)
+                # print('data:'+data)
 
                 self.cookies = data["cookies"]
                 self.osids = data["osids"]
