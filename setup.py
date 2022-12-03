@@ -24,5 +24,6 @@ setup(
             'ghunt = ghunt.ghunt:main'
         ]
     },
-    install_requires=requirements
+    install_requires=requirements,
+    include_package_data=True
 )
