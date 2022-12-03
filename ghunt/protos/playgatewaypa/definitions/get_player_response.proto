@@ -1,0 +1,191 @@
+syntax = "proto3";
+
+
+message GetPlayerResponseProto {
+
+  message field1_type {
+
+    message Results {
+
+      message Player {
+
+        message field1_type {
+          string name = 1;
+        }
+
+        field1_type field1 = 1;
+
+        message Avatar {
+          string url = 1;
+        }
+
+        Avatar avatar = 2;
+      }
+
+      Player player = 1;
+
+      message Section {
+
+        message Counter {
+          string number = 1;
+        }
+
+        Counter counter = 2;
+
+        message field3_type {
+          string section_name = 1;
+        }
+
+        field3_type field3 = 3;
+
+        message PlayedGames {
+
+          message field1_type {
+
+            message field1_type {
+
+              message field203130867_type {
+                string field1 = 1;
+              }
+
+              field203130867_type field203130867 = 203130867;
+            }
+
+            field1_type field1 = 1;
+
+            message Game {
+
+              message Icon {
+                string url = 1;
+              }
+
+              Icon icon = 3;
+
+              message field6_type {
+
+                message field1_type {
+
+                  message Details {
+
+                    message field1_type {
+                      string app_id = 1;
+                      string package_name = 2;
+                    }
+
+                    field1_type field1 = 1;
+                    string title = 2;
+                    string editor = 3;
+                  }
+
+                  Details details = 197793078;
+                }
+
+                field1_type field1 = 1;
+              }
+
+              field6_type field6 = 6;
+
+            }
+
+            repeated Game game = 208117482;
+
+            message field234686954_type {
+
+              message field1_type {
+                string field1 = 1;
+
+                message field2_type {
+                  int64 field2 = 2;
+                }
+
+                field2_type field2 = 2;
+              }
+
+              field1_type field1 = 1;
+            }
+
+            field234686954_type field234686954 = 234686954;
+          }
+
+          field1_type field1 = 1;
+        }
+
+        PlayedGames played_games = 5;
+
+        message Achievements {
+
+          message field1_type {
+
+            message field3_type {
+
+              message field1_type {
+
+                message Achievement {
+
+                  message field7_type {
+
+                    message field1_type {
+
+                      message Details {
+                        string title = 1;
+                        string description = 2;
+                        int64 xp = 3;
+                        fixed32 id = 4;
+                        string icon_url = 5;
+                        string game_id = 6;
+                        int64 timestamp = 7;
+                        int64 field8 = 8;
+                        int64 is_secret = 12;
+                      }
+
+                      Details details = 306286962;
+                    }
+
+                    field1_type field1 = 1;
+                  }
+
+                  field7_type field7 = 7;
+                }
+
+                repeated Achievement achievement = 303956152;
+              }
+
+              field1_type field1 = 1;
+
+              message field2_type {
+
+                message field1_type {
+
+                  message Page {
+                    string player_id = 1;
+                    string next_page_token = 3;
+                  }
+
+                  Page page = 303354831;
+                }
+
+                field1_type field1 = 1;
+              }
+
+              field2_type field2 = 2;
+            }
+
+            field3_type field3 = 3;
+            int64 field4 = 4;
+          }
+
+          field1_type field1 = 1;
+        }
+
+        Achievements achievements = 6;
+      }
+
+      repeated Section section = 2;
+    }
+
+    Results results = 303102213;
+  }
+
+  field1_type field1 = 1;
+}
+

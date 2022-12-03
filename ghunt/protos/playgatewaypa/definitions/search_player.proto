@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+
+message PlayerSearchProto {
+
+    message SearchForm {
+  
+        message Query {
+            string text = 1;
+        }
+  
+      Query query = 233436060;
+    }
+  
+    SearchForm search_form = 2;
+}

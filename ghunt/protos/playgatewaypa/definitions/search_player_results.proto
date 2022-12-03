@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+
+message PlayerSearchResultsProto {
+
+  message field1_type {
+
+    message Results {
+
+      message field1_type {
+
+        message field1_type {
+
+          message Player {
+
+            message Avatar {
+              string url = 1;
+            }
+
+            Avatar avatar = 3;
+
+            message Account {
+              string id = 1;
+              string name = 3;
+            }
+
+            Account account = 6;
+          }
+
+          repeated Player player = 232977370;
+        }
+
+        field1_type field1 = 1;
+      }
+
+      field1_type field1 = 1;
+    }
+
+    Results results = 192500038;
+  }
+
+  field1_type field1 = 1;
+}
+

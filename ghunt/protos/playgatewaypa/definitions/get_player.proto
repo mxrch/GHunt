@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+
+message GetPlayerProto {
+
+    message Form {
+  
+        message Query {
+            string id = 1;
+        }
+  
+      Query query = 303102213;
+    }
+  
+    Form form = 2;
+}
