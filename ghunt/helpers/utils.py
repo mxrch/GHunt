@@ -8,7 +8,7 @@ from dateutil.parser import isoparse
 from copy import deepcopy
 import jsonpickle
 import json
-
+from __future__ import annotations
 import httpx
 import imagehash
 from io import BytesIO
