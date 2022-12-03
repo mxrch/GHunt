@@ -30,13 +30,13 @@ class GHuntCreds(SmartObj):
         self.cookies: Dict[str, str] = {}
         self.osids: Dict[str, str] = {}
         self.android: AndroidCreds = AndroidCreds()
-        print('creds_path:'+creds_path)
         if not creds_path:
             cwd_path = Path().home()
             ghunt_folder = pathlib.Path(__file__).parent.resolve()
             # if not ghunt_folder.is_dir():
             #     ghunt_folder.mkdir(parents=True, exist_ok=True)
             creds_path = ghunt_folder / "creds.m"
+        print('creds_path:'+creds_path)
         self.creds_path: str = creds_path
 
     def are_creds_loaded(self) -> bool:
