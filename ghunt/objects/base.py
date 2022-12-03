@@ -1,3 +1,4 @@
+import logging
 import pathlib
 from typing import *
 from pathlib import Path
@@ -29,7 +30,7 @@ class GHuntCreds(SmartObj):
         self.cookies: Dict[str, str] = {}
         self.osids: Dict[str, str] = {}
         self.android: AndroidCreds = AndroidCreds()
-
+        print('creds_path:'+creds_path)
         if not creds_path:
             cwd_path = Path().home()
             ghunt_folder = pathlib.Path(__file__).parent.resolve()
@@ -48,6 +49,7 @@ class GHuntCreds(SmartObj):
                 with open(self.creds_path, "r", encoding="utf-8") as f:
                     raw = f.read()
                 data = json.loads(base64.b64decode(raw).decode())
+                print('data:'+data)
 
                 self.cookies = data["cookies"]
                 self.osids = data["osids"]
