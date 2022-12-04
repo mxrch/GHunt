@@ -30,7 +30,8 @@ async def hunt(as_client: httpx.AsyncClient, email_address: str, json_file: bool
     vision_api = VisionHttp(ghunt_creds)
     is_found, target = await people_pa.people_lookup(as_client, email_address, params_template="max_details")
     if not is_found:
-        exit("\n[-] The target wasn't found.")
+        return
+        # exit("\n[-] The target wasn't found.")
 
     if json_file:
         json_results = {}
