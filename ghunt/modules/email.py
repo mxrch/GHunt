@@ -108,16 +108,16 @@ async def hunt(as_client: httpx.AsyncClient, email_address: str, json_file: bool
     gb.rc.print("\n🎮 Play Games data", style="deep_pink2")
 
     player_results = await playgames.search_player(ghunt_creds, as_client, email_address)
-    # if player_results:
-    #     player_candidate = player_results[0]
-    #     print("\n[+] Found player profile !")
-    #     print(f"\nUsername : {player_candidate.name}")
-    #     print(f"Player ID : {player_candidate.id}")
-    #     print(f"Avatar : {player_candidate.avatar_url}")
-    #     _, player = await playgames.get_player(ghunt_creds, as_client, player_candidate.id)
-    #     playgames.output(player)
-    # else:
-    #     print("\n[-] No player profile found.")
+    if player_results:
+        player_candidate = player_results[0]
+        print("\n[+] Found player profile !")
+        print(f"\nUsername : {player_candidate.name}")
+        print(f"Player ID : {player_candidate.id}")
+        print(f"Avatar : {player_candidate.avatar_url}")
+        _, player = await playgames.get_player(ghunt_creds, as_client, player_candidate.id)
+        playgames.output(player)
+    else:
+        print("\n[-] No player profile found.")
 
     gb.rc.print("\n🗺️ Maps data", style="green4")
 
