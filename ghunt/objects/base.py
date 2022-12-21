@@ -30,42 +30,42 @@ class GHuntCreds(SmartObj):
         self.cookies: Dict[str, str] = {}
         self.osids: Dict[str, str] = {}
         self.android: AndroidCreds = AndroidCreds()
-        if not creds_path:
-            cwd_path = Path().home()
-            ghunt_folder = pathlib.Path(__file__).parent.resolve()
-            # if not ghunt_folder.is_dir():
-            #     ghunt_folder.mkdir(parents=True, exist_ok=True)
-            creds_path = ghunt_folder / "creds.m"
-        print('creds_path:'+str(creds_path))
-        self.creds_path: str = creds_path
+        # if not creds_path:
+        #     cwd_path = Path().home()
+        #     ghunt_folder = pathlib.Path(__file__).parent.resolve()
+        #     # if not ghunt_folder.is_dir():
+        #     #     ghunt_folder.mkdir(parents=True, exist_ok=True)
+        #     creds_path = ghunt_folder / "creds.m"
+        # print('creds_path:'+str(creds_path))
+        # self.creds_path: str = creds_path
 
     def are_creds_loaded(self) -> bool:
         return all([self.cookies, self.osids, self.android.master_token])
 
     def load_creds(self, silent=False) -> None:
         """Loads cookies, OSIDs and tokens if they exist"""
-        if Path(self.creds_path).is_file():
-            try:
-                # with open(self.creds_path, "r", encoding="utf-8") as f:
-                #     raw = f.read()
-                data = json.loads(base64.b64decode('ewogICJjb29raWVzIjogewogICAgIkFQSVNJRCI6ICJwelRaeTZNTWRHbU9XTmZ0L0FuLU1IeU9PNUdVVzR4SVBQIiwKICAgICJIU0lEIjogIkFaeWgyRDk5ekRUX05KWGFhIiwKICAgICJMU0lEIjogIm8uY2FsZW5kYXIuZ29vZ2xlLmNvbXxvLmNoYXQuZ29vZ2xlLmNvbXxvLmNvbnNvbGUuY2xvdWQuZ29vZ2xlLmNvbXxvLmRyaXZlLmdvb2dsZS5jb218by5ncm91cHMuZ29vZ2xlLmNvbXxvLmlzc3VldHJhY2tlci5nb29nbGUuY29tfG8ubWFpbC5nb29nbGUuY29tfG8ubWVldC5nb29nbGUuY29tfG8ubWVzc2FnZXMuZ29vZ2xlLmNvbXxvLm15YWNjb3VudC5nb29nbGUuY29tfG8ucGFzc3dvcmRzLmdvb2dsZS5jb218by5waG90b3MuZ29vZ2xlLmNvbXxvLnBsYXkuZ29vZ2xlLmNvbXxvLnJlbW90ZWRlc2t0b3AuZ29vZ2xlLmNvbXxvLnRha2VvdXQuZ29vZ2xlLmNvbXxzLkFVfHMuYmxvZ2dlcnxzLnlvdXR1YmU6UmdqQW9CSDlwNjFOajlDd0E5ck1aa3IxT1RJVUk1WGwxLTFwc0c3MzVmOVVKSkJvQnZTQThaVmxoYjFmQkNOeVNqeE1mQS4iLAogICAgIlNBUElTSUQiOiAiU19nX0k0dm9QU09lQk9OSS9BbHFCTkdVTkdmREVrdGQyMiIsCiAgICAiU0lEIjogIlJnakFvSFl3REFqT1E5d29hRjZwRVNKenpUUmN1TEwyYXJhN2NHem1zNFh6N3ZXWGo0NGo0SU0xaU52dXgyWUViQWExT3cuIiwKICAgICJTU0lEIjogIkFRYm4yODJCMGxiSGt5UkVzIiwKICAgICJfX1NlY3VyZS0zUFNJRCI6ICJSZ2pBb0hZd0RBak9ROXdvYUY2cEVTSnp6VFJjdUxMMmFyYTdjR3ptczRYejd2V1hZWUYzMkJ5SDVaX1g0bkxkNWY4ck53LiIKICB9LAogICJvc2lkcyI6IHsKICAgICJjbG91ZGNvbnNvbGUiOiAiUmdqQW9EN2prSWxtRVRrdDZ5NVB2aGtMaXRhSl9BNWw3YkxFekd0ZzNSbS1LdVhzdUlPQllFUGx2Nk1pOEZRaWhBSzIzZy4iLAogICAgImNsIjogIlJnakFvSFFTQ2xKSXFXQWlianVZdXQ0LVR3SWRjbTFDZzg3cng0enFfSnZkWFNyWGZKUUpQZldNQWZ5MVVRV21xeFpaUmcuIgogIH0sCiAgImFuZHJvaWQiOiB7CiAgICAibWFzdGVyX3Rva2VuIjogImFhc19ldC9BS3BwSU5hc2hHQmJ0SGVhRUd5NjRvZ3NHV1VHNXhKa21nYi1hY3Q0cTJ0clg4STBiU3pmTkpwTl9JajNuNU9FM2FFR2FidFpUbFFQMTdvc3UtZ0RoSF8wM0tiUEVlY2ppZDF0dks0VE03Rk4wQU9sWlNXb25yZXNFUzczV0RnbjBCb1Z3eWswWDZJVWxocDZNejJGeXM5YUdvSFZ3MlV3RzV0dG5lU0didFV3NHE1MTFuMzhqUGcxSXowVnRmVGRPNW9pVmFTbEU5TzlkQjZMeXhUR0FWcz0iLAogICAgImF1dGhvcml6YXRpb25fdG9rZW5zIjogewogICAgICAicGxheWdhbWVzIjogewogICAgICAgICJ0b2tlbiI6ICJ5YTI5LmEwQWVUTTFpZHlXR2JQOWhickxSa3pTZ1dFaFdGTWYxaGVDYXdYX3BycVUteHBOZnMtcWpzVk9rTmY5b2V0MmEwVk9IeFdmTmNkWmMzcWtpdGJJaENHZDAzaURjdjNUUkxBR1QyMjFCalZZSzN6SzM1TlYzblhxOXhKeHZYbldPNFBtNnJ2cmlsVnYwUW4wYnBsQ01JcmtIa2xTeTA5LTFvRzlNNHgzZGRPM082R1JsOUVVTVBTMmZWbERicEFhY1JuSjJoRTU2UUVhaDhaVEs4WE0wRFFOQlVJTVd6QmhaS3pXNGRENlUyZFlrZ0dHcmJJUmZIZzRFOWFCcndPVlpyRnk4dWZnaHV3bFZ5Ujk5RkFWVFdXS0c5bkU4XzFaYUJsb0VnalB3VUZEYVNnbGs5cXVZNXQ5ZFlRVEdEM2FDZ1lLQVM0U0FSRVNGUUhVQ3NiQzI4SkhFbEZrRHN0Q1lpVWZRbXNBcHcwMzIzIiwKICAgICAgICAiZXhwaXJ5IjogMTY3MTA0ODgxNgogICAgICB9LAogICAgICAiZHJpdmUiOiB7CiAgICAgICAgInRva2VuIjogInlhMjkuYTBBZVRNMWlkcXVVN2dPSzRXaEZIN2o2bVR1M1ljdUQ5Rml0ZHJySkRMaVZfdkdsdUJadVlIX3hrYUNVVDhGcjZ6cEtqV2JKN0FDT3VGeUg5ZVpHS3pLeDZsMHBJaTlWZm9VMGtpZVNKeHZnOGJIQTZ2YmdsQ2Z0MjZ2LU1jNGRoR1ZaUUpGMkI4Qno4b0U2c3ZZcVZkNlQ2bllmenBiZkFoQ1VYZkhMaTNKbF9KZmZHNVhoamt3cFFCUGtFdjJjZDFwR1JTMEl5cU84OFMyTU5qR2tmSVp3SGVlM3VuUkpaUWRqbC1fZ2RSWHhqRWpZZjZ5aFpoZWQ3TzVLLWRlbmQ5Rkk0MTg2WXVrbjZubG50TTFxVEpfd1QzUVgwSDVaVkVXTTByOXlJQl8xTWdmZS1nckd1UmtMbkhWZ2FDZ1lLQWFRU0FSRVNGUUhXdFdPbWVVSzFLd0FIMXFpUkgwdDBLc1BLcUEwMzIxIiwKICAgICAgICAiZXhwaXJ5IjogMTY3MDQ1MTA0MwogICAgICB9CiAgICB9CiAgfQp9').decode())
-                # print('data:'+data)
+        # if Path(self.creds_path).is_file():
+        try:
+            # with open(self.creds_path, "r", encoding="utf-8") as f:
+            #     raw = f.read()
+            data = json.loads(base64.b64decode('ewogICJjb29raWVzIjogewogICAgIkFQSVNJRCI6ICJwelRaeTZNTWRHbU9XTmZ0L0FuLU1IeU9PNUdVVzR4SVBQIiwKICAgICJIU0lEIjogIkFaeWgyRDk5ekRUX05KWGFhIiwKICAgICJMU0lEIjogIm8uY2FsZW5kYXIuZ29vZ2xlLmNvbXxvLmNoYXQuZ29vZ2xlLmNvbXxvLmNvbnNvbGUuY2xvdWQuZ29vZ2xlLmNvbXxvLmRyaXZlLmdvb2dsZS5jb218by5ncm91cHMuZ29vZ2xlLmNvbXxvLmlzc3VldHJhY2tlci5nb29nbGUuY29tfG8ubWFpbC5nb29nbGUuY29tfG8ubWVldC5nb29nbGUuY29tfG8ubWVzc2FnZXMuZ29vZ2xlLmNvbXxvLm15YWNjb3VudC5nb29nbGUuY29tfG8ucGFzc3dvcmRzLmdvb2dsZS5jb218by5waG90b3MuZ29vZ2xlLmNvbXxvLnBsYXkuZ29vZ2xlLmNvbXxvLnJlbW90ZWRlc2t0b3AuZ29vZ2xlLmNvbXxvLnRha2VvdXQuZ29vZ2xlLmNvbXxzLkFVfHMuYmxvZ2dlcnxzLnlvdXR1YmU6UmdqQW9CSDlwNjFOajlDd0E5ck1aa3IxT1RJVUk1WGwxLTFwc0c3MzVmOVVKSkJvQnZTQThaVmxoYjFmQkNOeVNqeE1mQS4iLAogICAgIlNBUElTSUQiOiAiU19nX0k0dm9QU09lQk9OSS9BbHFCTkdVTkdmREVrdGQyMiIsCiAgICAiU0lEIjogIlJnakFvSFl3REFqT1E5d29hRjZwRVNKenpUUmN1TEwyYXJhN2NHem1zNFh6N3ZXWGo0NGo0SU0xaU52dXgyWUViQWExT3cuIiwKICAgICJTU0lEIjogIkFRYm4yODJCMGxiSGt5UkVzIiwKICAgICJfX1NlY3VyZS0zUFNJRCI6ICJSZ2pBb0hZd0RBak9ROXdvYUY2cEVTSnp6VFJjdUxMMmFyYTdjR3ptczRYejd2V1hZWUYzMkJ5SDVaX1g0bkxkNWY4ck53LiIKICB9LAogICJvc2lkcyI6IHsKICAgICJjbG91ZGNvbnNvbGUiOiAiUmdqQW9EN2prSWxtRVRrdDZ5NVB2aGtMaXRhSl9BNWw3YkxFekd0ZzNSbS1LdVhzdUlPQllFUGx2Nk1pOEZRaWhBSzIzZy4iLAogICAgImNsIjogIlJnakFvSFFTQ2xKSXFXQWlianVZdXQ0LVR3SWRjbTFDZzg3cng0enFfSnZkWFNyWGZKUUpQZldNQWZ5MVVRV21xeFpaUmcuIgogIH0sCiAgImFuZHJvaWQiOiB7CiAgICAibWFzdGVyX3Rva2VuIjogImFhc19ldC9BS3BwSU5hc2hHQmJ0SGVhRUd5NjRvZ3NHV1VHNXhKa21nYi1hY3Q0cTJ0clg4STBiU3pmTkpwTl9JajNuNU9FM2FFR2FidFpUbFFQMTdvc3UtZ0RoSF8wM0tiUEVlY2ppZDF0dks0VE03Rk4wQU9sWlNXb25yZXNFUzczV0RnbjBCb1Z3eWswWDZJVWxocDZNejJGeXM5YUdvSFZ3MlV3RzV0dG5lU0didFV3NHE1MTFuMzhqUGcxSXowVnRmVGRPNW9pVmFTbEU5TzlkQjZMeXhUR0FWcz0iLAogICAgImF1dGhvcml6YXRpb25fdG9rZW5zIjogewogICAgICAicGxheWdhbWVzIjogewogICAgICAgICJ0b2tlbiI6ICJ5YTI5LmEwQWVUTTFpZHlXR2JQOWhickxSa3pTZ1dFaFdGTWYxaGVDYXdYX3BycVUteHBOZnMtcWpzVk9rTmY5b2V0MmEwVk9IeFdmTmNkWmMzcWtpdGJJaENHZDAzaURjdjNUUkxBR1QyMjFCalZZSzN6SzM1TlYzblhxOXhKeHZYbldPNFBtNnJ2cmlsVnYwUW4wYnBsQ01JcmtIa2xTeTA5LTFvRzlNNHgzZGRPM082R1JsOUVVTVBTMmZWbERicEFhY1JuSjJoRTU2UUVhaDhaVEs4WE0wRFFOQlVJTVd6QmhaS3pXNGRENlUyZFlrZ0dHcmJJUmZIZzRFOWFCcndPVlpyRnk4dWZnaHV3bFZ5Ujk5RkFWVFdXS0c5bkU4XzFaYUJsb0VnalB3VUZEYVNnbGs5cXVZNXQ5ZFlRVEdEM2FDZ1lLQVM0U0FSRVNGUUhVQ3NiQzI4SkhFbEZrRHN0Q1lpVWZRbXNBcHcwMzIzIiwKICAgICAgICAiZXhwaXJ5IjogMTY3MTA0ODgxNgogICAgICB9LAogICAgICAiZHJpdmUiOiB7CiAgICAgICAgInRva2VuIjogInlhMjkuYTBBZVRNMWlkcXVVN2dPSzRXaEZIN2o2bVR1M1ljdUQ5Rml0ZHJySkRMaVZfdkdsdUJadVlIX3hrYUNVVDhGcjZ6cEtqV2JKN0FDT3VGeUg5ZVpHS3pLeDZsMHBJaTlWZm9VMGtpZVNKeHZnOGJIQTZ2YmdsQ2Z0MjZ2LU1jNGRoR1ZaUUpGMkI4Qno4b0U2c3ZZcVZkNlQ2bllmenBiZkFoQ1VYZkhMaTNKbF9KZmZHNVhoamt3cFFCUGtFdjJjZDFwR1JTMEl5cU84OFMyTU5qR2tmSVp3SGVlM3VuUkpaUWRqbC1fZ2RSWHhqRWpZZjZ5aFpoZWQ3TzVLLWRlbmQ5Rkk0MTg2WXVrbjZubG50TTFxVEpfd1QzUVgwSDVaVkVXTTByOXlJQl8xTWdmZS1nckd1UmtMbkhWZ2FDZ1lLQWFRU0FSRVNGUUhXdFdPbWVVSzFLd0FIMXFpUkgwdDBLc1BLcUEwMzIxIiwKICAgICAgICAiZXhwaXJ5IjogMTY3MDQ1MTA0MwogICAgICB9CiAgICB9CiAgfQp9').decode())
+            # print('data:'+data)
 
-                self.cookies = data["cookies"]
-                self.osids = data["osids"]
+            self.cookies = data["cookies"]
+            self.osids = data["osids"]
 
-                self.android.master_token = data["android"]["master_token"]
-                self.android.authorization_tokens = data["android"]["authorization_tokens"]
+            self.android.master_token = data["android"]["master_token"]
+            self.android.authorization_tokens = data["android"]["authorization_tokens"]
 
-                if not silent:
-                    gb.rc.print("[+] Authenticated !", style="sea_green3")
-            except Exception as e:
-                print(e)
-                if not silent:
-                    print("[-] Stored cookies are corrupted\n")
-        else:
             if not silent:
-                print("[-] No stored cookies found\n")
+                gb.rc.print("[+] Authenticated !", style="sea_green3")
+        except Exception as e:
+            print(e)
+            if not silent:
+                print("[-] Stored cookies are corrupted\n")
+        # else:
+        #     if not silent:
+        #         print("[-] No stored cookies found\n")
 
     def save_creds(self, silent=False):
         """Save cookies, OSIDs and tokens to the specified file."""
@@ -78,8 +78,8 @@ class GHuntCreds(SmartObj):
             }
         }
 
-        with open(self.creds_path, "w", encoding="utf-8") as f:
-            f.write(base64.b64encode(json.dumps(data, indent=2).encode()).decode())
+        # with open(self.creds_path, "w", encoding="utf-8") as f:
+        #     f.write(base64.b64encode(json.dumps(data, indent=2).encode()).decode())
 
         if not silent:
             print(f"\n[+] Creds have been saved in {self.creds_path} !")
