@@ -23,7 +23,7 @@ async def hunt(as_client: httpx.AsyncClient, email_address: str, json_file: bool
 
     if not auth.check_cookies(ghunt_creds.cookies):
         return
-        exit("[-] Seems like the cookies are invalid. Exiting...")
+        # exit("[-] Seems like the cookies are invalid. Exiting...")
 
     #gb.rc.print("[+] Target found !", style="sea_green3")
 
