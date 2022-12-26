@@ -40,7 +40,8 @@ async def hunt(as_client: httpx.AsyncClient, file_id: str, json_file: bool=None)
         exit("[-] Creds aren't loaded. Are you logged in ?")
 
     if not auth.check_cookies(ghunt_creds.cookies):
-        exit("[-] Seems like the cookies are invalid. Exiting...")
+        return
+        # exit("[-] Seems like the cookies are invalid. Exiting...")
 
     drive = DriveHttp(ghunt_creds)
     file_found, file = await drive.get_file(as_client, file_id)

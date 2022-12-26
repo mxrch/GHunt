@@ -19,7 +19,8 @@ async def hunt(as_client: httpx.AsyncClient, gaia_id: str, json_file: bool=None)
     ghunt_creds.load_creds()
 
     if not auth.check_cookies(ghunt_creds.cookies):
-        exit("[-] Seems like the cookies are invalid. Exiting...")
+        return
+        # exit("[-] Seems like the cookies are invalid. Exiting...")
 
     #gb.rc.print("\n[+] Target found !", style="spring_green3")
 
