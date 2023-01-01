@@ -1,5 +1,6 @@
 types_translations = {
     'airport': 'Airport',
+    'atm': 'ATM',
     'bar': 'Bar',
     'bank_intl': 'Bank',
     'bus': 'Bus',
