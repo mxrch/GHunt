@@ -407,15 +407,15 @@ def output(err: str, stats: Dict[str, int], reviews: List[MapsReview], photos: L
 
     geolocator = Nominatim(user_agent="nominatim")
 
-    confidence, locations = calculate_probable_location(geolocator, reviews_and_photos, gb.config.gmaps_radius)
-    print(f"\n[+] Probable location (confidence => {confidence}) :")
+    # confidence, locations = calculate_probable_location(geolocator, reviews_and_photos, gb.config.gmaps_radius)
+    # print(f"\n[+] Probable location (confidence => {confidence}) :")
 
-    loc_names = []
-    for loc in locations:
-        loc_names.append(
-            f"- {loc['avg']['town']}, {loc['avg']['country']}"
-        )
+    # loc_names = []
+    # for loc in locations:
+    #     loc_names.append(
+    #         f"- {loc['avg']['town']}, {loc['avg']['country']}"
+    #     )
 
-    loc_names = set(loc_names)  # delete duplicates
-    for loc in loc_names:
-        print(loc)
+    # loc_names = set(loc_names)  # delete duplicates
+    # for loc in loc_names:
+    #     print(loc)
