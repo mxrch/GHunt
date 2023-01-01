@@ -74,11 +74,12 @@ class GAPI(SmartObj):
         for ext_type,ext_value in ext_metadata.items():
             ext_bin_headers = {f"X-Goog-Ext-{k}-{ext_type.title()}":v for k,v in ext_value.items()}
             headers = {**headers, **ext_bin_headers}
-        
+
         if not is_headers_syntax_good(headers):
             raise GHuntCorruptedHeadersError(f"The provided headers when loading the endpoint seems corrupted, please check it : {headers}")
 
         self.loaded_endpoints[endpoint_name] = EndpointConfig(headers, self.cookies)
+
 
     async def _check_and_gen_authorization_token(self, as_client: httpx.AsyncClient, creds: GHuntCreds):
         async with self.gen_token_lock:
