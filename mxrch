@@ -1,0 +1,130 @@
+
+mxrch
+/
+Caza
+Público
+🕵️‍♂️Marco ofensivo de Google.
+
+Licencia
+ Ver licencia
+ 13,2k estrellas 1,1k horquillas 
+Código
+Asuntos
+6
+Solicitudes de extracción
+2
+Discusiones
+Comportamiento
+Proyectos
+wiki
+Seguridad
+Perspectivas
+mxrch/GHunt
+Última confirmación
+@mxrch
+mxrch
+…
+la semana pasada
+Estadísticas de Git
+archivos
+LÉAME.md
+
+
+
+Versión mínima de Python
+
+😊Descripción
+GHunt (v2) es un marco ofensivo de Google, diseñado para evolucionar de manera eficiente.
+Actualmente está enfocado en OSINT, pero es posible cualquier uso relacionado con Google.
+
+Características :
+
+Módulos y uso de la CLI
+Uso de la biblioteca de Python
+Totalmente asíncrono
+exportación JSON
+Extensión del navegador para facilitar el inicio de sesión
+✔️Requisitos
+Pitón >= 3.10
+⚙️Instalación
+$ pip3 install pipx
+$ pipx ensurepath
+$ pipx install ghunt
+Automáticamente usará venvs para evitar conflictos de dependencia con otros proyectos.
+
+💃Uso
+Acceso
+Primero, inicie el oyente haciendo ghunt loginy elija entre 1 de los 2 primeros métodos:
+
+$ ghunt login
+
+[1] (Companion) Put GHunt on listening mode (currently not compatible with docker)
+[2] (Companion) Paste base64-encoded cookies
+[3] Enter manually all cookies
+
+Choice =>
+Luego, use GHunt Companion para completar el inicio de sesión.
+
+La extensión está disponible en las siguientes tiendas:
+
+Firefox   Cromo
+
+Módulos
+Entonces, ganancia:
+
+usage: ghunt [-h] {login,email,gaia,drive} ...
+
+positional arguments:
+  {login,email,gaia,drive}
+    login   (--clean)         Authenticate GHunt to Google.
+    email   (--json)          Get information on an email address.
+    gaia    (--json)          Get information on a Gaia ID.
+    drive   (--json)          Get information on a Drive file or folder.
+
+options:
+  -h, --help            show this help message and exit
+📄¡También puede usar --json con correo electrónico, gaia y módulos de unidades para exportar en JSON! Ejemplo :
+
+$ ghunt email <email_address> --json user_data.json
+Que te diviertas🥰💞
+
+🧑‍💻Desarrolladores
+📕Empecé a escribir algunos documentos aquí y ejemplos aquí , ¡siéntete libre de contribuir!
+
+Para usar GHunt como lib, no puede usar pipx porque usa un venv.
+Entonces deberías instalar GHunt con pip:
+
+$ pip3 install ghunt
+¡Y ahora, deberías poder hacerlo import ghunten tus proyectos!
+Ahora puedes jugar con los ejemplos .
+
+📮Detalles
+Descargo de responsabilidad obvio
+Esta herramienta es solo para fines educativos, no soy responsable de su uso.
+
+Descargo de responsabilidad menos obvio
+Este proyecto está bajo Licencia AGPL , y hay que respetarlo.
+Úselo solo en investigaciones personales, criminales, pentesting o proyectos de código abierto.
+
+Gracias
+novitae por ser mi colega Python
+¡ Toda la gente de Malfrats Industries y de otros lugares para la prueba beta!
+El equipo de HideAndSec💗(blog: https://hideandsec.sh )
+Med Amine Jouini por su hermoso rediseño del logotipo de Google, en el que me inspiré mucho .
+Patrocinadores
+¡Gracias a estas increíbles personas por apoyarme!
+
+elweth-seg  avispa  mucho  0xN0x  C3n7ral051nt4g3ncy  rayanlecat  ajmeese7  im-hanzou  GONZOSint  gingeleski  
+
+¿Te gusta mi trabajo?
+¡Patrocíname en GitHub!🤗
+
+Lanzamientos 1
+v2.0.1
+Último
+el 3 de diciembre de 2022
+Patrocine este proyecto
+@mxrch
+mxrch mxrch
+https://www.blockchain.com/btc/address/362MrYHLLMzWBbvBG7K5yzF18ouxMZeNge
+Más información sobre los patrocinadores de GitHub
