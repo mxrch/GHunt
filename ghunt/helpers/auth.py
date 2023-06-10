@@ -14,12 +14,14 @@ from ghunt.helpers.knowledge import get_domain_of_service, get_package_sig
 from ghunt.helpers.auth import *
 
 
-async def android_master_auth(as_client: httpx.AsyncClient, oauth_token: str) -> Tuple[str, List[str], str, str]:
+async def android_master_auth(
+    as_client: httpx.AsyncClient, oauth_token: str
+) -> Tuple[str, List[str], str, str]:
     """
-        Takes an oauth_token to perform an android authentication
-        to get the master token and other informations.
+    Takes an oauth_token to perform an android authentication
+    to get the master token and other informations.
 
-        Returns the master token, connected services, account email and account full name.
+    Returns the master token, connected services, account email and account full name.
     """
     data = {
         "Token": oauth_token,
@@ -27,23 +29,39 @@ async def android_master_auth(as_client: httpx.AsyncClient, oauth_token: str) ->
         "get_accountid": 1,
         "ACCESS_TOKEN": 1,
         "add_account": 1,
-        "callerSig": "38918a453d07199354f8b19af05ec6562ced5788"
+        "callerSig": "38918a453d07199354f8b19af05ec6562ced5788",
     }
 
     req = await as_client.post("https://android.googleapis.com/auth", data=data)
     resp = parse_oauth_flow_response(req.text)
-    for keyword in ["Token", "Email", "services", "firstName", "lastName"]:
-        if keyword not in resp:
-            raise GHuntAndroidMasterAuthError(f'Expected "{keyword}" in the response of the Android Master Authentication.\nThe oauth_token may be expired.')
-    return resp["Token"], resp["services"].split(","), resp["Email"], f'{resp["firstName"]} {resp["lastName"]}'
+    required_keywords = ["Token", "Email", "services", "firstName", "lastName"]
+    missing_keywords = [keyword for keyword in required_keywords if keyword not in resp]
+    if missing_keywords:
+        missing_keywords_str = ", ".join(f'"{keyword}"' for keyword in missing_keywords)
+        error_message = (
+            f"Expected {missing_keywords_str} in the response of the Android Master Authentication.\n"
+            "The oauth_token may be expired."
+        )
+        raise GHuntAndroidMasterAuthError(error_message)
+    return (
+        parsed_response["Token"],
+        parsed_response["services"].split(","),
+        parsed_response["Email"],
+        f'{parsed_response["firstName"]} {parsed_response["lastName"]}',
+    )
 
-async def android_oauth_app(as_client: httpx.AsyncClient, master_token: str,
-                package_name: str, scopes: List[str]) -> Tuple[str, List[str], int]:
+
+async def android_oauth_app(
+    as_client: httpx.AsyncClient,
+    master_token: str,
+    package_name: str,
+    scopes: List[str],
+) -> Tuple[str, List[str], int]:
     """
-        Uses the master token to ask for an authorization token,
-        with specific scopes and app package name.
+    Uses the master token to ask for an authorization token,
+    with specific scopes and app package name.
 
-        Returns the authorization token, granted scopes and expiry UTC timestamp.
+    Returns the authorization token, granted scopes and expiry UTC timestamp.
     """
     client_sig = get_package_sig(package_name)
 
@@ -51,37 +69,54 @@ async def android_oauth_app(as_client: httpx.AsyncClient, master_token: str,
         "app": package_name,
         "service": f"oauth2:{' '.join(scopes)}",
         "client_sig": client_sig,
-        "Token": master_token
+        "Token": master_token,
     }
 
     req = await as_client.post("https://android.googleapis.com/auth", data=data)
     resp = parse_oauth_flow_response(req.text)
     for keyword in ["Expiry", "grantedScopes", "Auth"]:
         if keyword not in resp:
-            raise GHuntAndroidAppOAuth2Error(f'Expected "{keyword}" in the response of the Android App OAuth2 Authentication.\nThe master token may be revoked.')
+            raise GHuntAndroidAppOAuth2Error(
+                f'Expected "{keyword}" in the response of the Android App OAuth2 Authentication.\nThe master token may be revoked.'
+            )
     return resp["Auth"], resp["grantedScopes"].split(" "), int(resp["Expiry"])
+
 
 async def gen_osids(cookies: Dict[str, str], osids: List[str]) -> Dict[str, str]:
     """
-        Generate OSIDs of given services names,
-        contained in the "osids" dict argument.
+    Generate OSIDs of given services names,
+    contained in the "osids" dict argument.
     """
     generated_osids = {}
     for service in osids:
         sample_cookies = deepcopy(cookies)
         domain = get_domain_of_service(service)
-        req = httpx.get(f"https://accounts.google.com/ServiceLogin?service={service}&osid=1&continue=https://{domain}/&followup=https://{domain}/&authuser=0",
-                        cookies=cookies, headers=gb.config.headers)
+        req = httpx.get(
+            f"https://accounts.google.com/ServiceLogin?service={service}&osid=1&continue=https://{domain}/&followup=https://{domain}/&authuser=0",
+            cookies=cookies,
+            headers=gb.config.headers,
+        )
 
         for cookie in ["__Host-GAPS", "SIDCC", "__Secure-3PSIDCC"]:
-           sample_cookies[cookie] = req.cookies[cookie]
+            sample_cookies[cookie] = req.cookies[cookie]
 
-        body = bs(req.text, 'html.parser')
-        
-        params = {x.attrs["name"]:x.attrs["value"] for x in body.find_all("input", {"type":"hidden"})}
+        body = bs(req.text, "html.parser")
 
-        headers = {**gb.config.headers, **{"Content-Type": "application/x-www-form-urlencoded"}}
-        req = httpx.post(f"https://{domain}/accounts/SetOSID", cookies=cookies, data=params, headers=headers)
+        params = {
+            x.attrs["name"]: x.attrs["value"]
+            for x in body.find_all("input", {"type": "hidden"})
+        }
+
+        headers = {
+            **gb.config.headers,
+            **{"Content-Type": "application/x-www-form-urlencoded"},
+        }
+        req = httpx.post(
+            f"https://{domain}/accounts/SetOSID",
+            cookies=cookies,
+            data=params,
+            headers=headers,
+        )
 
         if not "OSID" in req.cookies:
             raise GHuntOSIDAuthError("[-] No OSID header detected, exiting...")
@@ -90,9 +125,12 @@ async def gen_osids(cookies: Dict[str, str], osids: List[str]) -> Dict[str, str]
 
     return generated_osids
 
+
 def check_cookies(cookies: Dict[str, str]) -> bool:
     """Checks the validity of given cookies."""
-    req = httpx.get("https://docs.google.com", cookies=cookies, headers=gb.config.headers)
+    req = httpx.get(
+        "https://docs.google.com", cookies=cookies, headers=gb.config.headers
+    )
     if req.status_code != 307:
         return False
 
@@ -102,41 +140,54 @@ def check_cookies(cookies: Dict[str, str]) -> bool:
 
     return True
 
+
 def check_osids(cookies: Dict[str, str], osids: Dict[str, str]) -> bool:
     """Checks the validity of given OSIDs."""
     for service in osids:
         domain = get_domain_of_service(service)
         cookies_with_osid = inject_osid(cookies, osids, service)
         wanted = ["authuser", "continue", "osidt", "ifkv"]
-        req = httpx.get(f"https://accounts.google.com/ServiceLogin?service={service}&osid=1&continue=https://{domain}/&followup=https://{domain}/&authuser=0",
-                        cookies=cookies_with_osid, headers=gb.config.headers)
+        req = httpx.get(
+            f"https://accounts.google.com/ServiceLogin?service={service}&osid=1&continue=https://{domain}/&followup=https://{domain}/&authuser=0",
+            cookies=cookies_with_osid,
+            headers=gb.config.headers,
+        )
 
-        body = bs(req.text, 'html.parser')
-        params = [x.attrs["name"] for x in body.find_all("input", {"type":"hidden"})]
+        body = bs(req.text, "html.parser")
+        params = [x.attrs["name"] for x in body.find_all("input", {"type": "hidden"})]
         if not all([param in wanted for param in params]):
             return False
 
     return True
 
+
 async def check_master_token(as_client: httpx.AsyncClient, master_token: str) -> str:
     """Checks the validity of the android master token."""
     try:
-        await android_oauth_app(as_client, master_token, "com.google.android.play.games", ["https://www.googleapis.com/auth/games.firstparty"])
+        await android_oauth_app(
+            as_client,
+            master_token,
+            "com.google.android.play.games",
+            ["https://www.googleapis.com/auth/games.firstparty"],
+        )
     except GHuntAndroidAppOAuth2Error:
         return False
     return True
 
-async def getting_cookies_dialog(cookies: Dict[str, str]) -> Tuple[Dict[str, str], str] :
+
+async def getting_cookies_dialog(cookies: Dict[str, str]) -> Tuple[Dict[str, str], str]:
     """
-        Launch the dialog that asks the user
-        how he want to generate its credentials.
+    Launch the dialog that asks the user
+    how he want to generate its credentials.
     """
-    choices = ("You can facilitate configuring GHunt by using the GHunt Companion extension on Firefox, Chrome, Edge and Opera here :\n"
-                "=> https://github.com/mxrch/ghunt_companion\n\n"
-                "[1] (Companion) Put GHunt on listening mode (currently not compatible with docker)\n"
-                "[2] (Companion) Paste base64-encoded cookies\n"
-                "[3] Enter manually all cookies\n\n"
-                "Choice => ")
+    choices = (
+        "You can facilitate configuring GHunt by using the GHunt Companion extension on Firefox, Chrome, Edge and Opera here :\n"
+        "=> https://github.com/mxrch/ghunt_companion\n\n"
+        "[1] (Companion) Put GHunt on listening mode (currently not compatible with docker)\n"
+        "[2] (Companion) Paste base64-encoded cookies\n"
+        "[3] Enter manually all cookies\n\n"
+        "Choice => "
+    )
 
     choice = input(choices)
     if choice in ["1", "2"]:
