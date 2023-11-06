@@ -33,5 +33,6 @@ types_translations = {
     'worship_hindu': 'Worship Hindu',
     'worship_islam': 'Worship Islam',
     'worship_jewish': 'Worship Jewish',
-    'worship_sikh': 'Worship Sikh'
+    'worship_sikh': 'Worship Sikh',
+    'worship_jain': 'Worship Jain'
 }
