@@ -8,7 +8,7 @@ requirements = [f"{line.split('#egg=')[-1]} @ {line}" if "#egg=" in line else li
 
 setup(
     name='ghunt',
-    version='2.0.3',
+    version='2.0.4',
     packages=find_packages(include=['ghunt', 'ghunt.*']),
     license='AGPL-3.0',
     license_files = ('LICENSE.md'),
