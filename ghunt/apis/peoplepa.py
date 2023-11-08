@@ -57,7 +57,7 @@ class PeoplePaHttp(GAPI):
                 "extension_set.extension_names": [
                     "DYNAMITE_ADDITIONAL_DATA",
                     "DYNAMITE_ORGANIZATION_INFO",
-                    "GPLUS_ADDITIONAL_DATA"
+                    # "GPLUS_ADDITIONAL_DATA"
                 ],
                 "request_mask.include_field.paths": [
                     "person.metadata.best_display_name",
