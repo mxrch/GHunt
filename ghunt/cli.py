@@ -25,6 +25,11 @@ def parse_and_run():
     parser_drive = subparsers.add_parser('drive', help="Get information on a Drive file or folder.")
     parser_drive.add_argument("file_id", help="Example: 1N__vVu4c9fCt4EHxfthUNzVOs_tp8l6tHcMBnpOZv_M")
     parser_drive.add_argument('--json', type=str, help="File to write the JSON output to.")
+    
+    ### YouTube module
+    parser_youtube = subparsers.add_parser('youtube', help="Get information on a YouTube channel (doesn't work with channels created after Google removed IDs from the page source, and relies on the page having been archived by Wayback Machine.")
+    parser_youtube.add_argument("channel_url", help="Example: https://www.youtube.com/@YouTube")
+    parser_youtube.add_argument('--json', type=str, help="File to write the JSON output to.")
 
     ### Parsing
     args = parser.parse_args(args=None if sys.argv[1:] else ['--help'])
@@ -45,3 +50,6 @@ def process_args(args: argparse.Namespace):
         case "drive":
             from ghunt.modules import drive
             trio.run(drive.hunt, None, args.file_id, args.json)
+        case "youtube":
+            from ghunt.modules import youtube
+            trio.run(youtube.hunt, None, args.channel_url, args.json)
