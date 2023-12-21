@@ -1,0 +1,21 @@
+body {
+    max-width: 700px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 1rem;
+    color: var(--bs-emphasis-color);
+    font-weight: bold;
+    font-size: 3em;
+}
+
+a {
+    text-decoration: none;
+}
+
+* {
+    box-shadow: none !important;
+}

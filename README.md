@@ -19,6 +19,7 @@ Features :
 - Fully async
 - JSON export
 - Browser extension to ease login
+- HTTP API
 
 # ✔️ Requirements
 - Python >= 3.10
@@ -57,7 +58,7 @@ The extension is available on the following stores :\
 
 Then, profit :
 ```bash
-usage: ghunt [-h] {login,email,gaia,drive} ...
+usage: ghunt [-h] {login,email,gaia,drive,web} ...
 
 positional arguments:
   {login,email,gaia,drive}
@@ -65,6 +66,7 @@ positional arguments:
     email   (--json)          Get information on an email address.
     gaia    (--json)          Get information on a Gaia ID.
     drive   (--json)          Get information on a Drive file or folder.
+    web     (--api)           Launch web app.
 
 options:
   -h, --help            show this help message and exit
