@@ -131,7 +131,7 @@ async def getting_cookies_dialog(cookies: Dict[str, str]) -> Tuple[Dict[str, str
                 "=> https://github.com/mxrch/ghunt_companion\n\n"
                 "[1] (Companion) Put GHunt on listening mode (currently not compatible with docker)\n"
                 "[2] (Companion) Paste base64-encoded cookies\n"
-                "[3] Enter manually all cookies\n\n"
+                "[3] Enter manually all cookies (currently not supported)\n\n"
                 "Choice => ")
 
     choice = input(choices)
@@ -145,9 +145,10 @@ async def getting_cookies_dialog(cookies: Dict[str, str]) -> Tuple[Dict[str, str
         oauth_token = data["oauth_token"]
 
     elif choice == "3":
-        for name in cookies.keys():
-            cookies[name] = input(f"{name} => ").strip().strip('"')
-        oauth_token = input(f"oauth_token").strip().strip('"')
+        exit("This option is temporary not supported, please use other options. Exiting...")
+        # for name in cookies.keys():
+        #     cookies[name] = input(f"{name} => ").strip().strip('"')
+        # oauth_token = input(f"oauth_token").strip().strip('"')
 
     else:
         exit("Please choose a valid choice. Exiting...")
