@@ -96,10 +96,6 @@ def check_cookies(cookies: Dict[str, str]) -> bool:
     if req.status_code != 307:
         return False
 
-    set_cookies = extract_set_cookies(req)
-    if any([cookie in set_cookies for cookie in cookies]):
-        return False
-
     return True
 
 def check_osids(cookies: Dict[str, str], osids: Dict[str, str]) -> bool:
