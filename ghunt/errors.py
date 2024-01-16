@@ -37,8 +37,14 @@ class GHuntOSIDAuthError(BaseException):
 class GHuntCredsNotLoaded(BaseException):
     pass
 
+class GHuntInvalidSession(BaseException):
+    pass
+
 class GHuntNotAuthenticated(BaseException):
     pass
 
 class GHuntInvalidTarget(BaseException):
+    pass
+
+class GHuntLoginError(BaseException):
     pass

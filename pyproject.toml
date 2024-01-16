@@ -1,0 +1,30 @@
+[project]
+name = "ghunt"
+version = "2.0.5"
+authors = [
+    {name = "mxrch", email = "mxrch.dev@pm.me"},
+]
+description = "An offensive Google framework."
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "AGPL-3.0"}
+classifiers = [
+    "Programming Language :: Python :: 3",
+]
+dynamic = ["dependencies"]
+keywords=["osint", "pentest", "cybersecurity", "investigation", "hideandsec", "malfrats"]
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+
+[project.scripts]
+ghunt = "ghunt.ghunt:main"
+
+[tool.setuptools.packages.find]
+include = ["ghunt", "ghunt.*"]
+
+[project.urls]
+"Homepage" = "https://github.com/mxrch/GHunt"
+"Bug Reports" = "https://github.com/mxrch/GHunt/issues"
+"Funding" = "https://github.com/sponsors/mxrch"
+"Source" = "https://github.com/mxrch/GHunt"

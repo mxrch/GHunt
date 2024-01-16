@@ -2,9 +2,9 @@ from ghunt import globals as gb
 from ghunt.apis.vision import VisionHttp
 
 import httpx
-import trio
 
 from base64 import b64encode
+import asyncio
 
 
 async def detect_face(vision_api: VisionHttp, as_client: httpx.AsyncClient, image_url: str) -> None:
@@ -18,7 +18,7 @@ async def detect_face(vision_api: VisionHttp, as_client: httpx.AsyncClient, imag
         rate_limited, are_faces_found, faces_results = await vision_api.detect_faces(as_client, image_content=encoded_image)
         if not rate_limited:
             break
-        await trio.sleep(0.5)
+        await asyncio.sleep(0.5)
     else:
         exit("\n[-] Vision API keeps rate-limiting.")
 

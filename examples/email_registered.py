@@ -1,5 +1,5 @@
 import httpx
-import trio
+import asyncio
 
 import sys
 
@@ -17,4 +17,4 @@ async def main():
 
     print("Registered on Google :", is_registered)
 
-trio.run(main) # running our async code in a non-async code
+asyncio.run(main()) # running our async code in a non-async code

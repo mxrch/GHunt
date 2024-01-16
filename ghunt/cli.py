@@ -31,17 +31,17 @@ def parse_and_run():
     process_args(args)
 
 def process_args(args: argparse.Namespace):
-    import trio
+    import asyncio
     match args.module:
         case "login":
             from ghunt.modules import login
-            trio.run(login.check_and_login, None, args.clean)
+            asyncio.run(login.check_and_login(None, args.clean))
         case "email":
             from ghunt.modules import email
-            trio.run(email.hunt, None, args.email_address, args.json)
+            asyncio.run(email.hunt(None, args.email_address, args.json))
         case "gaia":
             from ghunt.modules import gaia
-            trio.run(gaia.hunt, None, args.gaia_id, args.json)
+            asyncio.run(gaia.hunt(None, args.gaia_id, args.json))
         case "drive":
             from ghunt.modules import drive
-            trio.run(drive.hunt, None, args.file_id, args.json)
+            asyncio.run(drive.hunt(None, args.file_id, args.json))

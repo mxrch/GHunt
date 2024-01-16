@@ -8,8 +8,9 @@ beautifultable==1.1.0
 beautifulsoup4==4.11.1
 alive-progress==2.4.1
 protobuf==4.21.9
-trio==0.21.0
 autoslot==2021.10.1
 humanize==4.4.0
 inflection==0.5.1
+jsonpickle==2.2.0
+packaging==23.0
 jsonpickle==2.2.0

@@ -1,6 +1,6 @@
 import httpx
-import trio
 
+import asyncio
 import sys
 
 from ghunt.apis.peoplepa import PeoplePaHttp
@@ -35,4 +35,4 @@ async def main():
         else:
             print("Not existing globally.")
 
-trio.run(main) # running our async code in a non-async code
+asyncio.run(main()) # running our async code in a non-async code

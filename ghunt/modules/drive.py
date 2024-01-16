@@ -33,14 +33,7 @@ async def hunt(as_client: httpx.AsyncClient, file_id: str, json_file: bool=None)
     if not as_client:
         as_client = get_httpx_client()
 
-    ghunt_creds = GHuntCreds()
-    ghunt_creds.load_creds()
-
-    if not ghunt_creds.are_creds_loaded():
-        exit("[-] Creds aren't loaded. Are you logged in ?")
-
-    if not auth.check_cookies(ghunt_creds.cookies):
-        exit("[-] Seems like the cookies are invalid. Exiting...")
+    ghunt_creds = await auth.load_and_auth(as_client)
 
     drive = DriveHttp(ghunt_creds)
     file_found, file = await drive.get_file(as_client, file_id)
@@ -52,7 +45,7 @@ async def hunt(as_client: httpx.AsyncClient, file_id: str, json_file: bool=None)
 
     #gb.rc.print(f"[+] {'Folder' if is_folder else 'File'} found !", style="sea_green3")
 
-    gb.rc.print("\n🗃️ Drive properties\n", style="deep_pink4")
+    gb.rc.print("🗃️ Drive properties\n", style="deep_pink4")
         
     print(f"Title : {file.title}")
     print(f"{'Folder' if is_folder else 'File'} ID : {file.id}")

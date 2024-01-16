@@ -15,11 +15,7 @@ async def hunt(as_client: httpx.AsyncClient, gaia_id: str, json_file: bool=None)
     if not as_client:
         as_client = get_httpx_client()
 
-    ghunt_creds = GHuntCreds()
-    ghunt_creds.load_creds()
-
-    if not auth.check_cookies(ghunt_creds.cookies):
-        exit("[-] Seems like the cookies are invalid. Exiting...")
+    ghunt_creds = await auth.load_and_auth(as_client)
 
     #gb.rc.print("\n[+] Target found !", style="spring_green3")
 
@@ -27,7 +23,7 @@ async def hunt(as_client: httpx.AsyncClient, gaia_id: str, json_file: bool=None)
     vision_api = VisionHttp(ghunt_creds)
     is_found, target = await people_pa.people(as_client, gaia_id, params_template="max_details")
     if not is_found:
-        exit("\n[-] The target wasn't found.")
+        exit("[-] The target wasn't found.")
 
     if json_file:
         json_results = {}
@@ -35,7 +31,7 @@ async def hunt(as_client: httpx.AsyncClient, gaia_id: str, json_file: bool=None)
     containers = target.sourceIds
 
     if len(containers) > 1 or not "PROFILE" in containers:
-        print("\n[!] You have this person in these containers :")
+        print("[!] You have this person in these containers :")
         for container in containers:
             print(f"- {container.title()}")
 
@@ -44,7 +40,7 @@ async def hunt(as_client: httpx.AsyncClient, gaia_id: str, json_file: bool=None)
 
     container = "PROFILE"
     
-    gb.rc.print("\n🙋 Google Account data\n", style="plum2")
+    gb.rc.print("🙋 Google Account data\n", style="plum2")
 
     if container in target.names:
         print(f"Name : {target.names[container].fullname}\n")

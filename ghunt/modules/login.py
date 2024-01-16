@@ -5,8 +5,9 @@ from pathlib import Path
 
 from ghunt import globals as gb
 from ghunt.helpers.utils import *
-from ghunt.helpers.auth import *
+from ghunt.helpers import auth
 from ghunt.objects.base import GHuntCreds
+from ghunt.errors import GHuntInvalidSession
 
 
 async def check_and_login(as_client: httpx.AsyncClient, clean: bool=False) -> None:
@@ -26,68 +27,61 @@ async def check_and_login(as_client: httpx.AsyncClient, clean: bool=False) -> No
     if not as_client:
         as_client = get_httpx_client()
 
-    ghunt_creds.load_creds()
+    is_session_valid = True
+    try:
+        ghunt_creds = await auth.load_and_auth(as_client, help=False)
+    except GHuntInvalidSession as e:
+        print(f"[-] {e}\n")
+        is_session_valid = False
 
-    wanted_cookies = {"SID": "", "SSID": "", "APISID": "", "SAPISID": "", "HSID": "", "LSID": "", "__Secure-3PSID": ""}
-    default_cookies = {"CONSENT": gb.config.default_consent_cookie, "PREF": gb.config.default_pref_cookie}
-
-    osids = ["cloudconsole", "cl"] # OSIDs to generate
-
-    new_cookies_entered = False
-    if not ghunt_creds.are_creds_loaded():
-        cookies, oauth_token = await getting_cookies_dialog(wanted_cookies)
-        cookies = {**cookies, **default_cookies}
-        new_cookies_entered = True
+    if not is_session_valid:
+        oauth_token, master_token = auth.auth_dialog()
     else:
-        # in case user wants to enter new cookies (example: for new account)
-        are_cookies_valid = check_cookies(ghunt_creds.cookies)
-        if are_cookies_valid:
-            print("\n[+] The cookies seems valid !")
-            are_osids_valid = check_osids(ghunt_creds.cookies, ghunt_creds.osids)
-            if are_osids_valid:
-                print("[+] The OSIDs seems valid !")
-            else:
-                print("[-] Seems like the OSIDs are invalid.")
-        else:
-            print("[-] Seems like the cookies are invalid.")
-        is_master_token_valid = await check_master_token(as_client, ghunt_creds.android.master_token)
+        # in case user wants to enter new creds (example: for new account)
+        is_master_token_valid = await auth.check_master_token(as_client, ghunt_creds.android.master_token)
         if is_master_token_valid:
             print("[+] The master token seems valid !")
         else:
             print("[-] Seems like the master token is invalid.")
-        new_gen_inp = input("\nDo you want to input new cookies ? (Y/n) ").lower()
-        if new_gen_inp == "y":
-            cookies, oauth_token = await getting_cookies_dialog(wanted_cookies)
-            new_cookies_entered = True
-        elif not are_cookies_valid:
-            await exit("Please put valid cookies. Exiting...")
 
-    # Validate cookies
-    if new_cookies_entered or not ghunt_creds.are_creds_loaded():
-        are_cookies_valid = check_cookies(cookies)
-        if are_cookies_valid:
-            print("\n[+] The cookies seems valid !")
+        cookies_valid = await auth.check_cookies(as_client, ghunt_creds.cookies)
+        if cookies_valid:
+            print("[+] The cookies seem valid !")
         else:
-            await exit("\n[-] Seems like the cookies are invalid, try regenerating them.")
-    
-    if not new_cookies_entered:
-        await exit()
+            print("[-] Seems like the cookies are invalid.")
 
-    print(f"\n[+] Got OAuth2 token => {oauth_token}")
-    master_token, services, owner_email, owner_name = await android_master_auth(as_client, oauth_token)
+        osids_valid = await auth.check_osids(as_client, ghunt_creds.cookies, ghunt_creds.osids)
+        if osids_valid:
+            print("[+] OSIDs seem valid !")
+        else:
+            print("[-] Seems like OSIDs are invalid.")
+        new_gen_inp = input("\nDo you want to create a new session ? (Y/n) ").lower()
+        if new_gen_inp == "y":
+            oauth_token, master_token = auth.auth_dialog()
+        else:
+            exit()
 
-    print("\n[Connected account]")
-    print(f"Name : {owner_name}")
-    print(f"Email : {owner_email}")
-    gb.rc.print("\n🔑 [underline]A master token has been generated for your account and saved in the credentials file[/underline], please keep it safe as if it were your password, because it gives access to a lot of Google services, and with that, your personal information.", style="bold")
-    print(f"Master token services access : {', '.join(services)}")
+    ghunt_creds.android.authorization_tokens = {} # Reset the authorization tokens
+
+    if oauth_token:
+        print(f"\n[+] Got OAuth2 token => {oauth_token}")
+        master_token, services, owner_email, owner_name = await auth.android_master_auth(as_client, oauth_token)
+
+        print("\n[Connected account]")
+        print(f"Name : {owner_name}")
+        print(f"Email : {owner_email}")
+        gb.rc.print("\n🔑 [underline]A master token has been generated for your account and saved in the credentials file[/underline], please keep it safe as if it were your password, because it gives access to a lot of Google services, and with that, your personal information.", style="bold")
+        print(f"Master token services access : {', '.join(services)}")
 
     # Feed the GHuntCreds object
-    ghunt_creds.cookies = cookies
     ghunt_creds.android.master_token = master_token
 
-    print("Generating OSIDs ...")
-    ghunt_creds.osids = await gen_osids(cookies, osids)
+    ghunt_creds.cookies = {"a": "a"} # Dummy ata
+    ghunt_creds.osids = {"a": "a"} # Dummy data
+
+    print("Generating cookies and osids...")
+    await auth.gen_cookies_and_osids(as_client, ghunt_creds)
+    print("[+] Cookies and osids generated !")
 
     ghunt_creds.save_creds()
 

@@ -8,19 +8,22 @@ from dateutil.parser import isoparse
 from copy import deepcopy
 import jsonpickle
 import json
+from packaging.version import parse as parse_version
 
 import httpx
 import imagehash
 from io import BytesIO
 
 from ghunt import globals as gb
+from ghunt import version as current_version
+from ghunt.lib.httpx import AsyncClient
 
 
 def get_httpx_client() -> httpx.AsyncClient:
     """
         Returns a customized to better support the needs of GHunt CLI users.
     """
-    return httpx.AsyncClient(http2=True, timeout=15)
+    return AsyncClient(http2=True, timeout=15)
 
 def oprint(obj: any) -> str:
     serialized = jsonpickle.encode(obj)
@@ -32,9 +35,6 @@ def within_docker() -> bool:
 
 def gen_sapisidhash(sapisid: str, origin: str, timestamp: str = str(int(time()))) -> str:
     return f"{timestamp}_{hashlib.sha1(' '.join([timestamp, sapisid, origin]).encode()).hexdigest()}"
-
-def extract_set_cookies(req: httpx.Response) -> Dict[str, str]:
-    return {pair[0]:''.join(pair[1:]) for x in req.headers.get_list("set-cookie") if (pair := x.split(";")[0].split("="))}
 
 def inject_osid(cookies: Dict[str, str], osids: Dict[str, str], service: str) -> Dict[str, str]:
     cookies_with_osid = deepcopy(cookies)
@@ -122,3 +122,32 @@ def unicode_patch(txt: str):
         "à": "a"
     }
     return txt.replace(''.join([*bad_chars.keys()]), ''.join([*bad_chars.values()]))
+
+def show_version():
+    new_version, new_metadata = check_new_version()
+    print()
+    gb.rc.print(f"> GHunt {current_version.metadata.get('version', '')} ({current_version.metadata.get('name', '')}) <".center(53), style="bold")
+    print()
+    if new_version:
+        gb.rc.print(f"🥳 New version {new_metadata.get('version', '')} ({new_metadata.get('name', '')}) is available !", style="bold red")
+        gb.rc.print(f"🤗 Run 'pipx upgrade ghunt' to update.", style="bold light_pink3")
+    else:
+        gb.rc.print("🎉 You are up to date !", style="light_pink3")
+        
+
+def check_new_version() -> tuple[bool, dict[str, str]]:
+    """
+        Checks if there is a new version of GHunt available.
+    """
+    req = httpx.get("https://raw.githubusercontent.com/mxrch/GHunt/master/ghunt/version.py")
+    if req.status_code != 200:
+        return False, {}
+    
+    raw = req.text.strip().removeprefix("metadata = ")
+    data = json.loads(raw)
+    new_version = data.get("version", "")
+    new_name = data.get("name", "")
+
+    if parse_version(new_version) > parse_version(current_version.metadata.get("version", "")):
+        return True, {"version": new_version, "name": new_name}
+    return False, {}

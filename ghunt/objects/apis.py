@@ -6,10 +6,10 @@ from ghunt.errors import *
 from ghunt.helpers.auth import *
 
 import httpx
-import trio
 
 from datetime import datetime, timezone
 from typing import *
+import asyncio
 
 
 # APIs objects
@@ -25,7 +25,7 @@ class GAPI(SmartObj):
         self.creds: GHuntCreds = None
         self.headers: Dict[str, str] = {}
         self.cookies: Dict[str, str] = {}
-        self.gen_token_lock: trio.Lock = None
+        self.gen_token_lock: asyncio.Semaphore = None
 
         self.authentication_mode: str = ""
         self.require_key: str = ""
@@ -39,7 +39,7 @@ class GAPI(SmartObj):
             raise GHuntCorruptedHeadersError(f"The provided headers when loading the endpoint seems corrupted, please check it : {headers}")
 
         if self.authentication_mode == "oauth":
-            self.gen_token_lock = trio.Lock()
+            self.gen_token_lock = asyncio.Semaphore(1)
 
         cookies = {}
         if self.authentication_mode in ["sapisidhash", "cookies_only"]:
