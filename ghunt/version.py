@@ -1,4 +1,4 @@
 metadata = {
-    "version": "2.0.5",
-    "name": "Temp version"
+    "version": "2.1.0",
+    "name": "BlackHat Edition"
 }
