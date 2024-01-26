@@ -33,6 +33,9 @@ async def check_and_login(as_client: httpx.AsyncClient, clean: bool=False) -> No
     except GHuntInvalidSession as e:
         print(f"[-] {e}\n")
         is_session_valid = False
+    except BaseException as e:
+        print(f"[-] Unexpected error : {e}\n")
+        is_session_valid = False
 
     if not is_session_valid:
         oauth_token, master_token = auth.auth_dialog()
