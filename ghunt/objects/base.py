@@ -88,12 +88,6 @@ class Position(SmartObj):
         self.latitude: float = 0.0
         self.longitude: float = 0.0
 
-class MapsGuidedAnswer(SmartObj):
-    def __init__(self):
-        self.id: str = ""
-        self.question: str = ""
-        self.answer: str = ""
-
 class MapsLocation(SmartObj):
     def __init__(self):
         self.id: str = ""
@@ -102,7 +96,7 @@ class MapsLocation(SmartObj):
         self.position: Position = Position()
         self.tags: List[str] = []
         self.types: List[str] = []
-        self.cost: int = 0 # 1-4
+        self.cost_level: int = 0 # 1-4
 
 class MapsReview(SmartObj):
     def __init__(self):
@@ -110,16 +104,14 @@ class MapsReview(SmartObj):
         self.comment: str = ""
         self.rating: int = 0
         self.location: MapsLocation = MapsLocation()
-        self.guided_answers: List[MapsGuidedAnswer] = []
-        self.approximative_date: relativedelta = None
+        self.date: datetime = None
 
 class MapsPhoto(SmartObj):
     def __init__(self):
         self.id: str = ""
         self.url: str = ""
         self.location: MapsLocation = MapsLocation()
-        self.approximative_date: relativedelta = None
-        self.exact_date: datetime = None
+        self.date: datetime = None
 
 ### Drive
 class DriveExtractedUser(SmartObj):
