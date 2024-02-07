@@ -119,7 +119,7 @@ class Person(Parser):
         self.emails: Dict[str, PersonEmail] = PersonContainers()
         self.names: Dict[str, PersonName] = PersonContainers()
         self.profileInfos: Dict[str, PersonProfileInfo] = PersonContainers()
-        self.profilePhotos: Dict[str, PersonPhoto] = PersonContainers()
+        self.profilePhotos: Dict[str, list[PersonPhoto]] = PersonContainers()
         self.coverPhotos: Dict[str, PersonPhoto] = PersonContainers()
         self.inAppReachability: Dict[str, PersonInAppReachability] = PersonContainers()
         self.extendedData: PersonExtendedData = PersonExtendedData()
@@ -148,7 +148,9 @@ class Person(Parser):
                     for photo_data in person_data["photo"]:
                         person_photo = PersonPhoto()
                         await person_photo._scrape(as_client, photo_data, "profile_photo")
-                        self.profilePhotos[profile_data["metadata"]["container"]] = person_photo
+                        if not self.profilePhotos.get(profile_data["metadata"]["container"]):
+                            self.profilePhotos[profile_data["metadata"]["container"]] = []
+                        self.profilePhotos[profile_data["metadata"]["container"]].append(person_photo)
 
         if (source_ids := person_data.get("metadata", {}).get("identityInfo", {}).get("sourceIds")):
             for source_ids_data in source_ids:

@@ -46,14 +46,15 @@ async def hunt(as_client: httpx.AsyncClient, gaia_id: str, json_file: bool=None)
         print(f"Name : {target.names[container].fullname}\n")
 
     if container in target.profilePhotos:
-        if target.profilePhotos[container].isDefault:
-            print("[-] Default profile picture")
-        else:
-            print("[+] Custom profile picture !")
-            print(f"=> {target.profilePhotos[container].url}")
-            
-            await ia.detect_face(vision_api, as_client, target.profilePhotos[container].url)
-            print()
+        for photo in target.profilePhotos[container]:
+            if photo.isDefault:
+                print("[-] Default profile picture")
+                print(f"=> {photo.url}")
+            else:
+                print("[+] Custom profile picture !")
+                print(f"=> {photo.url}")
+                await ia.detect_face(vision_api, as_client, photo.url)
+                print()
 
     if container in target.coverPhotos:
         if target.coverPhotos[container].isDefault:
