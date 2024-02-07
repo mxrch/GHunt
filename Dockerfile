@@ -8,3 +8,4 @@ RUN pip install -e . \
   pip install ghunt
 
 COPY . .
+CMD ["python", "./main.py"]
