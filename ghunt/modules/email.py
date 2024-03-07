@@ -20,7 +20,7 @@ async def hunt(as_client: httpx.AsyncClient, email_address: str, json_file: bool
     #gb.rc.print("[+] Target found !", style="sea_green3")
 
     people_pa = PeoplePaHttp(ghunt_creds)
-    vision_api = VisionHttp(ghunt_creds)
+    # vision_api = VisionHttp(ghunt_creds)
     is_found, target = await people_pa.people_lookup(as_client, email_address, params_template="max_details")
     if not is_found:
         exit("[-] The target wasn't found.")
@@ -52,7 +52,7 @@ async def hunt(as_client: httpx.AsyncClient, email_address: str, json_file: bool
             print("[+] Custom profile picture !")
             print(f"=> {target.profilePhotos[container].url}")
             
-            await ia.detect_face(vision_api, as_client, target.profilePhotos[container].url)
+            # await ia.detect_face(vision_api, as_client, target.profilePhotos[container].url)
             print()
 
     if container in target.coverPhotos:
@@ -62,7 +62,7 @@ async def hunt(as_client: httpx.AsyncClient, email_address: str, json_file: bool
             print("[+] Custom cover picture !")
             print(f"=> {target.coverPhotos[container].url}")
 
-            await ia.detect_face(vision_api, as_client, target.coverPhotos[container].url)
+            # await ia.detect_face(vision_api, as_client, target.coverPhotos[container].url)
             print()
 
     print(f"Last profile edit : {target.sourceIds[container].lastUpdated.strftime('%Y/%m/%d %H:%M:%S (UTC)')}\n")
