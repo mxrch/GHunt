@@ -41,9 +41,9 @@ First, launch the listener by doing `ghunt login` and choose between 1 of the 2 
 $ ghunt login
 
 [1] (Companion) Put GHunt on listening mode (currently not compatible with docker)
-[2] (Companion) Paste base64-encoded cookies
-[3] Enter manually all cookies
-
+[2] (Companion) Paste base64-encoded authentication
+[3] Enter the oauth_token (stats with "oauth2_4/")
+[4] Enter the master token (starts with "aas_et/")
 Choice =>
 ```
 
