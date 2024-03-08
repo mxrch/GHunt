@@ -303,7 +303,7 @@ def output(err: str, stats: Dict[str, int], reviews: List[MapsReview], photos: L
 
     reviews_and_photos: List[MapsReview|MapsPhoto] = reviews + photos
     if err != "private" and (err == "empty" or not reviews_and_photos):
-        print("\n[-] No review.")
+        print("\n[-] No reviews.")
         return
 
     print("\n[Statistics]")
