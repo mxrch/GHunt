@@ -26,7 +26,7 @@ class PeoplePaHttp(GAPI):
         self.scheme = "https"
 
         self.authentication_mode = "sapisidhash" # sapisidhash, cookies_only, oauth or None
-        self.require_key = "photos" # key name, or None
+        self.require_key = "drive" # key name, or None
 
         self._load_api(creds, headers)
 
@@ -66,7 +66,7 @@ class PeoplePaHttp(GAPI):
                     "person.interaction_settings",
                     "person.legacy_fields",
                     "person.metadata",
-                    "person.in_app_reachability",
+                    # "person.in_app_reachability",
                     "person.name",
                     "person.read_only_profile_info",
                     "person.sort_keys",
@@ -131,7 +131,7 @@ class PeoplePaHttp(GAPI):
                     "person.interaction_settings",
                     "person.legacy_fields",
                     "person.metadata",
-                    "person.in_app_reachability",
+                    # "person.in_app_reachability",
                     "person.name",
                     "person.read_only_profile_info",
                     "person.sort_keys",
