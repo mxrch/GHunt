@@ -4,5 +4,5 @@ keys = {
     "apis_explorer": {"key": "AIzaSyAa8yy0GdcGPHdtD083HiGGx_S0vMPScDM", "origin": "https://explorer.apis.google.com"},
     "calendar": {"key": "AIzaSyBNlYH01_9Hc5S1J9vuFmu2nUqBZJNAXxs", "origin": "https://calendar.google.com"},
     "youtubei": {"key": "AIzaSyA8eiZmM1FaDVjRy-df2KTyQ_vz_yYM39w", "origin": "https://youtube.com"},
-    "drive": {"key": "AIzaSyA65lEHUEizIsNtlbNo-l2K18dT680nsaM", "origin": "https://drive.google.com"}
+    "drive": {"key": "AIzaSyAWGrfCCr7albM3lmCc937gx4uIphbpeKQ", "origin": "https://drive.google.com"}
 }
