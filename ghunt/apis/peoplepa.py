@@ -26,7 +26,7 @@ class PeoplePaHttp(GAPI):
         self.scheme = "https"
 
         self.authentication_mode = "sapisidhash" # sapisidhash, cookies_only, oauth or None
-        self.require_key = "photos" # key name, or None
+        self.require_key = "drive" # key name, or None
 
         self._load_api(creds, headers)
 
@@ -40,14 +40,22 @@ class PeoplePaHttp(GAPI):
             "just_gaia_id": {
                 "id": email,
                 "type": "EMAIL",
-                "matchType": "EXACT",
-                "requestMask.includeField.paths": "person.metadata"
+                "match_type": "EXACT",
+                "request_mask.include_field.paths": "person.metadata",
+                "request_mask.include_container": [
+                    "PROFILE",
+                    "DOMAIN_PROFILE",
+                ],
             },
             "just_name": {
                 "id": email,
                 "type": "EMAIL",
-                "matchType": "EXACT",
-                "requestMask.includeField.paths": "person.name",
+                "match_type": "EXACT",
+                "request_mask.include_field.paths": "person.name",
+                "request_mask.include_container": [
+                    "PROFILE",
+                    "DOMAIN_PROFILE",
+                ],
                 "core_id_params.enable_private_names": True
             },
             "max_details": {
@@ -66,7 +74,7 @@ class PeoplePaHttp(GAPI):
                     "person.interaction_settings",
                     "person.legacy_fields",
                     "person.metadata",
-                    "person.in_app_reachability",
+                    # "person.in_app_reachability",
                     "person.name",
                     "person.read_only_profile_info",
                     "person.sort_keys",
@@ -114,7 +122,11 @@ class PeoplePaHttp(GAPI):
         params_templates = {
             "just_name": {
                 "person_id": gaia_id,
-                "requestMask.includeField.paths": "person.name",
+                "request_mask.include_field.paths": "person.name",
+                "request_mask.include_container": [
+                    "PROFILE",
+                    "DOMAIN_PROFILE",
+                ],
                 "core_id_params.enable_private_names": True
             },
             "max_details": {
@@ -131,7 +143,7 @@ class PeoplePaHttp(GAPI):
                     "person.interaction_settings",
                     "person.legacy_fields",
                     "person.metadata",
-                    "person.in_app_reachability",
+                    # "person.in_app_reachability",
                     "person.name",
                     "person.read_only_profile_info",
                     "person.sort_keys",
