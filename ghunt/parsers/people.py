@@ -80,9 +80,10 @@ class PersonName(Parser):
         self.lastName: str = ""
 
     def _scrape(self, name_data: Dict[str, any]):
-        self.fullname = unicode_patch(x) if (x := name_data.get("displayName")) else None
-        self.firstName = unicode_patch(x) if (x := name_data.get("givenName")) else None
-        self.lastName = unicode_patch(x) if (x := name_data.get("familyName")) else None
+        # self.fullname = unicode_patch(x) if (x := name_data.get("displayName")) else None
+        # self.firstName = unicode_patch(x) if (x := name_data.get("givenName")) else None
+        # self.lastName = unicode_patch(x) if (x := name_data.get("familyName")) else None
+        pass # Google patched the names :/ very sad
 
 class PersonProfileInfo(Parser):
     def __init__(self):

@@ -26,7 +26,7 @@ class PeoplePaHttp(GAPI):
         self.scheme = "https"
 
         self.authentication_mode = "sapisidhash" # sapisidhash, cookies_only, oauth or None
-        self.require_key = "drive" # key name, or None
+        self.require_key = "photos" # key name, or None
 
         self._load_api(creds, headers)
 

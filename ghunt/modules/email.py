@@ -42,8 +42,8 @@ async def hunt(as_client: httpx.AsyncClient, email_address: str, json_file: bool
     
     gb.rc.print("🙋 Google Account data\n", style="plum2")
 
-    if container in target.names:
-        print(f"Name : {target.names[container].fullname}\n")
+    # if container in target.names:
+        # print(f"Name : {target.names[container].fullname}\n")
 
     if container in target.profilePhotos:
         if target.profilePhotos[container].isDefault:
