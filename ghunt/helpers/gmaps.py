@@ -87,8 +87,8 @@ async def get_reviews(as_client: httpx.AsyncClient, gaia_id: str) -> Tuple[str, 
                         review = MapsReview()
                         review.id = review_data[6][0]
                         review.date = datetime.utcfromtimestamp(review_data[6][1][3] / 1000000)
-                        if len(review_data[6][2]) > 1 and review_data[6][2][1]:
-                            review.comment = review_data[6][2][1][0]
+                        if len(review_data[6][2]) > 1 and review_data[6][2][15]:
+                            review.comment = review_data[6][2][15][0][0]
                         review.rating = review_data[6][2][0][0]
 
                         review.location.id = review_data[1][14][0]

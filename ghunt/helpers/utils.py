@@ -24,6 +24,7 @@ def get_httpx_client() -> httpx.AsyncClient:
         Returns a customized to better support the needs of GHunt CLI users.
     """
     return AsyncClient(http2=True, timeout=15)
+    # return AsyncClient(http2=True, timeout=15, proxies="http://127.0.0.1:8282", verify=False)
 
 def oprint(obj: any) -> str:
     serialized = jsonpickle.encode(obj)
