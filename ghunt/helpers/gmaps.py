@@ -61,89 +61,89 @@ async def get_reviews(as_client: httpx.AsyncClient, gaia_id: str) -> Tuple[str, 
     if not total_reviews:
         return "empty", stats, [], []
 
-    with alive_bar(total_reviews, receipt=False) as bar:
-        for category in ["reviews", "photos"]:
-            first = True
-            while True:
-                if first:
-                    req = await as_client.get(f"https://www.google.com/locationhistory/preview/mas?authuser=0&hl=en&gl=us&pb={gb.config.templates['gmaps_pb'][category]['first'].format(gaia_id)}")
-                    first = False
-                else:
-                    req = await as_client.get(f"https://www.google.com/locationhistory/preview/mas?authuser=0&hl=en&gl=us&pb={gb.config.templates['gmaps_pb'][category]['page'].format(gaia_id, next_page_token)}")
-                data = json.loads(req.text[5:])
+    # with alive_bar(total_reviews, receipt=False) as bar:
+    for category in ["reviews", "photos"]:
+        first = True
+        while True:
+            if first:
+                req = await as_client.get(f"https://www.google.com/locationhistory/preview/mas?authuser=0&hl=en&gl=us&pb={gb.config.templates['gmaps_pb'][category]['first'].format(gaia_id)}")
+                first = False
+            else:
+                req = await as_client.get(f"https://www.google.com/locationhistory/preview/mas?authuser=0&hl=en&gl=us&pb={gb.config.templates['gmaps_pb'][category]['page'].format(gaia_id, next_page_token)}")
+            data = json.loads(req.text[5:])
 
-                new_reviews = []
-                new_photos = []
-                next_page_token = ""
+            new_reviews = []
+            new_photos = []
+            next_page_token = ""
 
-                # Reviews
-                if category == "reviews":
-                    if not data[24]:
-                        return "private", stats, [], []
-                    reviews_data = data[24][0]
-                    if not reviews_data:
-                        break
-                    for review_data in reviews_data:
-                        review = MapsReview()
-                        review.id = review_data[6][0]
-                        review.date = datetime.utcfromtimestamp(review_data[6][1][3] / 1000000)
-                        if len(review_data[6][2]) > 1 and review_data[6][2][15]:
-                            review.comment = review_data[6][2][15][0][0]
-                        review.rating = review_data[6][2][0][0]
+            # Reviews
+            if category == "reviews":
+                if not data[24]:
+                    return "private", stats, [], []
+                reviews_data = data[24][0]
+                if not reviews_data:
+                    break
+                for review_data in reviews_data:
+                    review = MapsReview()
+                    review.id = review_data[6][0]
+                    review.date = datetime.utcfromtimestamp(review_data[6][1][3] / 1000000)
+                    if len(review_data[6][2]) > 15 and review_data[6][2][15]:
+                        review.comment = review_data[6][2][15][0][0]
+                    review.rating = review_data[6][2][0][0]
 
-                        review.location.id = review_data[1][14][0]
-                        review.location.name = review_data[1][2]
-                        review.location.address = review_data[1][3]
-                        review.location.tags = review_data[1][4] if review_data[1][4] else []
-                        review.location.types = [x for x in review_data[1][8] if x]
-                        if review_data[1][0]:
-                            review.location.position.latitude = review_data[1][0][2]
-                            review.location.position.longitude = review_data[1][0][3]
-                        if len(review_data[1]) > 31 and review_data[1][31]:
-                            review.location.cost_level = len(review_data[1][31])
-                        new_reviews.append(review)
-                        bar()
+                    review.location.id = review_data[1][14][0]
+                    review.location.name = review_data[1][2]
+                    review.location.address = review_data[1][3]
+                    review.location.tags = review_data[1][4] if review_data[1][4] else []
+                    review.location.types = [x for x in review_data[1][8] if x]
+                    if review_data[1][0]:
+                        review.location.position.latitude = review_data[1][0][2]
+                        review.location.position.longitude = review_data[1][0][3]
+                    if len(review_data[1]) > 31 and review_data[1][31]:
+                        review.location.cost_level = len(review_data[1][31])
+                    new_reviews.append(review)
+                    # bar()
 
-                    agg_reviews += new_reviews
+                agg_reviews += new_reviews
 
-                    if not new_reviews or len(data[24]) < 4 or not data[24][3]:
-                        break
-                    next_page_token = data[24][3].strip("=")
+                if not new_reviews or len(data[24]) < 4 or not data[24][3]:
+                    break
+                next_page_token = data[24][3].strip("=")
 
-                # Photos
-                elif category == "photos" :
-                    if not data[22]:
-                        return "private", stats, [], []
-                    photos_data = data[22][1]
-                    if not photos_data:
-                        break
-                    for photo_data in photos_data:
-                        photos = MapsPhoto()
-                        photos.id = photo_data[0][10]
-                        photos.url = photo_data[0][6][0].split("=")[0]
-                        date = photo_data[0][21][6][8]
-                        photos.date = datetime(date[0], date[1], date[2], date[3]) # UTC
-                        # photos.approximative_date = get_datetime(date[8][0]) # UTC
+            # Photos
+            elif category == "photos" :
+                if not data[22]:
+                    return "private", stats, [], []
+                photos_data = data[22][1]
+                if not photos_data:
+                    break
+                for photo_data in photos_data:
+                    photos = MapsPhoto()
+                    photos.id = photo_data[0][10]
+                    photos.url = photo_data[0][6][0].split("=")[0]
+                    date = photo_data[0][21][6][8]
+                    photos.date = datetime(date[0], date[1], date[2], date[3]) # UTC
+                    # photos.approximative_date = get_datetime(date[8][0]) # UTC
 
-                        if len(photo_data) > 1:
-                            photos.location.id = photo_data[1][14][0]
-                            photos.location.name = photo_data[1][2]
-                            photos.location.address = photo_data[1][3]
-                            photos.location.tags = photo_data[1][4] if photo_data[1][4] else []
-                            photos.location.types = [x for x in photo_data[1][8] if x] if photo_data[1][8] else []
-                            if photo_data[1][0]:
-                                photos.location.position.latitude = photo_data[1][0][2]
-                                photos.location.position.longitude = photo_data[1][0][3]
-                            if len(photo_data[1]) > 31 and photo_data[1][31]:
-                                photos.location.cost_level = len(photo_data[1][31])
-                        new_photos.append(photos)
-                        bar()
+                    if len(photo_data) > 1:
+                        photos.location.id = photo_data[1][14][0]
+                        photos.location.name = photo_data[1][2]
+                        photos.location.address = photo_data[1][3]
+                        photos.location.tags = photo_data[1][4] if photo_data[1][4] else []
+                        photos.location.types = [x for x in photo_data[1][8] if x] if photo_data[1][8] else []
+                        if photo_data[1][0]:
+                            photos.location.position.latitude = photo_data[1][0][2]
+                            photos.location.position.longitude = photo_data[1][0][3]
+                        if len(photo_data[1]) > 31 and photo_data[1][31]:
+                            photos.location.cost_level = len(photo_data[1][31])
+                    new_photos.append(photos)
+                    # bar()
 
-                    agg_photos += new_photos
+                agg_photos += new_photos
 
-                    if not new_photos or len(data[22]) < 4 or not data[22][3]:
-                        break
-                    next_page_token = data[22][3].strip("=")
+                if not new_photos or len(data[22]) < 4 or not data[22][3]:
+                    break
+                next_page_token = data[22][3].strip("=")
 
     return "", stats, agg_reviews, agg_photos
 
