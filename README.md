@@ -57,20 +57,21 @@ The extension is available on the following stores :\
 
 Then, profit :
 ```bash
-usage: ghunt [-h] {login,email,gaia,drive} ...
+Usage: ghunt [-h] {login,email,gaia,drive,geolocate} ...
 
-positional arguments:
-  {login,email,gaia,drive}
-    login   (--clean)         Authenticate GHunt to Google.
-    email   (--json)          Get information on an email address.
-    gaia    (--json)          Get information on a Gaia ID.
-    drive   (--json)          Get information on a Drive file or folder.
+Positional Arguments:
+  {login,email,gaia,drive,geolocate}
+    login               Authenticate GHunt to Google.
+    email               Get information on an email address.
+    gaia                Get information on a Gaia ID.
+    drive               Get information on a Drive file or folder.
+    geolocate           Geolocate a BSSID.
 
-options:
+Options:
   -h, --help            show this help message and exit
 ```
 
-📄 You can also use --json with email, gaia and drive modules to export in JSON ! Example :
+📄 You can also use --json with email, gaia, drive and geolocate modules to export in JSON ! Example :
 
 ```bash
 $ ghunt email <email_address> --json user_data.json
