@@ -29,7 +29,7 @@ def show_user(user: DriveExtractedUser):
     if user.is_last_modifying_user:
         print("[+] Last user to have modified the document !")
 
-async def hunt(as_client: httpx.AsyncClient, file_id: str, json_file: bool=None):
+async def hunt(as_client: httpx.AsyncClient, file_id: str, json_file: bool=Path):
     if not as_client:
         as_client = get_httpx_client()
 

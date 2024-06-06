@@ -9,9 +9,10 @@ from ghunt.helpers.utils import get_httpx_client
 import httpx
 
 from typing import *
+from pathlib import Path
 
 
-async def hunt(as_client: httpx.AsyncClient, gaia_id: str, json_file: bool=None):
+async def hunt(as_client: httpx.AsyncClient, gaia_id: str, json_file: Path=None):
     if not as_client:
         as_client = get_httpx_client()
 

@@ -9,9 +9,10 @@ from ghunt.helpers.knowledge import get_user_type_definition
 import httpx
 
 from typing import *
+from pathlib import Path
 
 
-async def hunt(as_client: httpx.AsyncClient, email_address: str, json_file: bool=None):
+async def hunt(as_client: httpx.AsyncClient, email_address: str, json_file: Path=None):
     if not as_client:
         as_client = get_httpx_client()
  

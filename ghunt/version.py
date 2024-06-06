@@ -1,4 +1,4 @@
 metadata = {
-    "version": "2.1.6",
-    "name": "BlackHat Edition"
+    "version": "2.2.0",
+    "name": "Wardriving Edition"
 }

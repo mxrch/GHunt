@@ -14,3 +14,4 @@ inflection==0.5.1
 jsonpickle==2.2.0
 packaging==23.0
 jsonpickle==2.2.0
+rich_argparse==1.5.0
