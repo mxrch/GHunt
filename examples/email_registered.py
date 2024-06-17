@@ -1,3 +1,5 @@
+import os
+
 import httpx
 import asyncio
 
@@ -8,7 +10,8 @@ from ghunt.helpers.gmail import is_email_registered
 
 async def main():
     if not sys.argv[1:]:
-        exit("Please give an email address.")
+        print("Please give an email address.")
+        exit(os.EX_IOERR)
 
     as_client = httpx.AsyncClient() # Async Client
 

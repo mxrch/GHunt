@@ -1,3 +1,5 @@
+import os
+
 from ghunt.helpers.utils import *
 from ghunt.objects.base import DriveExtractedUser, GHuntCreds
 from ghunt.apis.drive import DriveHttp
@@ -38,7 +40,8 @@ async def hunt(as_client: httpx.AsyncClient, file_id: str, json_file: bool=Path)
     drive = DriveHttp(ghunt_creds)
     file_found, file = await drive.get_file(as_client, file_id)
     if not file_found:
-        exit("[-] The file wasn't found.")
+        print("[-] The file wasn't found.")
+        exit(os.EX_IOERR)
 
     is_folder = file.mime_type == "application/vnd.google-apps.folder"
     file_type = drive_knownledge.mime_types.get(file.mime_type)
