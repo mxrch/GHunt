@@ -1,4 +1,4 @@
-![](assets/long_banner.png)
+![anitapantoja58@gmail.com](assets/long_banner.png)
 
 <br>
 
