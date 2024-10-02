@@ -17,7 +17,7 @@ keywords=["osint", "pentest", "cybersecurity", "investigation", "hideandsec", "m
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements.txt"]}
 
-[project.scripts]
+[tool.poetry.scripts]
 ghunt = "ghunt.ghunt:main"
 
 [tool.setuptools.packages.find]
