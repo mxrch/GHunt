@@ -99,8 +99,9 @@ async def get_reviews(as_client: httpx.AsyncClient, gaia_id: str) -> Tuple[str, 
                         if review_data[1][0]:
                             review.location.position.latitude = review_data[1][0][2]
                             review.location.position.longitude = review_data[1][0][3]
-                        if len(review_data[1]) > 31 and review_data[1][31]:
-                            review.location.cost_level = len(review_data[1][31])
+                        # if len(review_data[1]) > 31 and review_data[1][31]:
+                            # print(f"Cost level : {review_data[1][31]}")
+                            # review.location.cost_level = len(review_data[1][31])
                         new_reviews.append(review)
                         bar()
 
@@ -319,36 +320,38 @@ def output(err: str, stats: Dict[str, int], reviews: List[MapsReview], photos: L
     avg_ratings = round(sum([x.rating for x in reviews]) / len(reviews), 1)
     print(f"[+] Average rating : {ppnb(avg_ratings)}/5\n")
 
-    costs_table = {
-        1: "Inexpensive",
-        2: "Moderately expensive",
-        3: "Expensive",
-        4: "Very expensive"
-    }
+    # I removed the costs calculation because of a Google update : https://github.com/mxrch/GHunt/issues/529
 
-    total_costs = 0
-    costs_stats = {x:0 for x in range(1,5)}
-    for review in reviews_and_photos:
-        if review.location.cost_level:
-            costs_stats[review.location.cost_level] += 1
-            total_costs += 1
-    costs_stats = dict(sorted(costs_stats.items(), key=lambda item: item[1], reverse=True)) # We sort the dict by cost popularity
+    # costs_table = {
+    #     1: "Inexpensive",
+    #     2: "Moderately expensive",
+    #     3: "Expensive",
+    #     4: "Very expensive"
+    # }
 
-    if total_costs:
-        print("[Costs]")
-        for cost, desc in costs_table.items():
-            line = f"> {ppnb(round(costs_stats[cost]/total_costs*100, 1))}% {desc} ({costs_stats[cost]})"
-            style = ""
-            if not costs_stats[cost]:
-                style = "bright_black"
-            elif costs_stats[cost] == list(costs_stats.values())[0]:
-                style = "spring_green1"
-            gb.rc.print(line, style=style)
+    # total_costs = 0
+    # costs_stats = {x:0 for x in range(1,5)}
+    # for review in reviews_and_photos:
+    #     if review.location.cost_level:
+    #         costs_stats[review.location.cost_level] += 1
+    #         total_costs += 1
+    # costs_stats = dict(sorted(costs_stats.items(), key=lambda item: item[1], reverse=True)) # We sort the dict by cost popularity
+
+    # if total_costs:
+    #     print("[Costs]")
+    #     for cost, desc in costs_table.items():
+    #         line = f"> {ppnb(round(costs_stats[cost]/total_costs*100, 1))}% {desc} ({costs_stats[cost]})"
+    #         style = ""
+    #         if not costs_stats[cost]:
+    #             style = "bright_black"
+    #         elif costs_stats[cost] == list(costs_stats.values())[0]:
+    #             style = "spring_green1"
+    #         gb.rc.print(line, style=style)
             
-        avg_costs = round(sum([x*y for x,y in costs_stats.items()]) / total_costs)
-        print(f"\n[+] Average costs : {costs_table[avg_costs]}")
-    else:
-        print("[-] No costs data.")
+    #     avg_costs = round(sum([x*y for x,y in costs_stats.items()]) / total_costs)
+    #     print(f"\n[+] Average costs : {costs_table[avg_costs]}")
+    # else:
+    #     print("[-] No costs data.")
 
     types = {}
     for review in reviews_and_photos:
