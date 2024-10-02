@@ -3,6 +3,7 @@
 <br>
 
 #### 🌐 GHunt Online version : https://osint.industries
+#### 🐍 Now Python 3.13 compatible !
 
 <br>
 
