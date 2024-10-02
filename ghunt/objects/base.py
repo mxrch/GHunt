@@ -10,7 +10,10 @@ from autoslot import Slots
 from ghunt.errors import GHuntInvalidSession
 
 
-class SmartObj(Slots):
+# class SmartObj(Slots): # Not Python 3.13 compatible
+#     pass
+
+class SmartObj():
     pass
 
 class AndroidCreds(SmartObj):

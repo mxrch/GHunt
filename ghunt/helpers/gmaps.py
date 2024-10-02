@@ -53,6 +53,9 @@ async def get_reviews(as_client: httpx.AsyncClient, gaia_id: str) -> Tuple[str, 
     stats = {}
 
     req = await as_client.get(f"https://www.google.com/locationhistory/preview/mas?authuser=0&hl=en&gl=us&pb={gb.config.templates['gmaps_pb']['stats'].format(gaia_id)}")
+    if req.status_code == 302 and req.headers["Location"].startswith("https://www.google.com/sorry/index"):
+        return "failed", stats, [], []
+
     data = json.loads(req.text[5:])
     if not data[16][8]:
         return "empty", stats, [], []
@@ -301,6 +304,9 @@ def output(err: str, stats: Dict[str, int], reviews: List[MapsReview], photos: L
     """Pretty print the Maps results, and do some guesses."""
 
     print(f"\nProfile page : https://www.google.com/maps/contrib/{gaia_id}/reviews")
+
+    if err == "failed":
+        print("\n[-] Your IP has been blocked by Google. Try again later.")
 
     reviews_and_photos: List[MapsReview|MapsPhoto] = reviews + photos
     if err != "private" and (err == "empty" or not reviews_and_photos):
