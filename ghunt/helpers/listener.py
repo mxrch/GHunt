@@ -1,3 +1,4 @@
+import os
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from typing import *
 
@@ -45,7 +46,8 @@ def run(server_class=HTTPServer, handler_class=Server, port=60067):
                 break
 
     except KeyboardInterrupt:
-        exit("[-] Exiting...")
+        print("[-] Exiting...")
+        exit(os.CLD_KILLED)
     else:
         if handler_class.data_bridge.data:
             print("[+] Received cookies !")

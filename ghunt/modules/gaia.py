@@ -1,3 +1,5 @@
+import os
+
 from ghunt import globals as gb
 from ghunt.objects.base import GHuntCreds
 from ghunt.apis.peoplepa import PeoplePaHttp
@@ -24,7 +26,8 @@ async def hunt(as_client: httpx.AsyncClient, gaia_id: str, json_file: Path=None)
     # vision_api = VisionHttp(ghunt_creds)
     is_found, target = await people_pa.people(as_client, gaia_id, params_template="max_details")
     if not is_found:
-        exit("[-] The target wasn't found.")
+        print("[-] The target wasn't found.")
+        exit(os.EX_DATAERR)
 
     if json_file:
         json_results = {}
@@ -37,7 +40,8 @@ async def hunt(as_client: httpx.AsyncClient, gaia_id: str, json_file: Path=None)
             print(f"- {container.title()}")
 
     if not "PROFILE" in containers:
-        exit("[-] Given information does not match a public Google Account.")
+        print("[-] Given information does not match a public Google Account.")
+        exit(os.EX_DATAERR)
 
     container = "PROFILE"
     
