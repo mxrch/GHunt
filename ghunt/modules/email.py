@@ -66,7 +66,8 @@ async def hunt(as_client: httpx.AsyncClient, email_address: str, json_file: Path
             # await ia.detect_face(vision_api, as_client, target.coverPhotos[container].url)
             print()
 
-    print(f"Last profile edit : {target.sourceIds[container].lastUpdated.strftime('%Y/%m/%d %H:%M:%S (UTC)')}\n")
+    if target.sourceIds[container].lastUpdated is not None:
+        print(f"Last profile edit : {target.sourceIds[container].lastUpdated.strftime('%Y/%m/%d %H:%M:%S (UTC)')}\n")
     
     if container in target.emails:
         print(f"Email : {target.emails[container].value}")
