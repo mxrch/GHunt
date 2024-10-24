@@ -1,3 +1,5 @@
+import os
+
 from ghunt import globals as gb
 from ghunt.apis.vision import VisionHttp
 
@@ -20,7 +22,8 @@ async def detect_face(vision_api: VisionHttp, as_client: httpx.AsyncClient, imag
             break
         await asyncio.sleep(0.5)
     else:
-        exit("\n[-] Vision API keeps rate-limiting.")
+        print("\n[-] Vision API keeps rate-limiting.")
+        exit(os.EX_UNAVAILABLE)
 
     if are_faces_found:
         if len(faces_results.face_annotations) > 1:
