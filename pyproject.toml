@@ -1,6 +1,6 @@
 [project]
 name = "ghunt"
-version = "2.3.2"
+version = "2.3.3"
 authors = [
     {name = "mxrch", email = "mxrch.dev@pm.me"},
 ]
@@ -31,7 +31,7 @@ include = ["ghunt", "ghunt.*"]
 
 [tool.poetry]
 name = "ghunt"
-version = "2.3.2"
+version = "2.3.3"
 description = "An offensive Google framework."
 authors = ["mxrch <mxrch.dev@pm.me>"]
 license = "AGPL-3.0"
