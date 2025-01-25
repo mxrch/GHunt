@@ -1,7 +1,7 @@
 from ghunt.objects.base import GHuntCreds
 from ghunt.errors import *
 import ghunt.globals as gb
-from ghunt.objects.apis import GAPI
+from ghunt.objects.apis import GAPI, EndpointConfig
 from ghunt.parsers.playgames import PlayedGames, PlayerAchievements, PlayerProfile
 
 import httpx
@@ -33,20 +33,21 @@ class PlayGames(GAPI):
         self.hostname = "www.googleapis.com"
         self.scheme = "https"
 
-        self.authentication_mode = "oauth" # sapisidhash, cookies_only, oauth or None
-        self.require_key = None # key name, or None
-
         self._load_api(creds, headers)
 
     async def get_profile(self, as_client: httpx.AsyncClient, player_id: str) -> Tuple[bool, PlayerProfile]:
-        endpoint_name = inspect.currentframe().f_code.co_name
+        endpoint = EndpointConfig(
+            name = inspect.currentframe().f_code.co_name,
+            verb = "GET",
+            data_type = None, # json, data or None
+            authentication_mode = "oauth", # sapisidhash, cookies_only, oauth or None
+            require_key = None, # key name, or None
+        )
+        self._load_endpoint(endpoint)
 
-        verb = "GET"
         base_url = f"/games/v1whitelisted/players/{player_id}"
-        data_type = None # json, data or None
 
-        self._load_endpoint(endpoint_name)
-        req = await self._query(as_client, verb, endpoint_name, base_url, None, None, data_type)
+        req = await self._query(endpoint.name, as_client, base_url)
 
         # Parsing
         data = json.loads(req.text)
@@ -60,25 +61,27 @@ class PlayGames(GAPI):
         return True, player_profile
 
     async def get_played_games(self, as_client: httpx.AsyncClient, player_id: str, page_token: str="") -> Tuple[bool, str, PlayedGames]:
-        endpoint_name = inspect.currentframe().f_code.co_name
+        endpoint = EndpointConfig(
+            name = inspect.currentframe().f_code.co_name,
+            verb = "GET",
+            data_type = None, # json, data or None
+            authentication_mode = "oauth", # sapisidhash, cookies_only, oauth or None
+            require_key = None, # key name, or None
+        )
+        self._load_endpoint(endpoint)
 
-        verb = "GET"
         base_url = f"/games/v1whitelisted/players/{player_id}/applications/played"
-        data_type = None # json, data or None
 
         params = {}
         if page_token:
             params = {"pageToken": page_token}
 
-        self._load_endpoint(endpoint_name)
-        req = await self._query(as_client, verb, endpoint_name, base_url, params, None, data_type)
+        req = await self._query(endpoint.name, as_client, base_url, params=params)
 
         # Parsing
         data = json.loads(req.text)
         played_games = PlayedGames()
         if not "items" in data:
-            print(req)
-            print(req.text)
             return False, "", played_games
 
         next_page_token = data.get("nextPageToken", "")
@@ -88,11 +91,16 @@ class PlayGames(GAPI):
         return True, next_page_token, played_games
 
     async def get_achievements(self, as_client: httpx.AsyncClient, player_id: str, page_token: str="") -> Tuple[bool, str, PlayerAchievements]:
-        endpoint_name = inspect.currentframe().f_code.co_name
+        endpoint = EndpointConfig(
+            name = inspect.currentframe().f_code.co_name,
+            verb = "POST",
+            data_type = "json", # json, data or None
+            authentication_mode = "oauth", # sapisidhash, cookies_only, oauth or None
+            require_key = None, # key name, or None
+        )
+        self._load_endpoint(endpoint)
 
-        verb = "POST"
         base_url = f"/games/v1whitelisted/players/{player_id}/achievements"
-        data_type = "json" # json, data or None
 
         params = {
             "state": "UNLOCKED",
@@ -100,20 +108,15 @@ class PlayGames(GAPI):
             "sortOrder": "RECENT_FIRST"
         }
 
-        data = {}
-
         if page_token:
             params["pageToken"] = page_token
 
-        self._load_endpoint(endpoint_name)
-        req = await self._query(as_client, verb, endpoint_name, base_url, params, data, data_type)
+        req = await self._query(endpoint.name, as_client, base_url, params=params)
 
         # Parsing
         data = json.loads(req.text)
         achievements = PlayerAchievements()
         if not "items" in data:
-            print(req)
-            print(req.text)
             return False, "", achievements
         
         next_page_token = ""

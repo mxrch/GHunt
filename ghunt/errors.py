@@ -1,50 +1,50 @@
-class GHuntKnowledgeError(BaseException):
+class GHuntKnowledgeError(Exception):
     pass
 
-class GHuntCorruptedHeadersError(BaseException):
+class GHuntCorruptedHeadersError(Exception):
     pass
 
-class GHuntUnknownVerbError(BaseException):
+class GHuntUnknownVerbError(Exception):
     pass
 
-class GHuntUnknownRequestDataTypeError(BaseException):
+class GHuntUnknownRequestDataTypeError(Exception):
     pass
 
-class GHuntInsufficientCreds(BaseException):
+class GHuntInsufficientCreds(Exception):
     pass
 
-class GHuntParamsTemplateError(BaseException):
+class GHuntParamsTemplateError(Exception):
     pass
 
-class GHuntParamsInputError(BaseException):
+class GHuntParamsInputError(Exception):
     pass
 
-class GHuntAPIResponseParsingError(BaseException):
+class GHuntAPIResponseParsingError(Exception):
     pass
 
-class GHuntObjectsMergingError(BaseException):
+class GHuntObjectsMergingError(Exception):
     pass
 
-class GHuntAndroidMasterAuthError(BaseException):
+class GHuntAndroidMasterAuthError(Exception):
     pass
 
-class GHuntAndroidAppOAuth2Error(BaseException):
+class GHuntAndroidAppOAuth2Error(Exception):
     pass
 
-class GHuntOSIDAuthError(BaseException):
+class GHuntOSIDAuthError(Exception):
     pass
 
-class GHuntCredsNotLoaded(BaseException):
+class GHuntCredsNotLoaded(Exception):
     pass
 
-class GHuntInvalidSession(BaseException):
+class GHuntInvalidSession(Exception):
     pass
 
-class GHuntNotAuthenticated(BaseException):
+class GHuntNotAuthenticated(Exception):
     pass
 
-class GHuntInvalidTarget(BaseException):
+class GHuntInvalidTarget(Exception):
     pass
 
-class GHuntLoginError(BaseException):
+class GHuntLoginError(Exception):
     pass

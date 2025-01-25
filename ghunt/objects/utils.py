@@ -5,16 +5,21 @@ from ghunt.objects.base import SmartObj
 from typing import *
 
 
-class TMPrinter(SmartObj):
-    def __init__(self):
-        self.max_len = 0
+from rich.console import Console
 
-    def out(self, text: str):
+class TMPrinter():
+    """
+        Print temporary text, on the same line.
+    """
+    def __init__(self, rc: Console=Console(highlight=False)):
+        self.max_len = 0
+        self.rc = rc
+
+    def out(self, text: str, style: str=""):
         if len(text) > self.max_len:
             self.max_len = len(text)
         else:
             text += (" " * (self.max_len - len(text)))
-        print(text, end='\r')
-
+        self.rc.print(text, end='\r', style=style)
     def clear(self):
-    	print(" " * self.max_len, end="\r")
+        self.rc.print(" " * self.max_len, end="\r")

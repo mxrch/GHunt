@@ -1,4 +1,4 @@
-from ghunt.objects.apis import GAPI
+from ghunt.objects.apis import GAPI, EndpointConfig
 from ghunt.objects.base import GHuntCreds
 from ghunt import globals as gb
 from ghunt.protos.playgatewaypa.search_player_pb2 import PlayerSearchProto
@@ -29,7 +29,6 @@ class PlayGatewayPaGrpc(GAPI):
 
         if not headers:
             headers = gb.config.android_headers
-            headers["User-Agent"] = headers["User-Agent"].format(self.package_name)
 
         headers = {**headers, **{
             "Content-Type": "application/grpc",
@@ -41,24 +40,25 @@ class PlayGatewayPaGrpc(GAPI):
         self.hostname = "playgateway-pa.googleapis.com"
         self.scheme = "https"
 
-        self.authentication_mode = "oauth" # sapisidhash, cookies_only, oauth or None
-        self.require_key = None # key name, or None
-
         self._load_api(creds, headers)
 
     async def search_player(self, as_client: httpx.AsyncClient, query: str) -> PlayerSearchResults:
-        endpoint_name = inspect.currentframe().f_code.co_name
+        endpoint = EndpointConfig(
+            name = inspect.currentframe().f_code.co_name,
+            verb = "POST",
+            data_type = "data", # json, data or None
+            authentication_mode = "oauth", # sapisidhash, cookies_only, oauth or None
+            require_key = None, # key name, or None
+            ext_metadata = {
+                                "bin": {
+                                    "158709649": "CggaBgj22K2aARo4EgoI+aKnlZf996E/GhcQHhoPUkQyQS4yMTEwMDEuMDAyIgIxMToICgZJZ0pHVWdCB1BpeGVsIDU",
+                                    "173715354": "CgEx"
+                                }
+                            }
+        )
+        self._load_endpoint(endpoint)
 
-        verb = "POST"
         base_url = "/play.gateway.adapter.interplay.v1.PlayGatewayInterplayService/GetPage"
-        data_type = "data"
-
-        ext_metadata = {
-            "bin": {
-                "158709649": "CggaBgj22K2aARo4EgoI+aKnlZf996E/GhcQHhoPUkQyQS4yMTEwMDEuMDAyIgIxMToICgZJZ0pHVWdCB1BpeGVsIDU",
-                "173715354": "CgEx"
-            }
-        }
 
         player_search = PlayerSearchProto()
         player_search.search_form.query.text = query
@@ -67,8 +67,7 @@ class PlayGatewayPaGrpc(GAPI):
         prefix = bytes(1) + pack(">i", len(payload))
         data = prefix + payload
 
-        self._load_endpoint(endpoint_name, {}, ext_metadata)
-        req = await self._query(as_client, verb, endpoint_name, base_url, None, data, data_type)
+        req = await self._query(endpoint.name, as_client, base_url, data=data)
 
         # Parsing
         player_search_results = PlayerSearchResultsProto()
@@ -85,18 +84,22 @@ class PlayGatewayPaGrpc(GAPI):
             To get all the details about a player, please use get_player method of PlayGames (HTTP API).
         """
 
-        endpoint_name = inspect.currentframe().f_code.co_name
+        endpoint = EndpointConfig(
+            name = inspect.currentframe().f_code.co_name,
+            verb = "POST",
+            data_type = "data", # json, data or None
+            authentication_mode = "oauth", # sapisidhash, cookies_only, oauth or None
+            require_key = None, # key name, or None
+            ext_metadata = {
+                                "bin": {
+                                    "158709649": "CggaBgj22K2aARo4EgoI+aKnlZf996E/GhcQHhoPUkQyQS4yMTEwMDEuMDAyIgIxMToICgZJZ0pHVWdCB1BpeGVsIDU",
+                                    "173715354": "CgEx"
+                                }
+                            }
+        )
+        self._load_endpoint(endpoint)
 
-        verb = "POST"
         base_url = "/play.gateway.adapter.interplay.v1.PlayGatewayInterplayService/GetPage"
-        data_type = "data"
-
-        ext_metadata = {
-            "bin": {
-                "158709649": "CggaBgj22K2aARo4EgoI+aKnlZf996E/GhcQHhoPUkQyQS4yMTEwMDEuMDAyIgIxMToICgZJZ0pHVWdCB1BpeGVsIDU",
-                "173715354": "CgEx"
-            }
-        }
 
         player_profile = GetPlayerProto()
         player_profile.form.query.id = player_id
@@ -105,8 +108,7 @@ class PlayGatewayPaGrpc(GAPI):
         prefix = bytes(1) + pack(">i", len(payload))
         data = prefix + payload
 
-        self._load_endpoint(endpoint_name, {}, ext_metadata)
-        req = await self._query(as_client, verb, endpoint_name, base_url, None, data, data_type)
+        req = await self._query(endpoint.name, as_client, base_url, data=data)
 
         # Parsing
         player_profile = GetPlayerResponseProto()

@@ -1,7 +1,7 @@
 from ghunt.objects.base import GHuntCreds
 from ghunt.errors import *
 import ghunt.globals as gb
-from ghunt.objects.apis import GAPI
+from ghunt.objects.apis import GAPI, EndpointConfig
 from ghunt.parsers.people import Person
 
 import httpx
@@ -18,44 +18,54 @@ class PeoplePaHttp(GAPI):
         if not headers:
             headers = gb.config.headers
 
-        base_headers = {}
+        base_headers = {
+            "Host": "people-pa.clients6.google.com",
+        }
 
         headers = {**headers, **base_headers}
 
-        self.hostname = "people-pa.clients6.google.com"
+        self.hostname = "googleapis.com"
         self.scheme = "https"
-
-        self.authentication_mode = "sapisidhash" # sapisidhash, cookies_only, oauth or None
-        self.require_key = "photos" # key name, or None
 
         self._load_api(creds, headers)
 
     async def people_lookup(self, as_client: httpx.AsyncClient, email: str, params_template="just_gaia_id") -> Tuple[bool, Person]:
-        endpoint_name = inspect.currentframe().f_code.co_name
+        endpoint = EndpointConfig(
+            name = inspect.currentframe().f_code.co_name,
+            verb = "GET",
+            data_type = None, # json, data or None
+            authentication_mode = "sapisidhash", # sapisidhash, cookies_only, oauth or None
+            require_key = "photos", # key name, or None
+            # key_origin="photos"
+        )
 
-        verb = "GET"
+        # Android OAuth fields
+        self.api_name = "people"
+        self.package_name = "com.google.android.gms"
+        self.scopes = [
+            "https://www.googleapis.com/auth/profile.agerange.read",
+            "https://www.googleapis.com/auth/profile.language.read",
+            "https://www.googleapis.com/auth/contacts",
+            "https://www.googleapis.com/auth/peopleapi.legacy.readwrite"
+
+        ]
+
+        self._load_endpoint(endpoint)
+
         base_url = "/v2/people/lookup"
-        data_type = None # json, data or None
+
         params_templates = {
             "just_gaia_id": {
                 "id": email,
                 "type": "EMAIL",
-                "match_type": "EXACT",
-                "request_mask.include_field.paths": "person.metadata",
-                "request_mask.include_container": [
-                    "PROFILE",
-                    "DOMAIN_PROFILE",
-                ],
+                "matchType": "EXACT",
+                "requestMask.includeField.paths": "person.metadata"
             },
             "just_name": {
                 "id": email,
                 "type": "EMAIL",
-                "match_type": "EXACT",
-                "request_mask.include_field.paths": "person.name",
-                "request_mask.include_container": [
-                    "PROFILE",
-                    "DOMAIN_PROFILE",
-                ],
+                "matchType": "EXACT",
+                "requestMask.includeField.paths": "person.name",
                 "core_id_params.enable_private_names": True
             },
             "max_details": {
@@ -64,8 +74,7 @@ class PeoplePaHttp(GAPI):
                 "match_type": "EXACT",
                 "extension_set.extension_names": [
                     "DYNAMITE_ADDITIONAL_DATA",
-                    "DYNAMITE_ORGANIZATION_INFO",
-                    # "GPLUS_ADDITIONAL_DATA"
+                    "DYNAMITE_ORGANIZATION_INFO"
                 ],
                 "request_mask.include_field.paths": [
                     "person.metadata.best_display_name",
@@ -74,7 +83,7 @@ class PeoplePaHttp(GAPI):
                     "person.interaction_settings",
                     "person.legacy_fields",
                     "person.metadata",
-                    # "person.in_app_reachability",
+                    "person.in_app_reachability",
                     "person.name",
                     "person.read_only_profile_info",
                     "person.sort_keys",
@@ -97,10 +106,10 @@ class PeoplePaHttp(GAPI):
         }
 
         if not params_templates.get(params_template):
-            raise GHuntParamsTemplateError(f"The asked template {params_template} for the endpoint {endpoint_name} wasn't recognized by GHunt.")
+            raise GHuntParamsTemplateError(f"The asked template {params_template} for the endpoint {endpoint.name} wasn't recognized by GHunt.")
+        params = params_templates[params_template]
 
-        self._load_endpoint(endpoint_name)
-        req = await self._query(as_client, verb, endpoint_name, base_url, params_templates[params_template], None, data_type)
+        req = await self._query(endpoint.name, as_client, base_url, params=params)
 
         # Parsing
         data = json.loads(req.text)
@@ -114,27 +123,40 @@ class PeoplePaHttp(GAPI):
         return True, person
 
     async def people(self, as_client: httpx.AsyncClient, gaia_id: str, params_template="just_name") -> Tuple[bool, Person]:
-        endpoint_name = inspect.currentframe().f_code.co_name
+        endpoint = EndpointConfig(
+            name = inspect.currentframe().f_code.co_name,
+            verb = "GET",
+            data_type = None, # json, data or None
+            authentication_mode = "sapisidhash", # sapisidhash, cookies_only, oauth or None
+            require_key = "photos", # key name, or None
+            # key_origin="photos"
+        )
+        self._load_endpoint(endpoint)
 
-        verb = "GET"
+        # Android OAuth fields
+        self.api_name = "people"
+        self.package_name = "com.google.android.gms"
+        self.scopes = [
+            "https://www.googleapis.com/auth/profile.agerange.read",
+            "https://www.googleapis.com/auth/profile.language.read",
+            "https://www.googleapis.com/auth/contacts",
+            "https://www.googleapis.com/auth/peopleapi.legacy.readwrite"
+
+        ]
+
         base_url = "/v2/people"
-        data_type = None # json, data or None
+
         params_templates = {
             "just_name": {
                 "person_id": gaia_id,
-                "request_mask.include_field.paths": "person.name",
-                "request_mask.include_container": [
-                    "PROFILE",
-                    "DOMAIN_PROFILE",
-                ],
+                "requestMask.includeField.paths": "person.name",
                 "core_id_params.enable_private_names": True
             },
             "max_details": {
                 "person_id": gaia_id,
                 "extension_set.extension_names": [
                     "DYNAMITE_ADDITIONAL_DATA",
-                    "DYNAMITE_ORGANIZATION_INFO",
-                    # "GPLUS_ADDITIONAL_DATA"
+                    "DYNAMITE_ORGANIZATION_INFO"
                 ],
                 "request_mask.include_field.paths": [
                     "person.metadata.best_display_name",
@@ -143,7 +165,7 @@ class PeoplePaHttp(GAPI):
                     "person.interaction_settings",
                     "person.legacy_fields",
                     "person.metadata",
-                    # "person.in_app_reachability",
+                    "person.in_app_reachability",
                     "person.name",
                     "person.read_only_profile_info",
                     "person.sort_keys",
@@ -166,10 +188,10 @@ class PeoplePaHttp(GAPI):
         }
 
         if not params_templates.get(params_template):
-            raise GHuntParamsTemplateError(f"The asked template {params_template} for the endpoint {endpoint_name} wasn't recognized by GHunt.")
+            raise GHuntParamsTemplateError(f"The asked template {params_template} for the endpoint {endpoint.name} wasn't recognized by GHunt.")
+        params = params_templates[params_template]
 
-        self._load_endpoint(endpoint_name)
-        req = await self._query(as_client, verb, endpoint_name, base_url, params_templates[params_template], None, data_type)
+        req = await self._query(endpoint.name, as_client, base_url, params=params)
 
         # Parsing
         data = json.loads(req.text)

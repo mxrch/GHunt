@@ -1,7 +1,7 @@
 from ghunt.objects.base import GHuntCreds
 from ghunt.errors import *
 import ghunt.globals as gb
-from ghunt.objects.apis import GAPI
+from ghunt.objects.apis import GAPI, EndpointConfig
 
 import httpx
 
@@ -36,19 +36,23 @@ class Accounts(GAPI):
         self._load_api(creds, headers)
 
     async def OAuthLogin(self, as_client: httpx.AsyncClient) -> str:
-        endpoint_name = inspect.currentframe().f_code.co_name
+        endpoint = EndpointConfig(
+            name = inspect.currentframe().f_code.co_name,
+            verb = "GET",
+            data_type = None, # json, data or None
+            authentication_mode = "oauth", # sapisidhash, cookies_only, oauth or None
+            require_key = None, # key name, or None
+            key_origin = None
+        )
+        self._load_endpoint(endpoint)
 
-        verb = "GET"
         base_url = f"/OAuthLogin"
-        data_type = None # json, data or None
-
         params = {
             "source": "ChromiumBrowser",
             "issueuberauth": 1
         }
 
-        self._load_endpoint(endpoint_name)
-        req = await self._query(as_client, verb, endpoint_name, base_url, params, None, data_type)
+        req = await self._query(endpoint.name, as_client, base_url, params)
 
         # Parsing
         uber_auth = req.text

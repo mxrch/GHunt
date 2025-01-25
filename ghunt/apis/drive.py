@@ -1,7 +1,7 @@
 from ghunt.objects.base import GHuntCreds
 from ghunt.errors import *
 import ghunt.globals as gb
-from ghunt.objects.apis import GAPI
+from ghunt.objects.apis import GAPI, EndpointConfig
 from ghunt.parsers.drive import DriveCommentList, DriveFile, DriveChildList
 from ghunt.knowledge import drive as drive_knowledge
 
@@ -34,25 +34,26 @@ class DriveHttp(GAPI):
         self.hostname = "www.googleapis.com"
         self.scheme = "https"
 
-        self.authentication_mode = "oauth" # sapisidhash, cookies_only, oauth or None
-        self.require_key = None # key name, or None
-
         self._load_api(creds, headers)
 
     async def get_file(self, as_client: httpx.AsyncClient, file_id: str) -> Tuple[bool, DriveFile]:
-        endpoint_name = inspect.currentframe().f_code.co_name
+        endpoint = EndpointConfig(
+            name = inspect.currentframe().f_code.co_name,
+            verb = "GET",
+            data_type = None, # json, data or None
+            authentication_mode = "oauth", # sapisidhash, cookies_only, oauth or None
+            require_key = None, # key name, or None
+        )
+        self._load_endpoint(endpoint)
 
-        verb = "GET"
         base_url = f"/drive/v2internal/files/{file_id}"
-        data_type = None # json, data or None
 
         params = {
             "fields": ','.join(drive_knowledge.request_fields),
             "supportsAllDrives": True
         }
 
-        self._load_endpoint(endpoint_name)
-        req = await self._query(as_client, verb, endpoint_name, base_url, params, None, data_type)
+        req = await self._query(endpoint.name, as_client, base_url, params=params)
 
         # Parsing
         data = json.loads(req.text)
@@ -65,11 +66,16 @@ class DriveHttp(GAPI):
         return True, drive_file
 
     async def get_comments(self, as_client: httpx.AsyncClient, file_id: str, page_token: str="") -> Tuple[bool, str, DriveCommentList]:
-        endpoint_name = inspect.currentframe().f_code.co_name
+        endpoint = EndpointConfig(
+            name = inspect.currentframe().f_code.co_name,
+            verb = "GET",
+            data_type = None, # json, data or None
+            authentication_mode = "oauth", # sapisidhash, cookies_only, oauth or None
+            require_key = None, # key name, or None
+        )
+        self._load_endpoint(endpoint)
 
-        verb = "GET"
         base_url = f"/drive/v2internal/files/{file_id}/comments"
-        data_type = None # json, data or None
 
         params = {
             "supportsAllDrives": True,
@@ -79,8 +85,7 @@ class DriveHttp(GAPI):
         if page_token:
             params["pageToken"] = page_token
 
-        self._load_endpoint(endpoint_name)
-        req = await self._query(as_client, verb, endpoint_name, base_url, params, None, data_type)
+        req = await self._query(endpoint.name, as_client, base_url, params=params)
 
         # Parsing
         data = json.loads(req.text)
@@ -95,11 +100,16 @@ class DriveHttp(GAPI):
         return True, next_page_token, drive_comments
 
     async def get_childs(self, as_client: httpx.AsyncClient, file_id: str, page_token: str="") -> Tuple[bool, str, DriveChildList]:
-        endpoint_name = inspect.currentframe().f_code.co_name
+        endpoint = EndpointConfig(
+            name = inspect.currentframe().f_code.co_name,
+            verb = "GET",
+            data_type = None, # json, data or None
+            authentication_mode = "oauth", # sapisidhash, cookies_only, oauth or None
+            require_key = None, # key name, or None
+        )
+        self._load_endpoint(endpoint)
 
-        verb = "GET"
         base_url = f"/drive/v2internal/files/{file_id}/children"
-        data_type = None # json, data or None
 
         params = {
             "supportsAllDrives": True,
@@ -109,8 +119,7 @@ class DriveHttp(GAPI):
         if page_token:
             params["pageToken"] = page_token
 
-        self._load_endpoint(endpoint_name)
-        req = await self._query(as_client, verb, endpoint_name, base_url, params, None, data_type)
+        req = await self._query(endpoint.name, as_client, base_url, params=params)
 
         # Parsing
         data = json.loads(req.text)

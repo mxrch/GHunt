@@ -31,6 +31,14 @@ def oprint(obj: any) -> str:
     pretty_output = json.dumps(json.loads(serialized), indent=2)
     print(pretty_output)
 
+def chunkify(lst, n):
+    """
+        Cut a given list to chunks of n items.
+    """
+    k, m = divmod(len(lst), n)
+    for i in range(n):
+        yield lst[i*k+min(i, m):(i+1)*k+min(i+1, m)]
+
 def within_docker() -> bool:
     return Path('/.dockerenv').is_file()
 

@@ -1,7 +1,7 @@
 from ghunt.objects.base import GHuntCreds
 from ghunt.errors import *
 import ghunt.globals as gb
-from ghunt.objects.apis import GAPI
+from ghunt.objects.apis import GAPI, EndpointConfig
 from ghunt.parsers.vision import VisionFaceDetection
 
 import httpx
@@ -27,23 +27,26 @@ class VisionHttp(GAPI):
         self.hostname = "content-vision.googleapis.com"
         self.scheme = "https"
 
-        self.authentication_mode = None # sapisidhash, cookies_only, oauth or None
-        self.require_key = "apis_explorer" # key name, or None
-        self.key_origin = "https://content-vision.googleapis.com"
-
         self._load_api(creds, headers)
 
     async def detect_faces(self, as_client: httpx.AsyncClient, image_url: str = "", image_content: str = "",
-                            params_template="default") -> Tuple[bool, bool, VisionFaceDetection]:
-        endpoint_name = inspect.currentframe().f_code.co_name
+                            data_template="default") -> Tuple[bool, bool, VisionFaceDetection]:
+        endpoint = EndpointConfig(
+            name = inspect.currentframe().f_code.co_name,
+            verb = "POST",
+            data_type = "json", # json, data or None
+            authentication_mode = None, # sapisidhash, cookies_only, oauth or None
+            require_key = "apis_explorer", # key name, or None
+            key_origin = "https://content-vision.googleapis.com"
+        )
+        self._load_endpoint(endpoint)
+
+        base_url = "/v1/images:annotate"
 
         # image_url can cause errors with vision_api, so we prefer using image_content
         # See => https://cloud.google.com/vision/docs/detecting-faces?#detect_faces_in_a_remote_image
 
-        verb = "POST"
-        base_url = "/v1/images:annotate"
-        data_type = "json" # json, data or None
-        params_templates = {
+        data_templates = {
             "default": {
                 "requests":[
                     {
@@ -59,8 +62,8 @@ class VisionHttp(GAPI):
             }
         }
 
-        if not params_templates.get(params_template):
-            raise GHuntParamsTemplateError(f"The asked template {params_template} for the endpoint {endpoint_name} wasn't recognized by GHunt.")
+        if not data_templates.get(data_template):
+            raise GHuntParamsTemplateError(f"The asked template {data_template} for the endpoint {endpoint.name} wasn't recognized by GHunt.")
 
         # Inputs checks
         if image_url and image_content:
@@ -68,19 +71,21 @@ class VisionHttp(GAPI):
         elif not image_url and not image_content:
             raise GHuntParamsInputError("[Vision API faces detection] Please choose at least one parameter between image_url and image_content.")
 
-        if image_url:
-            params_templates["default"]["requests"][0]["image"] = {
-                "source": {
-                    "imageUri": image_url
+        if data_template == "default":
+            if image_url:
+                data_templates["default"]["requests"][0]["image"] = {
+                    "source": {
+                        "imageUri": image_url
+                    }
                 }
-            }
-        elif image_content:
-            params_templates["default"]["requests"][0]["image"] = {
-                "content": image_content
-            }
+            elif image_content:
+                data_templates["default"]["requests"][0]["image"] = {
+                    "content": image_content
+                }
 
-        self._load_endpoint(endpoint_name)
-        req = await self._query(as_client, verb, endpoint_name, base_url, None, params_templates[params_template], data_type)
+        data = data_templates[data_template]
+        req = await self._query(endpoint.name, as_client, base_url, data=data)
+
         rate_limited = req.status_code == 429 # API Explorer sometimes rate-limit because they set their DefaultRequestsPerMinutePerProject to 1800
 
         vision_face_detection = VisionFaceDetection()

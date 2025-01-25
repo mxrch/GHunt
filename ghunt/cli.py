@@ -42,12 +42,20 @@ def parse_and_run():
     geolocate_group.add_argument("-f", "--file", type=Path,  help="File containing a raw request body, useful to put many BSSIDs. ([italic light_steel_blue1][link=https://developers.google.com/maps/documentation/geolocation/requests-geolocation?#sample-requests]Reference format[/link][/italic light_steel_blue1])")
     parser_geolocate.add_argument('--json', type=Path, help="File to write the JSON output to.")
 
+    ### Spiderdal module
+    parser_spiderdal = subparsers.add_parser('spiderdal', help="Find assets using Digital Assets Links.", formatter_class=RichHelpFormatter)
+    parser_spiderdal.add_argument("-p", "--package", help="Example: com.squareup.cash")
+    parser_spiderdal.add_argument("-f", "--fingerprint", help="Example: 21:A7:46:75:96:C1:68:65:0F:D7:B6:31:B6:54:22:EB:56:3E:1D:21:AF:F2:2D:DE:73:89:BA:0D:5D:73:87:48")
+    parser_spiderdal.add_argument("-u", "--url", help="Example: https://cash.app. If a domain is given, it will convert it to a URL, and also try the \"www\" subdomain.")
+    parser_spiderdal.add_argument("-s", "--strict", action='store_true', help="Don't attempt to convert the domain to a URL, and don't try the \"www\" subdomain.")
+    parser_spiderdal.add_argument('--json', type=Path, help="File to write the JSON output to.")
+
     ### Parsing
     args = None
     if not sys.argv[1:]:
         parser.parse_args(["--help"])
     else:
-        for mod in ["email", "gaia", "drive", "geolocate"]:
+        for mod in ["email", "gaia", "drive", "geolocate", "spiderdal"]:
             if sys.argv[1] == mod and not sys.argv[2:]:
                 parser.parse_args([mod, "--help"])
 
@@ -72,3 +80,8 @@ def process_args(args: argparse.Namespace):
         case "geolocate":
             from ghunt.modules import geolocate
             asyncio.run(geolocate.main(None, args.bssid, args.file, args.json))
+        case "spiderdal":
+            if any([args.package, args.fingerprint]) and not all([args.package, args.fingerprint]):
+                exit("[!] You must provide both a package name and a certificate fingerprint.")
+            from ghunt.modules import spiderdal
+            asyncio.run(spiderdal.main(args.url, args.package, args.fingerprint, args.strict, args.json))

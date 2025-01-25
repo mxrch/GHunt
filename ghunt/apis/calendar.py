@@ -1,7 +1,7 @@
 from ghunt.objects.base import GHuntCreds
 from ghunt.errors import *
 import ghunt.globals as gb
-from ghunt.objects.apis import GAPI
+from ghunt.objects.apis import GAPI, EndpointConfig
 from ghunt.parsers.calendar import Calendar, CalendarEvents
 
 import httpx
@@ -26,20 +26,21 @@ class CalendarHttp(GAPI):
         self.hostname = "clients6.google.com"
         self.scheme = "https"
 
-        self.authentication_mode = "sapisidhash" # sapisidhash, cookies_only, oauth or None
-        self.require_key = "calendar" # key name, or None
-
         self._load_api(creds, headers)
 
     async def get_calendar(self, as_client: httpx.AsyncClient, calendar_id: str) -> Tuple[bool, Calendar]:
-        endpoint_name = inspect.currentframe().f_code.co_name
+        endpoint = EndpointConfig(
+            name = inspect.currentframe().f_code.co_name,
+            verb = "GET",
+            data_type = None, # json, data or None
+            authentication_mode = "sapisidhash", # sapisidhash, cookies_only, oauth or None
+            require_key = "calendar", # key name, or None
+        )
+        self._load_endpoint(endpoint)
 
-        verb = "GET"
         base_url = f"/calendar/v3/calendars/{calendar_id}"
-        data_type = None # json, data or None
 
-        self._load_endpoint(endpoint_name)
-        req = await self._query(as_client, verb, endpoint_name, base_url, None, None, data_type)
+        req = await self._query(endpoint.name, as_client, base_url)
 
         # Parsing
         data = json.loads(req.text)
@@ -54,11 +55,17 @@ class CalendarHttp(GAPI):
 
     async def get_events(self, as_client: httpx.AsyncClient, calendar_id: str, params_template="next_events",
                         time_min=datetime.today().replace(tzinfo=timezone.utc).isoformat(), max_results=250, page_token="") -> Tuple[bool, CalendarEvents]:
-        endpoint_name = inspect.currentframe().f_code.co_name
+        endpoint = EndpointConfig(
+            name = inspect.currentframe().f_code.co_name,
+            verb = "GET",
+            data_type = None, # json, data or None
+            authentication_mode = "sapisidhash", # sapisidhash, cookies_only, oauth or None
+            require_key = "calendar", # key name, or None
+        )
+        self._load_endpoint(endpoint)
 
-        verb = "GET"
         base_url = f"/calendar/v3/calendars/{calendar_id}/events"
-        data_type = None # json, data or None
+
         params_templates = {
             "next_events": {
                 "calendarId": calendar_id,
@@ -82,14 +89,13 @@ class CalendarHttp(GAPI):
         }
 
         if not params_templates.get(params_template):
-            raise GHuntParamsTemplateError(f"The asked template {params_template} for the endpoint {endpoint_name} wasn't recognized by GHunt.")
+            raise GHuntParamsTemplateError(f"The asked template {params_template} for the endpoint {endpoint.name} wasn't recognized by GHunt.")
 
         params = params_templates[params_template]
         if page_token:
             params["pageToken"] = page_token
 
-        self._load_endpoint(endpoint_name)
-        req = await self._query(as_client, verb, endpoint_name, base_url, params, None, data_type)
+        req = await self._query(endpoint.name, as_client, base_url, params=params)
 
         # Parsing
         data = json.loads(req.text)

@@ -1,7 +1,7 @@
 from ghunt.objects.base import GHuntCreds
 from ghunt.errors import *
 import ghunt.globals as gb
-from ghunt.objects.apis import GAPI
+from ghunt.objects.apis import GAPI, EndpointConfig
 from ghunt.parsers.geolocate import GeolocationResponse
 
 import httpx
@@ -31,11 +31,16 @@ class GeolocationHttp(GAPI):
         self._load_api(creds, headers)
 
     async def geolocate(self, as_client: httpx.AsyncClient, bssid: str, body: dict) -> Tuple[bool, GeolocationResponse]:
-        endpoint_name = inspect.currentframe().f_code.co_name
+        endpoint = EndpointConfig(
+            name = inspect.currentframe().f_code.co_name,
+            verb = "POST",
+            data_type = "json", # json, data or None
+            authentication_mode = None, # sapisidhash, cookies_only, oauth or None
+            require_key = "geolocation", # key name, or None
+        )
+        self._load_endpoint(endpoint)
 
-        verb = "POST"
         base_url = f"/geolocation/v1/geolocate"
-        data_type = "json" # json, data or None
 
         if bssid:
             payload = {
@@ -52,8 +57,7 @@ class GeolocationHttp(GAPI):
         else:
             payload = body
 
-        self._load_endpoint(endpoint_name)
-        req = await self._query(as_client, verb, endpoint_name, base_url, None, payload, data_type)
+        req = await self._query(endpoint.name, as_client, base_url, data=payload)
 
         # Parsing
         data = json.loads(req.text)
