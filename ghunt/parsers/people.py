@@ -47,21 +47,21 @@ class PersonExtendedData(Parser):
         if (gplus_data := extended_data.get("gplusExtendedData")):
             self.gplusData._scrape(gplus_data)
 
+
 class PersonPhoto(Parser):
     def __init__(self):
         self.url: str = ""
         self.isDefault: bool = False
-        self.flathash: str = None
 
     async def _scrape(self, as_client: httpx.AsyncClient, photo_data: Dict[str, any], photo_type: str):
         if photo_type == "profile_photo":
             self.url = photo_data.get("url")
+            if isDefault := photo_data.get("isDefault"):
+                self.isDefault = isDefault
 
-            self.isDefault, self.flathash = await is_default_profile_pic(as_client, self.url)
-            
         elif photo_type == "cover_photo":
             self.url = '='.join(photo_data.get("imageUrl").split("=")[:-1])
-            if (isDefault := photo_data.get("isDefault")):
+            if isDefault := photo_data.get("isDefault"):
                 self.isDefault = isDefault
         else:
             raise GHuntAPIResponseParsingError(f'The provided photo type "{photo_type}" weren\'t recognized.')
