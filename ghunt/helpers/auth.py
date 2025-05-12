@@ -173,7 +173,7 @@ def auth_dialog() -> Tuple[Dict[str, str], str] :
                 "=> https://github.com/mxrch/ghunt_companion\n\n"
                 "[1] (Companion) Put GHunt on listening mode (currently not compatible with docker)\n"
                 "[2] (Companion) Paste base64-encoded authentication\n"
-                "[3] Enter the oauth_token (stats with \"oauth2_4/\")\n"
+                "[3] Enter the oauth_token (starts with \"oauth2_4/\")\n"
                 "[4] Enter the master token (starts with \"aas_et/\")\n"
                 "Choice => ")
 
