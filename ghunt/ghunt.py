@@ -1,3 +1,4 @@
+import os
 import sys
 
 
@@ -6,7 +7,7 @@ def main():
     if (version < (3, 10)):
         print('[-] GHunt only works with Python 3.10+.')
         print(f'Your current Python version : {version.major}.{version.minor}.{version.micro}')
-        sys.exit(1)
+        sys.exit(os.EX_SOFTWARE)
 
     from ghunt.cli import parse_and_run
     from ghunt.helpers.banner import show_banner
