@@ -9,6 +9,7 @@ import httpx
 from typing import *
 import inspect
 import json
+import pprint
 
 
 class PeoplePaHttp(GAPI):
@@ -113,9 +114,15 @@ class PeoplePaHttp(GAPI):
 
         # Parsing
         data = json.loads(req.text)
+        
         person = Person()
         if not data:
             return False, person
+        
+        if "error" in data:
+          message = data["error"].get("message", "Erro desconhecido.")
+          gb.rc.print(f"[-] Request Error: {message}", style="deep_pink4")
+          return False, person
         
         person_data = list(data["people"].values())[0]
         await person._scrape(as_client, person_data)
