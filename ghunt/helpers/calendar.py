@@ -1,4 +1,6 @@
-from xmlrpc.client import Boolean
+from defusedxml.xmlrpc import monkey_patch
+monkey_patch()
+from defusedxml.defusedxml.xmlrpc.client import Boolean
 from dateutil.relativedelta import relativedelta
 from beautifultable import BeautifulTable
 import httpx
