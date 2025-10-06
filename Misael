@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Pago de Diamantes FF</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f6f6f6; }
+        .container { max-width: 400px; margin: 40px auto; background: #fff; padding: 24px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);}
+        h2 { color: #2b8a3e; }
+        .section { margin-bottom: 18px; }
+        .pagar-btn { background: #2b8a3e; color: #fff; border: none; padding: 12px 24px; border-radius: 4px; cursor: pointer; font-size: 16px;}
+        .pagar-btn:hover { background: #236d31; }
+        select, input[type="radio"] { margin-bottom: 8px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Descuentos de diamantes aquí</h2>
+        <form id="form-descuento">
+            <div class="section">
+                <label>Selecciona tu descuento:</label><br>
+                <input type="radio" name="descuento" value="5" id="desc1" checked>
+                <label for="desc1">5% de descuento</label><br>
+                <input type="radio" name="descuento" value="10" id="desc2">
+                <label for="desc2">10% de descuento</label><br>
+                <input type="radio" name="descuento" value="15" id="desc3">
+                <label for="desc3">15% de descuento</label>
+            </div>
+            <div class="section">
+                <label for="banco">Selecciona el Banco para pagar:</label><br>
+                <select id="banco" name="banco" onchange="mostrarCuenta()">
+                    <option value="bcp">BCP</option>
+                    <option value="interbank">Interbank</option>
+                    <option value="bbva">BBVA</option>
+                </select>
+            </div>
+            <div class="section">
+                <div id="cuenta-info">
+                    <!-- Aquí aparecerán los datos de la cuenta -->
+                </div>
+            </div>
+            <button type="button" class="pagar-btn" onclick="aplicarDescuento()">Pagar</button>
+        </form>
+        <div id="resultado" style="margin-top:20px; font-weight:bold;"></div>
+    </div>
+    <script>
+        const cuentas = {
+            bcp: { nombre: "Banco BCP", cuenta: "123-4567890-11", titular: "Juan Pérez" },
+            interbank: { nombre: "Interbank", cuenta: "999-8887776-55", titular: "Ana Gómez" },
+            bbva: { nombre: "BBVA", cuenta: "777-5554433-22", titular: "Carlos Ruiz" }
+        };
+
+        function mostrarCuenta() {
+            const banco = document.getElementById('banco').value;
+            const info = cuentas[banco];
+            document.getElementById('cuenta-info').innerHTML =
+                `<strong>${info.nombre}</strong><br>
+                Cuenta: ${info.cuenta}<br>
+                Titular: ${info.titular}`;
+        }
+
+        function aplicarDescuento() {
+            const descuento = document.querySelector('input[name="descuento"]:checked').value;
+            const banco = document.getElementById('banco').value;
+            // Simula el precio original de los diamantes
+            const precioOriginal = 100;
+            const precioFinal = precioOriginal - (precioOriginal * descuento / 100);
+            document.getElementById('resultado').textContent = 
+                `Precio final con ${descuento}% de descuento: $${precioFinal.toFixed(2)}\n
+                 Realiza el pago en la cuenta de ${cuentas[banco].nombre}: ${cuentas[banco].cuenta} (Titular: ${cuentas[banco].titular})`;
+        }
+
+        // Mostrar la cuenta al inicio
+        window.onload = mostrarCuenta;
+    </script>
+</body>
+</html>
