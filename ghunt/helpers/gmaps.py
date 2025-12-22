@@ -81,7 +81,7 @@ async def get_reviews(as_client: httpx.AsyncClient, gaia_id: str) -> Tuple[str, 
 
                 # Reviews
                 if category == "reviews":
-                    if not data[24]:
+                    if len(data) <= 24 or not data[24]:
                         return "private", stats, [], []
                     reviews_data = data[24][0]
                     if not reviews_data:
@@ -115,8 +115,8 @@ async def get_reviews(as_client: httpx.AsyncClient, gaia_id: str) -> Tuple[str, 
                     next_page_token = data[24][3].strip("=")
 
                 # Photos
-                elif category == "photos" :
-                    if not data[22]:
+                elif category == "photos":
+                    if len(data) <= 22 or not data[22]:
                         return "private", stats, [], []
                     photos_data = data[22][1]
                     if not photos_data:
@@ -353,7 +353,7 @@ def output(err: str, stats: Dict[str, int], reviews: List[MapsReview], photos: L
     #         elif costs_stats[cost] == list(costs_stats.values())[0]:
     #             style = "spring_green1"
     #         gb.rc.print(line, style=style)
-            
+
     #     avg_costs = round(sum([x*y for x,y in costs_stats.items()]) / total_costs)
     #     print(f"\n[+] Average costs : {costs_table[avg_costs]}")
     # else:
