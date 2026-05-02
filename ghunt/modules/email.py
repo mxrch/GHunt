@@ -120,6 +120,8 @@ async def hunt(as_client: httpx.AsyncClient, email_address: str, json_file: Path
         print("\n[-] No player profile found.")
 
     gb.rc.print("\n🗺️ Maps data", style="green4")
+    photos = None
+    reviews = None
 
     err, stats = await gmaps.get_reviews(as_client, target.personId)
     gmaps.output(err, stats, target.personId)
