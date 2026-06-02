@@ -160,14 +160,26 @@ class Person(Parser):
         if person_data.get("coverPhoto"):
             for cover_photo_data in person_data["coverPhoto"]:
                 person_cover_photo = PersonPhoto()
-                await person_cover_photo._scrape(as_client, cover_photo_data, "cover_photo")
-                container = cover_photo_data.get("metadata", {}).get("container", "unknown")
-                self.coverPhotos[container] = person_cover_photo
+                await person_cover_photo._scrape(
+                    as_client,
+                    cover_photo_data,
+                    "cover_photo"
+                )
+
+                metadata = cover_photo_data.get("metadata", {})
+                container = metadata.get("container")
+
+                if container:
+                    self.coverPhotos[container] = person_cover_photo
 
         if (apps_data := person_data.get("inAppReachability")):
             containers_names = set()
+
             for app_data in person_data["inAppReachability"]:
-                containers_names.add(app_data["metadata"]["container"])
+                container = app_data.get("metadata", {}).get("container")
+
+                if container:
+                    containers_names.add(container)
 
             for container_name in containers_names:
                 person_app_reachability = PersonInAppReachability()
