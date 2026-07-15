@@ -145,11 +145,12 @@ class Person(Parser):
                 person_profile._scrape(profile_data)
                 self.profileInfos[profile_data["metadata"]["container"]] = person_profile
 
-                if person_data.get("photo"):
-                    for photo_data in person_data["photo"]:
-                        person_photo = PersonPhoto()
-                        await person_photo._scrape(as_client, photo_data, "profile_photo")
-                        self.profilePhotos[profile_data["metadata"]["container"]] = person_photo
+        if person_data.get("photo"):
+            for photo_data in person_data["photo"]:
+                person_photo = PersonPhoto()
+                await person_photo._scrape(as_client, photo_data, "profile_photo")
+                container = photo_data.get("metadata", {}).get("container", "unknown")
+                self.profilePhotos[container] = person_photo
 
         if (source_ids := person_data.get("metadata", {}).get("identityInfo", {}).get("sourceIds")):
             for source_ids_data in source_ids:
