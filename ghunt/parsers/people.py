@@ -2,11 +2,10 @@ from typing import *
 from datetime import datetime
 
 from ghunt.errors import *
-from ghunt.helpers.utils import is_default_profile_pic, unicode_patch
+from ghunt.helpers.utils import unicode_patch
 from ghunt.objects.apis import Parser
 
 import httpx
-import imagehash
 
 
 class PersonGplusExtendedData(Parser):
@@ -51,14 +50,13 @@ class PersonPhoto(Parser):
     def __init__(self):
         self.url: str = ""
         self.isDefault: bool = False
-        self.flathash: str = None
 
     async def _scrape(self, as_client: httpx.AsyncClient, photo_data: Dict[str, any], photo_type: str):
         if photo_type == "profile_photo":
             self.url = photo_data.get("url")
+            if (isDefault := photo_data.get("isDefault")):
+                self.isDefault = isDefault
 
-            self.isDefault, self.flathash = await is_default_profile_pic(as_client, self.url)
-            
         elif photo_type == "cover_photo":
             self.url = '='.join(photo_data.get("imageUrl").split("=")[:-1])
             if (isDefault := photo_data.get("isDefault")):

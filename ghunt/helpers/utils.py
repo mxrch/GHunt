@@ -1,5 +1,4 @@
 from pathlib import Path
-from PIL import Image
 import hashlib
 from typing import *
 from time import time
@@ -11,8 +10,6 @@ import json
 from packaging.version import parse as parse_version
 
 import httpx
-import imagehash
-from io import BytesIO
 
 from ghunt import globals as gb
 from ghunt import version as current_version
@@ -56,23 +53,6 @@ def is_headers_syntax_good(headers: Dict[str, str]) -> bool:
         return True
     except:
         return False
-
-async def get_url_image_flathash(as_client: httpx.AsyncClient, image_url: str) -> str:
-    req = await as_client.get(image_url)
-    img = Image.open(BytesIO(req.content))
-    flathash = imagehash.average_hash(img)
-    return str(flathash)
-
-async def is_default_profile_pic(as_client: httpx.AsyncClient, image_url: str) -> Tuple[bool, str]:
-    """
-        Returns a boolean which indicates if the image_url
-        is a default profile picture, and the flathash of
-        the image.
-    """
-    flathash = await get_url_image_flathash(as_client, image_url)
-    if imagehash.hex_to_flathash(flathash, 8) - imagehash.hex_to_flathash("000018183c3c0000", 8) < 10 :
-        return True, str(flathash)
-    return False, str(flathash)
 
 def get_class_name(obj) -> str:
         return str(obj).strip("<>").split(" ")[0]
