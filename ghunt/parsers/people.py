@@ -131,43 +131,54 @@ class Person(Parser):
         self.personId = person_data.get("personId")
         if person_data.get("email"):
             for email_data in person_data["email"]:
-                container = email_data.get("metadata", {}).get("container", "unknown")
+                if not (container := email_data.get("metadata", {}).get("container")):
+                    continue
                 person_email = PersonEmail()
                 person_email._scrape(email_data)
                 self.emails[container] = person_email
 
         if person_data.get("name"):
             for name_data in person_data["name"]:
-                container = name_data.get("metadata", {}).get("container", "unknown")
+                if not (container := name_data.get("metadata", {}).get("container")):
+                    continue
                 person_name = PersonName()
                 person_name._scrape(name_data)
                 self.names[container] = person_name
 
         if person_data.get("readOnlyProfileInfo"):
             for profile_data in person_data["readOnlyProfileInfo"]:
-                container = profile_data.get("metadata", {}).get("container", "unknown")
+                if not (container := profile_data.get("metadata", {}).get("container")):
+                    continue
                 person_profile = PersonProfileInfo()
                 person_profile._scrape(profile_data)
                 self.profileInfos[container] = person_profile
 
-                if person_data.get("photo"):
-                    for photo_data in person_data["photo"]:
-                        person_photo = PersonPhoto()
-                        await person_photo._scrape(as_client, photo_data, "profile_photo")
-                        self.profilePhotos[container] = person_photo
+        # Each photo carries its own container in its metadata, independent of
+        # readOnlyProfileInfo's containers, so it's keyed separately rather than
+        # nested in the loop above (that previously mis-attributed every photo
+        # to whichever profile container happened to be current in the outer loop).
+        if person_data.get("photo"):
+            for photo_data in person_data["photo"]:
+                if not (container := photo_data.get("metadata", {}).get("container")):
+                    continue
+                person_photo = PersonPhoto()
+                await person_photo._scrape(as_client, photo_data, "profile_photo")
+                self.profilePhotos[container] = person_photo
 
         if (source_ids := person_data.get("metadata", {}).get("identityInfo", {}).get("sourceIds")):
             for source_ids_data in source_ids:
-                container = source_ids_data.get("container", "unknown")
+                if not (container := source_ids_data.get("container")):
+                    continue
                 person_source_ids = PersonSourceIds()
                 person_source_ids._scrape(source_ids_data)
                 self.sourceIds[container] = person_source_ids
 
         if person_data.get("coverPhoto"):
             for cover_photo_data in person_data["coverPhoto"]:
+                if not (container := cover_photo_data.get("metadata", {}).get("container")):
+                    continue
                 person_cover_photo = PersonPhoto()
                 await person_cover_photo._scrape(as_client, cover_photo_data, "cover_photo")
-                container = cover_photo_data.get("metadata", {}).get("container", "unknown")
                 self.coverPhotos[container] = person_cover_photo
 
         if (apps_data := person_data.get("inAppReachability")):
