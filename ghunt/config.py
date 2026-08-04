@@ -27,3 +27,6 @@ gmaps_radius     = 30 # in km. The radius distance to create groups of gmaps rev
 # Cookies
 default_consent_cookie = "YES+cb.20220118-08-p0.fr+FX+510"
 default_pref_cookie = "tz=Europe.Paris&f6=40000000&hl=en" # To set the lang settings to english
+
+# Page opened in Firefox when using the Companion login (listening mode)
+login_companion_url = "https://accounts.google.com"

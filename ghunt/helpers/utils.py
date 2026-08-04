@@ -1,6 +1,10 @@
 from pathlib import Path
 from PIL import Image
 import hashlib
+import os
+import shutil
+import subprocess
+import webbrowser
 from typing import *
 from time import time
 from datetime import datetime, timezone
@@ -18,6 +22,23 @@ from ghunt import globals as gb
 from ghunt import version as current_version
 from ghunt.lib.httpx import AsyncClient
 
+
+def open_browser(url: str) -> bool:
+    """
+        Opens the given URL in Firefox (the GHunt Companion extension is
+        only available on Firefox, so Chrome is never used).
+
+        Returns True if Firefox was launched, False otherwise.
+    """
+    browser = os.environ.get("GHUNT_BROWSER")
+    candidates = [browser] if browser else ["firefox", "firefox-esr"]
+    for name in candidates:
+        path = shutil.which(name)
+        if path:
+            subprocess.Popen([path, url])
+            return True
+    webbrowser.open(url)
+    return False
 
 def get_httpx_client() -> httpx.AsyncClient:
     """

@@ -171,7 +171,7 @@ def auth_dialog() -> Tuple[Dict[str, str], str] :
         Launch the dialog that asks the user
         how he want to generate its credentials.
     """
-    choices = ("You can facilitate configuring GHunt by using the GHunt Companion extension on Firefox, Chrome, Edge and Opera here :\n"
+    choices = ("You can facilitate configuring GHunt by using the GHunt Companion extension on Firefox here :\n"
                 "=> https://github.com/mxrch/ghunt_companion\n\n"
                 "[1] (Companion) Put GHunt on listening mode (currently not compatible with docker)\n"
                 "[2] (Companion) Paste base64-encoded authentication\n"
@@ -184,6 +184,10 @@ def auth_dialog() -> Tuple[Dict[str, str], str] :
     choice = input(choices)
     if choice in ["1", "2"]:
         if choice == "1":
+            if not within_docker():
+                print("[+] Opening Firefox to complete the login...")
+                if not open_browser(gb.config.login_companion_url):
+                    print("[!] Firefox not found, please open a browser manually.")
             received_data = listener.run()
         elif choice == "2":
             received_data = input("Paste the encoded credentials here => ")
