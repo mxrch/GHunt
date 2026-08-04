@@ -50,9 +50,10 @@ Choice =>
 
 Then, use GHunt Companion to complete the login.
 
-The extension is available on the following stores :\
-\
-[![Firefox](https://files.catbox.moe/5g2ld5.png)](https://addons.mozilla.org/en-US/firefox/addon/ghunt-companion/)&nbsp;&nbsp;&nbsp;[![Chrome](https://developer.chrome.com/static/docs/webstore/branding/image/206x58-chrome-web-bcb82d15b2486.png)](https://chrome.google.com/webstore/detail/ghunt-companion/dpdcofblfbmmnikcbmmiakkclocadjab)
+The extension is available on Firefox here :\
+[![Firefox](https://files.catbox.moe/5g2ld5.png)](https://addons.mozilla.org/en-US/firefox/addon/ghunt-companion/)
+
+> The GHunt Companion extension is no longer available on the Chrome Web Store, so the login flow is done with Firefox.
 
 ## Modules
 
