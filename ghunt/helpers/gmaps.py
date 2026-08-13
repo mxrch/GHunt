@@ -289,7 +289,7 @@ def calculate_probable_location(geolocator: Nominatim, reviews_and_photos: List[
                 try:
                     location = geolocator.reverse(f"{avg[0]}, {avg[1]}", timeout=10).raw["address"]
                     break
-                except:
+                except Exception:
                     pass
             location = sanitize_location(location)
             locs[nb]["avg"] = location

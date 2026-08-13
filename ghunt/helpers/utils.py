@@ -54,7 +54,7 @@ def is_headers_syntax_good(headers: Dict[str, str]) -> bool:
     try:
         httpx.Headers(headers)
         return True
-    except:
+    except Exception:
         return False
 
 async def get_url_image_flathash(as_client: httpx.AsyncClient, image_url: str) -> str:
