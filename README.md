@@ -37,6 +37,7 @@ Or, on Linux, with [OTinstaller](https://github.com/OSINTVerseHQ/OTinstaller), a
 
 ```bash
 $ pipx install otinstaller
+$ otinstaller init
 $ otinstaller install ghunt
 $ otinstaller run ghunt -- login
 $ otinstaller run ghunt -- e:<email_address>   # same as ghunt email <email_address>
