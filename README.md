@@ -33,6 +33,16 @@ $ pipx install ghunt
 ```
 It will automatically use venvs to avoid dependency conflicts with other projects.
 
+Or, on Linux, with [OTinstaller](https://github.com/OSINTVerseHQ/OTinstaller), a third-party tool manager that installs the PyPI release into its own virtualenv. It isn't maintained by the GHunt authors, so please report problems with it [on the OTinstaller tracker](https://github.com/OSINTVerseHQ/OTinstaller/issues).
+
+```bash
+$ pipx install otinstaller
+$ otinstaller init
+$ otinstaller install ghunt
+$ otinstaller run ghunt -- login
+$ otinstaller run ghunt -- e:<email_address>   # same as ghunt email <email_address>
+```
+
 # 💃 Usage
 
 ## Login
