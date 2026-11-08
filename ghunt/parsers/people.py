@@ -55,12 +55,23 @@ class PersonPhoto(Parser):
 
     async def _scrape(self, as_client: httpx.AsyncClient, photo_data: Dict[str, any], photo_type: str):
         if photo_type == "profile_photo":
-            self.url = photo_data.get("url")
+            url = photo_data.get("url")
+            if not url:
+                # No custom profile photo is attached to this account.
+                self.isDefault = True
+                return
 
+            self.url = url
             self.isDefault, self.flathash = await is_default_profile_pic(as_client, self.url)
             
         elif photo_type == "cover_photo":
-            self.url = '='.join(photo_data.get("imageUrl").split("=")[:-1])
+            image_url = photo_data.get("imageUrl")
+            if not image_url:
+                # No custom cover photo is attached to this account.
+                self.isDefault = True
+                return
+
+            self.url = '='.join(image_url.split("=")[:-1])
             if (isDefault := photo_data.get("isDefault")):
                 self.isDefault = isDefault
         else:
