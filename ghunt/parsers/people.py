@@ -175,8 +175,10 @@ class Person(Parser):
 
         if person_data.get("coverPhoto"):
             for cover_photo_data in person_data["coverPhoto"]:
-                if not (container := cover_photo_data.get("metadata", {}).get("container")):
-                    continue
+                # coverPhoto is a PROFILE-scoped field: when Google drops the
+                # container stamp, PROFILE is the only container it can belong
+                # to. Skipping it would silently remove the cover photo line.
+                container = (cover_photo_data.get("metadata") or {}).get("container") or "PROFILE"
                 person_cover_photo = PersonPhoto()
                 await person_cover_photo._scrape(as_client, cover_photo_data, "cover_photo")
                 self.coverPhotos[container] = person_cover_photo
