@@ -2,6 +2,15 @@
 
 <br>
 
+> **This is `ghunt-fixed`, a fork of [mxrch/GHunt](https://github.com/mxrch/GHunt), modified on 2026-07-31.**
+> The upstream PyPI release (2.3.4) crashes with `KeyError: 'container'` on some accounts because
+> Google's People API responses now sometimes omit `metadata.container`. This fork patches
+> `ghunt/parsers/people.py` to handle that missing key gracefully instead of crashing
+> (see [upstream PR #593](https://github.com/mxrch/GHunt/pull/593), not yet merged/released as of this fork).
+> Still licensed under AGPLv3, same as upstream — see [LICENSE.md](LICENSE.md).
+
+<br>
+
 #### 🌐 GHunt Online version : https://osint.industries
 #### 🐍 Now Python 3.13 compatible !
 
