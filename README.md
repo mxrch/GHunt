@@ -54,6 +54,11 @@ The extension is available on the following stores :\
 \
 [![Firefox](https://files.catbox.moe/5g2ld5.png)](https://addons.mozilla.org/en-US/firefox/addon/ghunt-companion/)&nbsp;&nbsp;&nbsp;[![Chrome](https://developer.chrome.com/static/docs/webstore/branding/image/206x58-chrome-web-bcb82d15b2486.png)](https://chrome.google.com/webstore/detail/ghunt-companion/dpdcofblfbmmnikcbmmiakkclocadjab)
 
+> [!TIP]
+> If the login fails with `Expected "Token" in the response of the Android Master Authentication` / `Error=BadAuthentication`, the extension is most likely resending an `oauth_token` that was already used (it's single-use and the extension caches it). Either:
+> - get a fresh one by hand: in a private window, sign in at https://accounts.google.com/EmbeddedSetup, copy the `oauth_token` cookie of `accounts.google.com` (F12 → Application → Cookies), then choose option 3 right away;
+> - or use the community-maintained Manifest V3 extension [ghunt-fixed Companion](https://github.com/Iskandeur/ghunt-fixed-companion), which always fetches a fresh token and works with this GHunt.
+
 ## Modules
 
 Then, profit :
